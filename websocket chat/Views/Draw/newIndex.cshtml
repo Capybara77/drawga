@@ -154,16 +154,23 @@
                 <div class="settings-container">
                     <div class="settings-save-container">
                         <button>Сохранить файл</button>
+                        <img src='/icons/save.svg' alt='save icon' class='settings-icon' />
                     </div>
                     <div class="settings-clear-all-container">
                         <button>Очистить полотно</button>
+                        <img src='/icons/trash.svg' alt='trash bin icon' class='settings-icon' />
                     </div>
                     <div class="settings-theme-container">
-                        <h3>Выбрать тему</h1>
-                        <select class="">
-                            <option>Светлая тема</option>
-                            <option>Тёмная тема</option>
-                        </select>
+                        <p>Выбрать тему</p>
+                        <div>
+                            <input type='radio' name='theme' id='light-theme' checked />
+                            <label for="light-theme">Светлая тема</label>
+                        </div>
+
+                        <div>
+                            <input type='radio' name='theme' id='dark-theme' />
+                            <label for="dark-theme">Тёмная тема</label>
+                        </div>
                     </div>                    
                 </div>
             </div>
