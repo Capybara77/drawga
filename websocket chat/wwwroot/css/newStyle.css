@@ -10,11 +10,10 @@
     --clr-border: rgb(214, 214, 214);
     --clr-background-transparent: rgba(255, 255, 255, 0.8);
 
-    /* --clr-background-icons: rgb(255, 255, 255); */
-
     --clr-text: rgb(51, 51, 51);
 
     --clr-trailer: rgb(0, 0, 0);
+    --clr-canvas: rgb(255, 255, 255);
 }
 
 * {
@@ -40,7 +39,8 @@ button {
 }
 
 .main-container,
-.main-container button {
+.main-container button,
+.main-container input {
     position: relative;
     overflow: hidden;
 
@@ -53,6 +53,7 @@ button {
 
 #canvas {
     overflow: hidden;
+    background-color: var(--clr-canvas);
 }
 
 /* ======================== TRAILER ======================== */
@@ -157,6 +158,7 @@ button {
 .options-color-container {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
 .color-container {
@@ -184,7 +186,7 @@ button {
 }
 
 .color-picker-input {
-    border: 1px solid var(--clr-border);
+    outline: 2px solid var(--clr-border);
     border-radius: 4px;
 
     display: flex;
@@ -204,12 +206,11 @@ button {
     position: absolute;
     left: 30px;
     top: -2px;
-    border: 2px solid var(--clr-primary);
-    background-color: var(--clr-white);
+    border: 2px solid var(--clr-border);
+    background-color: var(--clr-background-transparent);
     z-index: 10000;
 
     padding: 5px;
-    border: 2px solid var(--clr-gray-light);
     border-radius: 4px;
 
     display: grid;
@@ -439,7 +440,9 @@ input[type='range']::-webkit-slider-runnable-track {
     --clr-background-transparent: rgba(49, 49, 49, 0.8);
 
     --clr-text: rgb(233, 233, 233);
-    --clr-trailer: rgb(255, 255, 255);
+    --clr-trailer: #ccc;
+
+    --clr-canvas: #333;
 }
 
 :root:has(#dark-theme:checked) {
@@ -453,7 +456,9 @@ input[type='range']::-webkit-slider-runnable-track {
     --clr-background-transparent: rgba(49, 49, 49, 0.8);
 
     --clr-text: rgb(233, 233, 233);
-    --clr-trailer: rgb(255, 255, 255);
+    --clr-trailer: #ccc;
+
+    --clr-canvas: #333;
 }
 
 .settings-show-btn {

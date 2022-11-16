@@ -747,57 +747,7 @@ saveBtn.addEventListener('click', () => {
     a.click();
 });
 
-// ============================ ВЫБРАТЬ ЦВЕТ ГРАНИЦЫ
-
-const strokeColorPickerButton = document.getElementById(
-    'stroke-color-picker'
-) as HTMLButtonElement;
-const strokeColorListContainer = document.getElementById(
-    'stroke-color-list'
-) as HTMLDivElement;
-const strokeColorsItemList = document.querySelectorAll('#stroke-color-item');
-const strokeColorPickerInput = document.getElementById(
-    'stroke-color-picker-input'
-) as HTMLInputElement;
-
-strokeColorPickerButton.addEventListener('click', (event) => {
-    event.stopPropagation();
-    const visible = strokeColorListContainer.style.display === 'grid';
-    if (visible) {
-        strokeColorListContainer.style.display = 'none';
-    } else {
-        strokeColorListContainer.style.display = 'grid';
-    }
-});
-
-for (let i = 0; i < strokeColorsItemList.length; i++) {
-    const element = strokeColorsItemList[i];
-
-    element.addEventListener('click', (e) => {
-        const element = e.target as HTMLDivElement;
-        if (element === null) return;
-        const clickedColor = element.style.backgroundColor;
-        strokeColorPickerButton.style.backgroundColor = clickedColor;
-        currentBorderColor = clickedColor;
-        // changeColor(clickedColor, ctx, trailer);
-        strokeColorListContainer.style.display = 'none';
-
-        console.log(currentBorderColor);
-    });
-}
-
-strokeColorPickerInput.addEventListener('input', (event) => {
-    const element = event.target as HTMLInputElement;
-    if (element === null) return;
-    const newColor = '#' + element.value;
-    if (newColor.length > 1) {
-        strokeColorPickerButton.style.backgroundColor = newColor;
-        currentBorderColor = newColor;
-        // changeColor(newColor, ctx, trailer);
-    }
-});
-
-// ============================ ВЫБРАТЬ ЦВЕТ ЗАРИСОВКИ
+//  ============================ ЦВЕТА КОНСТАНТЫ
 
 const colorPickerButton = document.querySelector(
     '.color-picker'
@@ -810,7 +760,22 @@ const colorPickerInput = document.getElementById(
     'color-picker-input'
 ) as HTMLInputElement;
 
+const strokeColorPickerButton = document.getElementById(
+    'stroke-color-picker'
+) as HTMLButtonElement;
+const strokeColorListContainer = document.getElementById(
+    'stroke-color-list'
+) as HTMLDivElement;
+const strokeColorsItemList = document.querySelectorAll('#stroke-color-item');
+const strokeColorPickerInput = document.getElementById(
+    'stroke-color-picker-input'
+) as HTMLInputElement;
+
+// ============================ ВЫБРАТЬ ЦВЕТ ЗАРИСОВКИ
+
 colorPickerButton.addEventListener('click', (event) => {
+    strokeColorListContainer.style.display = 'none';
+
     event.stopPropagation();
     const visible = colorListContainer.style.display === 'grid';
     if (visible) {
@@ -843,7 +808,67 @@ colorPickerInput.addEventListener('input', (event) => {
     }
 });
 
+document.documentElement.addEventListener('click', (event) => {
+    if (
+        colorListContainer.style.display === 'grid' &&
+        event.target !== colorListContainer
+    ) {
+        colorListContainer.style.display = 'none';
+    }
+});
+
+// ============================ ВЫБРАТЬ ЦВЕТ ГРАНИЦЫ
+
+strokeColorPickerButton.addEventListener('click', (event) => {
+    colorListContainer.style.display = 'none';
+
+    event.stopPropagation();
+    const visible = strokeColorListContainer.style.display === 'grid';
+    if (visible) {
+        strokeColorListContainer.style.display = 'none';
+    } else {
+        strokeColorListContainer.style.display = 'grid';
+    }
+});
+
+for (let i = 0; i < strokeColorsItemList.length; i++) {
+    const element = strokeColorsItemList[i];
+
+    element.addEventListener('click', (e) => {
+        const element = e.target as HTMLDivElement;
+        if (element === null) return;
+        const clickedColor = element.style.backgroundColor;
+        strokeColorPickerButton.style.backgroundColor = clickedColor;
+        currentBorderColor = clickedColor;
+        // changeColor(clickedColor, ctx, trailer);
+        strokeColorListContainer.style.display = 'none';
+
+        // console.log(currentBorderColor);
+    });
+}
+
+strokeColorPickerInput.addEventListener('input', (event) => {
+    const element = event.target as HTMLInputElement;
+    if (element === null) return;
+    const newColor = '#' + element.value;
+    if (newColor.length > 1) {
+        strokeColorPickerButton.style.backgroundColor = newColor;
+        currentBorderColor = newColor;
+        // changeColor(newColor, ctx, trailer);
+    }
+});
+
+document.documentElement.addEventListener('click', (event) => {
+    if (
+        strokeColorListContainer.style.display === 'grid' &&
+        event.target !== strokeColorListContainer
+    ) {
+        strokeColorListContainer.style.display = 'none';
+    }
+});
+
 //  ===================================== ТОЛЩИНА
+
 const widthBtns = document.querySelectorAll('.width-btn');
 
 widthBtns.forEach((optionButton) => {

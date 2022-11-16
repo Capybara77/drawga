@@ -1,19 +1,19 @@
-import { RoughCanvas } from 'roughjs/bin/canvas'
+import { RoughCanvas } from 'roughjs/bin/canvas';
 import {
     BaseObject,
     EllipseObject,
     RectangleObject,
     LineObject,
     CurveObject,
-} from './types'
+} from './types';
 
 export function getTypedDrawObject(
     str: string,
     roughCanvas: RoughCanvas,
     ctx: CanvasRenderingContext2D
 ): BaseObject | null {
-    let json: BaseObject = JSON.parse(str)
-    let type: string = json.typeName
+    let json: BaseObject = JSON.parse(str);
+    let type: string = json.typeName;
 
     switch (type) {
         case 'rectangle':
@@ -27,7 +27,7 @@ export function getTypedDrawObject(
                 strokeWidth,
                 userId,
                 zoom,
-            } = json as RectangleObject
+            } = json as RectangleObject;
 
             let r = new RectangleObject(
                 color,
@@ -39,11 +39,11 @@ export function getTypedDrawObject(
                 stroke,
                 strokeWidth,
                 userId
-            )
+            );
 
-            r.zoom = zoom
+            r.zoom = zoom;
 
-            return r
+            return r;
         case 'ellipse': {
             let {
                 color,
@@ -56,7 +56,7 @@ export function getTypedDrawObject(
                 isCircle,
                 userId,
                 zoom,
-            } = json as EllipseObject
+            } = json as EllipseObject;
 
             let e = new EllipseObject(
                 color,
@@ -69,15 +69,15 @@ export function getTypedDrawObject(
                 strokeWidth,
                 isCircle,
                 userId
-            )
+            );
 
-            e.zoom = zoom
+            e.zoom = zoom;
 
-            return e
+            return e;
         }
         case 'line': {
             let { color, width, startPoint, endPoint, userId, zoom } =
-                json as LineObject
+                json as LineObject;
 
             let l = new LineObject(
                 color,
@@ -86,22 +86,23 @@ export function getTypedDrawObject(
                 endPoint,
                 roughCanvas,
                 userId
-            )
+            );
 
-            l.zoom = zoom
+            l.zoom = zoom;
 
-            return l
+            return l;
         }
         case 'curve': {
-            let { pointsList, color, width, userId, zoom } = json as CurveObject
+            let { pointsList, color, width, userId, zoom } =
+                json as CurveObject;
 
-            let c = new CurveObject(pointsList, color, width, ctx, userId)
-            c.zoom = zoom
+            let c = new CurveObject(pointsList, color, width, ctx, userId);
+            c.zoom = zoom;
 
-            return c
+            return c;
         }
         default:
-            return null
+            return null;
     }
 }
 
@@ -112,11 +113,11 @@ export function animateCursor(
 ) {
     const keyFrames = {
         transform: `translate(${trailerX}px, ${trailerY}px)`,
-    }
+    };
 
     trailer.animate(keyFrames, {
         fill: 'forwards',
-    })
+    });
 }
 
 export function changeColor(
@@ -124,83 +125,83 @@ export function changeColor(
     ctx: CanvasRenderingContext2D,
     trailer: HTMLDivElement
 ) {
-    ctx.fillStyle = color
+    ctx.fillStyle = color;
     // ctx.strokeStyle = color;
-    trailer.style.backgroundColor = color
+    trailer.style.backgroundColor = color;
 
     const list = document.getElementsByClassName(
         'trailer'
-    ) as HTMLCollectionOf<HTMLElement>
+    ) as HTMLCollectionOf<HTMLElement>;
 
     for (let i = 0; i < list.length; i++) {
-        const item = list[i]
-        item.style.backgroundColor = color
+        const item = list[i];
+        item.style.backgroundColor = color;
     }
 }
 
 export function average(a: number, b: number) {
-    return (a + b) / 2
+    return (a + b) / 2;
 }
 
 export function getSvgPathFromStroke(points: number[][], closed = true) {
-    const len = points.length
+    const len = points.length;
 
     if (len < 4) {
-        return ``
+        return ``;
     }
 
-    let a = points[0]
-    let b = points[1]
+    let a = points[0];
+    let b = points[1];
 
-    const c = points[2]
+    const c = points[2];
 
     let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
         2
     )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
         b[1],
         c[1]
-    ).toFixed(2)} T`
+    ).toFixed(2)} T`;
 
     for (let i = 2, max = len - 1; i < max; i++) {
-        a = points[i]
-        b = points[i + 1]
+        a = points[i];
+        b = points[i + 1];
         result += `${average(a[0], b[0]).toFixed(2)},${average(
             a[1],
             b[1]
-        ).toFixed(2)} `
+        ).toFixed(2)} `;
     }
 
     if (closed) {
-        result += 'Z'
+        result += 'Z';
     }
 
-    return result
+    return result;
 }
 
 export function hexToRgbA(hex: string, alpha = '1') {
-    let c: string[]
-    let cc: number
+    let c: string[];
+    let cc: number;
     if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-        c = hex.substring(1).split('')
+        c = hex.substring(1).split('');
         if (c.length == 3) {
-            c = [c[0], c[0], c[1], c[1], c[2], c[2]]
+            c = [c[0], c[0], c[1], c[1], c[2], c[2]];
         }
-        cc = +('0x' + c.join(''))
+        cc = +('0x' + c.join(''));
         return (
             'rgba(' +
             [(cc >> 16) & 255, (cc >> 8) & 255, cc & 255].join(',') +
             ',' +
             alpha +
             ')'
-        )
+        );
     }
-    throw new Error('Bad Hex')
+    throw new Error('Bad Hex');
 }
 
 export function rgbaToRgba(color: string, alpha: number) {
     let colorArr = color
         .slice(color.indexOf('(') + 1, color.indexOf(')'))
-        .split(', ')
+        .split(', ');
 
     return (
         'rgba(' +
@@ -212,19 +213,19 @@ export function rgbaToRgba(color: string, alpha: number) {
         ', ' +
         alpha +
         ')'
-    )
+    );
 }
 
 export function makeid(length: number) {
-    let result = ''
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    const charactersLength = characters.length
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
         result += characters.charAt(
             Math.floor(Math.random() * charactersLength)
-        )
+        );
     }
-    return result
+    return result;
 }
 
 export function cleanCanvas(ctx: CanvasRenderingContext2D) {
@@ -233,7 +234,7 @@ export function cleanCanvas(ctx: CanvasRenderingContext2D) {
         0,
         document.documentElement.clientWidth,
         document.documentElement.clientHeight
-    )
+    );
 }
 
 export function reDraw(
@@ -243,10 +244,10 @@ export function reDraw(
     screenWidth: number,
     screenHeight: number
 ) {
-    let counter: number = 0
+    let counter: number = 0;
 
     for (let index = 0; index < objects.length; index++) {
-        const element = objects[index]
+        const element = objects[index];
 
         if (
             element.isOverlay(
@@ -256,10 +257,10 @@ export function reDraw(
                 screenHeight
             )
         ) {
-            element.draw(offsetXCustom, offsetYCustom)
-            counter++
+            element.draw(offsetXCustom, offsetYCustom);
+            counter++;
         } else {
         }
     }
-    console.log(objects.length + "  " + counter);
+    // console.log(objects.length + "  " + counter);
 }

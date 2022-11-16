@@ -1,35 +1,35 @@
-import getStroke from 'perfect-freehand'
-import { RoughCanvas } from 'roughjs/bin/canvas'
-import { Drawable } from 'roughjs/bin/core'
-import { getSvgPathFromStroke, hexToRgbA } from './utils'
+import getStroke from 'perfect-freehand';
+import { RoughCanvas } from 'roughjs/bin/canvas';
+import { Drawable } from 'roughjs/bin/core';
+import { getSvgPathFromStroke, hexToRgbA } from './utils';
 
 export abstract class BaseObject {
-    color
-    width
-    userId
-    typeName: string = ''
-    tempObj: boolean = false
-    zoom: number = 1
+    color;
+    width;
+    userId;
+    typeName: string = '';
+    tempObj: boolean = false;
+    zoom: number = 1;
 
     constructor(color: string, width: number, userId: string) {
-        this.color = color
-        this.width = width
-        this.userId = userId
+        this.color = color;
+        this.width = width;
+        this.userId = userId;
     }
 
     draw(offsetX: number, offsetY: number) {
-        console.log('offset:', offsetX, offsetY)
+        console.log('offset:', offsetX, offsetY);
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true
+        return true;
     }
 }
 
 export class CurveObject extends BaseObject {
-    pointsList
-    ctx
-    typeName: string = 'curve'
+    pointsList;
+    ctx;
+    typeName: string = 'curve';
     constructor(
         pointsList: number[][],
         color: string,
@@ -37,69 +37,69 @@ export class CurveObject extends BaseObject {
         ctx: CanvasRenderingContext2D,
         userId: string
     ) {
-        super(color, width, userId)
-        this.pointsList = pointsList
-        this.ctx = ctx
-        this.userId = userId
+        super(color, width, userId);
+        this.pointsList = pointsList;
+        this.ctx = ctx;
+        this.userId = userId;
     }
 
     draw(offsetX: number, offsetY: number): void {
-        let newLines: number[][] = []
+        let newLines: number[][] = [];
 
         for (let index = 0; index < this.pointsList.length; index++) {
-            let element = this.pointsList[index]
+            let element = this.pointsList[index];
             newLines.push([
                 element[0] * this.zoom + offsetX,
                 element[1] * this.zoom + offsetY,
-            ])
+            ]);
         }
 
         const outlinePoints = getStroke(newLines, {
             size: this.width * this.zoom,
             thinning: 0.7,
-        })
+        });
 
-        const pathData = getSvgPathFromStroke(outlinePoints)
+        const pathData = getSvgPathFromStroke(outlinePoints);
 
-        const myPath = new Path2D(pathData)
+        const myPath = new Path2D(pathData);
 
-        let tempColor = this.ctx.fillStyle
+        let tempColor = this.ctx.fillStyle;
 
         this.ctx.fillStyle = this.color.startsWith('#')
             ? hexToRgbA(this.color)
-            : this.color
-        this.ctx.fill(myPath)
-        this.ctx.fillStyle = tempColor
+            : this.color;
+        this.ctx.fill(myPath);
+        this.ctx.fillStyle = tempColor;
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        x *= -1
-        y *= -1
+        x *= -1;
+        y *= -1;
 
-        if (this.pointsList.length === 0) return false
+        if (this.pointsList.length === 0) return false;
 
-        let Xmin = this.pointsList[0][0]
-        let Xmax = this.pointsList[0][0]
-        let Ymin = this.pointsList[0][1]
-        let Ymax = this.pointsList[0][1]
+        let Xmin = this.pointsList[0][0];
+        let Xmax = this.pointsList[0][0];
+        let Ymin = this.pointsList[0][1];
+        let Ymax = this.pointsList[0][1];
 
         for (let index = 0; index < this.pointsList.length; index++) {
-            const element = this.pointsList[index]
-            Xmin = Xmin > element[0] ? element[0] : Xmin
-            Xmax = Xmax < element[0] ? element[0] : Xmax
-            Ymin = Ymin > element[1] ? element[1] : Ymin
-            Ymax = Ymax < element[1] ? element[1] : Ymax
+            const element = this.pointsList[index];
+            Xmin = Xmin > element[0] ? element[0] : Xmin;
+            Xmax = Xmax < element[0] ? element[0] : Xmax;
+            Ymin = Ymin > element[1] ? element[1] : Ymin;
+            Ymax = Ymax < element[1] ? element[1] : Ymax;
         }
 
-        Xmin *= this.zoom
-        Ymin *= this.zoom
-        Xmax *= this.zoom
-        Ymax *= this.zoom
+        Xmin *= this.zoom;
+        Ymin *= this.zoom;
+        Xmax *= this.zoom;
+        Ymax *= this.zoom;
 
-        let screenX = x
-        let screenY = y
-        let screenX1 = x + offsetX
-        let screenY1 = y + offsetY
+        let screenX = x;
+        let screenY = y;
+        let screenX1 = x + offsetX;
+        let screenY1 = y + offsetY;
 
         //console.log("xObj = " + Xmin + " yObj = " + Ymin + " x1Obj = " + Xmax + " y1Obj = " + Ymax);
         //console.log("xS = " + screenX + " yS = " + screenY + " x1S = " + screenX1 + " y1S = " + screenY1);
@@ -122,18 +122,18 @@ export class CurveObject extends BaseObject {
                 ((Ymin >= screenY && Ymin <= screenY1) ||
                     (Ymax >= screenY && Ymax <= screenY1)))
         ) {
-            return true
+            return true;
         }
 
-        return false
+        return false;
     }
 }
 
 export class LineObject extends BaseObject {
-    startPoint
-    endPoint
-    roughCanvas
-    typeName: string = 'line'
+    startPoint;
+    endPoint;
+    roughCanvas;
+    typeName: string = 'line';
 
     constructor(
         color: string,
@@ -143,11 +143,11 @@ export class LineObject extends BaseObject {
         roughCanvas: RoughCanvas,
         userId: string
     ) {
-        super(color, width, userId)
-        this.startPoint = startPoint
-        this.endPoint = endPoint
-        this.roughCanvas = roughCanvas
-        this.userId = userId
+        super(color, width, userId);
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        this.roughCanvas = roughCanvas;
+        this.userId = userId;
     }
 
     draw(offsetX: number, offsetY: number): void {
@@ -161,23 +161,23 @@ export class LineObject extends BaseObject {
                 stroke: this.color,
                 seed: 1,
             }
-        )
+        );
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true
+        return true;
     }
 }
 
 export class RectangleObject extends BaseObject {
-    startPoint
-    endPoint
-    roughCanvas
-    fillStyle
-    typeName: string = 'rectangle'
-    stroke
-    strokeWidth
-    drawableObj: Drawable | null = null
+    startPoint;
+    endPoint;
+    roughCanvas;
+    fillStyle;
+    typeName: string = 'rectangle';
+    stroke;
+    strokeWidth;
+    drawableObj: Drawable | null = null;
 
     constructor(
         color: string,
@@ -190,19 +190,20 @@ export class RectangleObject extends BaseObject {
         strokeWidth: number,
         userId: string
     ) {
-        super(color, width, userId)
-        this.startPoint = startPoint
-        this.endPoint = endPoint
-        this.roughCanvas = roughCanvas
-        this.fillStyle = fillStyle
-        this.stroke = stroke
-        this.strokeWidth = strokeWidth
-        this.userId = userId
+        super(color, width, userId);
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        this.roughCanvas = roughCanvas;
+        this.fillStyle = fillStyle;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
+        this.userId = userId;
     }
 
     draw(offsetX: number, offsetY: number): void {
-        let width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom
-        let height: number = (this.endPoint[1] - this.startPoint[1]) * this.zoom
+        let width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
+        let height: number =
+            (this.endPoint[1] - this.startPoint[1]) * this.zoom;
 
         this.roughCanvas.rectangle(
             this.startPoint[0] * this.zoom + offsetX,
@@ -216,24 +217,24 @@ export class RectangleObject extends BaseObject {
                 seed: 1,
                 stroke: this.stroke,
             }
-        )
+        );
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true
+        return true;
     }
 }
 
 export class EllipseObject extends BaseObject {
-    startPoint
-    endPoint
-    roughCanvas
-    fillStyle
-    typeName: string = 'ellipse'
-    stroke
-    strokeWidth
-    drawableObj: Drawable | null = null
-    isCircle
+    startPoint;
+    endPoint;
+    roughCanvas;
+    fillStyle;
+    typeName: string = 'ellipse';
+    stroke;
+    strokeWidth;
+    drawableObj: Drawable | null = null;
+    isCircle;
 
     constructor(
         color: string,
@@ -247,20 +248,21 @@ export class EllipseObject extends BaseObject {
         isCircle: boolean,
         userId: string
     ) {
-        super(color, width, userId)
-        this.startPoint = startPoint
-        this.endPoint = endPoint
-        this.roughCanvas = roughCanvas
-        this.fillStyle = fillStyle
-        this.stroke = stroke
-        this.strokeWidth = strokeWidth
-        this.isCircle = isCircle
-        this.userId = this.userId
+        super(color, width, userId);
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        this.roughCanvas = roughCanvas;
+        this.fillStyle = fillStyle;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
+        this.isCircle = isCircle;
+        this.userId = this.userId;
     }
 
     draw(offsetX: number, offsetY: number): void {
-        let width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom
-        let height: number = (this.endPoint[1] - this.startPoint[1]) * this.zoom
+        let width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
+        let height: number =
+            (this.endPoint[1] - this.startPoint[1]) * this.zoom;
 
         this.roughCanvas.ellipse(
             this.startPoint[0] * this.zoom + offsetX,
@@ -274,10 +276,10 @@ export class EllipseObject extends BaseObject {
                 seed: 1,
                 stroke: this.stroke,
             }
-        )
+        );
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true
+        return true;
     }
 }
