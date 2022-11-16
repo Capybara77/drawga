@@ -475,11 +475,16 @@ window.addEventListener('mousemove', (e) => {
     const cursorYCurrent = e.clientY
 
     switch (currentShape) {
-        case 'eraster': {
-            break
+        case 'eraser': {
+            allObjects = allObjects.filter(item => {
+                return !item.isOverlay(e.clientX * -1, e.clientY * -1,
+                    1, 1);
+            });
+            fullReDraw();
+            break;
         }
         case 'pointer':
-            break
+            break;
 
         case 'pen':
             if (prevX == null || prevY == null || !isDraw) {
