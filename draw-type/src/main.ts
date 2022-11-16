@@ -516,11 +516,10 @@ window.addEventListener('mousemove', (e) => {
         case 'eraser': {
             allObjects = allObjects.filter((item) => {
                 if (item.typeName === "curve"){
-                    if ((item as CurveObject).isCloseToPoints(e.clientX, e.clientY, 10)){
+                    if ((item as CurveObject).isCloseToPoints(e.clientX - offsetXCustom, e.clientY - offsetYCustom, 10)){
                         return false;
                     }
                 }
-
                 return true;
             });
             fullReDraw();
