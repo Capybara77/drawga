@@ -355,3 +355,44 @@ input[type='range']::-webkit-slider-runnable-track {
 /* test start */
 
 /* test end */
+
+/* ======================== SETTINGS ======================== */
+
+.settings-wrapper {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 1.125rem;
+}
+
+.settings-show-btn {
+    right: 10px;
+}
+
+.settings-container {
+    border: 3px solid var(--clr-border-gray);
+    background-color: var(--clr-background-transparent);
+}
+
+.settings-container button {
+    width: 100%;
+    background-color: inherit;
+    outline: none;
+    border: none;
+    font-size: 1.125rem;
+}
+
+.settings-theme-container {
+}
+
+.settings-theme-container > select {
+    width: 100%;
+    background-color: inherit;
+    outline: none;
+    border: none;
+    font-size: 1.125rem;
+}
