@@ -11,9 +11,7 @@ draw-type/node_modules/
 *lerna-debug.log*
 *.local
 draw-type/dist
-draw-type/
 draw-type/dist-ssr
-draw-type/
 
 *.vscode/*
 *.suo
