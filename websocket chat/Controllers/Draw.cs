@@ -29,7 +29,6 @@ namespace websocket_chat.Controllers
 
         private async void EventForClient(WebSocket socket, int id)
         {
-            Console.WriteLine($"Disconnect {Sockets[id].Count}");
             await SendData(socket, Encoding.UTF8.GetBytes("disconnect:::"), id);
         }
 
@@ -105,7 +104,7 @@ namespace websocket_chat.Controllers
             {
                 try
                 {
-                    byte[] bufferSize = new byte[4];
+                    byte[] bufferSize = new byte[32];
                     await socket.ReceiveAsync(bufferSize, CancellationToken.None);
 
                     bool successParse = int.TryParse(Encoding.UTF8.GetString(bufferSize), out int size);

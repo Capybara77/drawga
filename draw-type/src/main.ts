@@ -342,7 +342,7 @@ window.addEventListener('mouseup', (e) => {
             let curve = new CurveObject(
                 currentLine,
                 ctx.fillStyle as string,
-                +ctx.lineWidth / currentZoom,
+                +ctx.lineWidth,
                 ctx,
                 myId
             );
@@ -357,7 +357,7 @@ window.addEventListener('mouseup', (e) => {
 
             let line = new LineObject(
                 ctx.fillStyle as string,
-                +ctx.lineWidth / currentZoom,
+                +ctx.lineWidth,
                 [
                     (cursorXStart - offsetXCustom) / currentZoom,
                     (cursorYStart - offsetYCustom) / currentZoom,
@@ -514,7 +514,7 @@ window.addEventListener('mousemove', (e) => {
 
             let line = new LineObject(
                 ctx.fillStyle as string,
-                +ctx.lineWidth / currentZoom,
+                +ctx.lineWidth,
                 [
                     (cursorXStart - offsetXCustom) / currentZoom,
                     (cursorYStart - offsetYCustom) / currentZoom,
