@@ -202,8 +202,8 @@ export class RectangleObject extends BaseObject {
   }
 
   draw(offsetX: number, offsetY: number): void {
-    let width: number = this.endPoint[0] - this.startPoint[0];
-    let height: number = this.endPoint[1] - this.startPoint[1];
+    let width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
+    let height: number = ( this.endPoint[1] - this.startPoint[1]) *this.zoom;
 
     this.roughCanvas.rectangle(
       this.startPoint[0] * this.zoom + offsetX,
@@ -260,8 +260,8 @@ export class EllipseObject extends BaseObject {
   }
 
   draw(offsetX: number, offsetY: number): void {
-    let width: number = this.endPoint[0] - this.startPoint[0];
-    let height: number = this.endPoint[1] - this.startPoint[1];
+    let width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
+    let height: number = (this.endPoint[1] - this.startPoint[1]) * this.zoom;
 
     this.roughCanvas.ellipse(
       this.startPoint[0] * this.zoom + offsetX,

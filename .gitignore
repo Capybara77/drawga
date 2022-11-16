@@ -24,5 +24,3 @@ websocket chat/.config
 websocket chat/bin
 websocket chat/obj
 websocket chat/saves
-websocket chat/websocket chat.csproj
-websocket chat/websocket chat.csproj.user
