@@ -369,6 +369,7 @@ window.addEventListener('mouseup', (e) => {
                 roughCanvas,
                 myId
             );
+
             line.zoom = currentZoom;
             allObjects.push(line);
             fullReDraw();
@@ -380,14 +381,16 @@ window.addEventListener('mouseup', (e) => {
             let rect = new RectangleObject(
                 ctx.fillStyle as string,
                 +ctx.lineWidth,
-                [cursorXStart - offsetXCustom, cursorYStart - offsetYCustom],
-                [e.clientX - offsetXCustom, e.clientY - offsetYCustom],
+                [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
+                [(e.clientX - offsetXCustom) / currentZoom, (e.clientY - offsetYCustom) / currentZoom],
                 currentFillStyle,
                 roughCanvas,
                 currentBorderColor as string,
                 ctx.lineWidth,
                 myId
             );
+
+            rect.zoom = currentZoom;
             rect.draw(offsetXCustom, offsetYCustom);
             allObjects.push(rect);
             break;
@@ -399,8 +402,8 @@ window.addEventListener('mouseup', (e) => {
             let ellipse = new EllipseObject(
                 ctx.fillStyle as string,
                 +ctx.lineWidth,
-                [cursorXStart - offsetXCustom, cursorYStart - offsetYCustom],
-                [e.clientX - offsetXCustom, e.clientY - offsetYCustom],
+                [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
+                [(e.clientX - offsetXCustom) / currentZoom, (e.clientY - offsetYCustom) / currentZoom],
                 currentFillStyle,
                 roughCanvas,
                 currentBorderColor,
@@ -409,6 +412,7 @@ window.addEventListener('mouseup', (e) => {
                 myId
             );
 
+            ellipse.zoom = currentZoom;
             ellipse.draw(offsetXCustom, offsetYCustom);
             allObjects.push(ellipse);
             break;
@@ -532,10 +536,10 @@ window.addEventListener('mousemove', (e) => {
             let ellipse = new EllipseObject(
                 ctx.fillStyle as string,
                 +ctx.lineWidth,
-                [cursorXStart - offsetXCustom, cursorYStart - offsetYCustom],
+                [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
                 [
-                    cursorXCurrent - offsetXCustom,
-                    cursorYCurrent - offsetYCustom,
+                    (cursorXCurrent - offsetXCustom) / currentZoom,
+                    (cursorYCurrent - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -545,6 +549,7 @@ window.addEventListener('mousemove', (e) => {
                 myId
             );
 
+            ellipse.zoom = currentZoom;
             ellipse.draw(offsetXCustom, offsetYCustom);
 
             break;
@@ -554,10 +559,10 @@ window.addEventListener('mousemove', (e) => {
             let rect = new RectangleObject(
                 ctx.fillStyle as string,
                 +ctx.lineWidth,
-                [cursorXStart - offsetXCustom, cursorYStart - offsetYCustom],
+                [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
                 [
-                    cursorXCurrent - offsetXCustom,
-                    cursorYCurrent - offsetYCustom,
+                    (cursorXCurrent - offsetXCustom) / currentZoom,
+                    (cursorYCurrent - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -566,6 +571,7 @@ window.addEventListener('mousemove', (e) => {
                 myId
             );
 
+            rect.zoom = currentZoom;
             rect.draw(offsetXCustom, offsetYCustom);
             break;
 

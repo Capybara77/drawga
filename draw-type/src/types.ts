@@ -266,8 +266,8 @@ export class EllipseObject extends BaseObject {
     this.roughCanvas.ellipse(
       this.startPoint[0] * this.zoom + offsetX,
       this.startPoint[1] * this.zoom + offsetY,
-      width * 2 * this.zoom,
-      height * 2 * this.zoom,
+      width * 2,
+      height * 2,
       {
         strokeWidth: this.width * this.zoom,
         fill: this.color,
