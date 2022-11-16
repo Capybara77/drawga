@@ -148,10 +148,10 @@
                 <button class="zoom-btn" id="zoom-increase"><span>+</span></button>
             </div>
              <div class="settings-wrapper">
-                <button class="settings-show-btn">
+                <button class="settings-show-btn" id='settings-show-btn'>
                     <img src='/icons/settings.svg' alt='settings icon' width="30" height="30" /> 
                 </button>
-                <div class="settings-container">
+                <div class="settings-container" style="display: none;">
                     <div class="settings-save-container">
                         <button>Сохранить файл</button>
                         <img src='/icons/save.svg' alt='save icon' class='settings-icon' />
@@ -163,13 +163,13 @@
                     <div class="settings-theme-container">
                         <p>Выбрать тему</p>
                         <div>
-                            <input type='radio' name='theme' id='light-theme' checked />
-                            <label for="light-theme">Светлая тема</label>
+                            <input type='radio' name='theme' id='lightTheme' checked />
+                            <label for="lightTheme">Светлая тема</label>
                         </div>
 
                         <div>
-                            <input type='radio' name='theme' id='dark-theme' />
-                            <label for="dark-theme">Тёмная тема</label>
+                            <input type='radio' name='theme' id='darkTheme' />
+                            <label for="darkTheme">Тёмная тема</label>
                         </div>
                     </div>                    
                 </div>

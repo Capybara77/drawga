@@ -428,6 +428,20 @@ input[type='range']::-webkit-slider-runnable-track {
     flex-direction: column;
 }
 
+.darkTheme {
+    --clr-primary: rgb(95, 61, 196);
+    --clr-primary-dark: rgb(61, 8, 219);
+    --clr-primary-active: rgba(95, 61, 196, 0.4);
+    --clr-gray-light: rgb(211, 211, 211);
+    --clr-gray-dark: rgb(138, 138, 138);
+
+    --clr-border: rgb(44, 44, 44);
+    --clr-background-transparent: rgba(49, 49, 49, 0.8);
+
+    --clr-text: rgb(233, 233, 233);
+    --clr-trailer: rgb(255, 255, 255);
+}
+
 :root:has(#dark-theme:checked) {
     --clr-primary: rgb(95, 61, 196);
     --clr-primary-dark: rgb(61, 8, 219);
