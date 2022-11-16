@@ -72,6 +72,19 @@ export class CurveObject extends BaseObject {
         this.ctx.fillStyle = tempColor;
     }
 
+    isCloseToPoints(x:number, y:number, delta: number){
+      if (this.pointsList.length === 0) return false;
+
+      for (let index = 0; index < this.pointsList.length; index++) {
+        const element = this.pointsList[index];
+        if (Math.sqrt(Math.pow(x - element[0], 2) + Math.pow(y - element[1], 2)) < delta){
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
         x *= -1;
         y *= -1;

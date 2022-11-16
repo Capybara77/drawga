@@ -515,7 +515,13 @@ window.addEventListener('mousemove', (e) => {
     switch (currentShape) {
         case 'eraser': {
             allObjects = allObjects.filter((item) => {
-                return !item.isOverlay(e.clientX * -1, e.clientY * -1, 1, 1);
+                if (item.typeName === "curve"){
+                    if ((item as CurveObject).isCloseToPoints(e.clientX, e.clientY, 10)){
+                        return false;
+                    }
+                }
+
+                return true;
             });
             fullReDraw();
             break;
