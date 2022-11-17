@@ -490,9 +490,9 @@ window.addEventListener('mousemove', (e) => {
             'cur:::' +
             myId +
             ':::' +
-            +(trailerX - offsetXCustom) +
+            +(e.clientX / currentZoom - offsetXCustom / currentZoom) +
             ':::' +
-            +(trailerY - offsetYCustom) +
+            +(e.clientY / currentZoom - offsetYCustom / currentZoom) +
             ':::';
 
         socket.send(memessageToServer.length as unknown as string);
