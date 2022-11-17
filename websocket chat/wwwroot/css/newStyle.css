@@ -11,6 +11,7 @@
 
     --clr-border: rgb(230, 225, 225);
     --clr-background-transparent: rgba(255, 255, 255, 0.8);
+    --clr-hover: rgb(238, 238, 238);
 
     --clr-text: rgb(51, 51, 51);
 
@@ -445,7 +446,7 @@ input[type='range']::-webkit-slider-runnable-track {
 }
 
 .settings-item:hover {
-    background-color: rgb(238, 238, 238);
+    background-color: var(--clr-hover);
 }
 
 .settings-item-icon {
@@ -530,6 +531,7 @@ input[type='range']::-webkit-slider-runnable-track {
 
     --clr-border: rgb(65, 65, 65);
     --clr-background-transparent: rgba(49, 49, 49, 0.8);
+    --clr-hover: rgb(94, 94, 94);
 
     --clr-text: rgb(233, 233, 233);
     --clr-trailer: #ccc;
@@ -549,6 +551,7 @@ input[type='range']::-webkit-slider-runnable-track {
 
     --clr-border: rgb(65, 65, 65);
     --clr-background-transparent: rgba(49, 49, 49, 0.8);
+    --clr-hover: rgb(94, 94, 94);
 
     --clr-text: rgb(233, 233, 233);
     --clr-trailer: #ccc;

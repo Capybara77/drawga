@@ -656,7 +656,7 @@ window.addEventListener('resize', () => {
     fullReDraw();
 });
 
-// ======================SCROLL EVENT
+// ====================== SCROLL EVENT
 window.addEventListener('wheel', (event: WheelEvent) => {
     // + отдалаяем, - прибавляем
     let screenCentreX: number = document.documentElement.clientWidth / 2;
@@ -758,6 +758,12 @@ clearBtn.addEventListener('click', () => {
     socket.send('clear:::');
 
     settingsContainer.style.display = 'none';
+    currentShape = 'pointer';
+
+    shapeBtns.forEach((shapeButton) => {
+        shapeButton.classList.remove('active-shape');
+    });
+    document.getElementById('pointer-btn')?.classList.add('active-shape');
 });
 
 //  ============================ ЦВЕТА КОНСТАНТЫ
