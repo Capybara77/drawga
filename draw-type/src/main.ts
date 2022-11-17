@@ -530,7 +530,7 @@ window.addEventListener('mousemove', (e) => {
                 return true;
             });
 
-            if (prevCount !== allObjects.length){
+            if (prevCount !== allObjects.length) {
                 fullReDraw();
             }
             break;
@@ -557,22 +557,15 @@ window.addEventListener('mousemove', (e) => {
 
                 fullReDraw();
 
-                let pointsToDraw: number[][] = [];
-                for (let index = 0; index < currentLine.length; index++) {
-                    const element = currentLine[index];
-                    pointsToDraw.push([
-                        element[0] * currentZoom,
-                        element[1] * currentZoom,
-                    ]);
-                }
-
-                new CurveObject(
-                    pointsToDraw,
+                let curve = new CurveObject(
+                    currentLine,
                     ctx.fillStyle as string,
                     ctx.lineWidth,
                     ctx,
                     myId
-                ).draw(offsetXCustom, offsetYCustom);
+                );
+                curve.zoom = currentZoom;
+                curve.draw(offsetXCustom, offsetYCustom);
             }
 
             prevX = currentX;
