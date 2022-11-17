@@ -49,7 +49,6 @@ namespace websocket_chat.Controllers
                     Thread.Sleep(5);
                 }
             }
-
         }
 
         public IActionResult Privacy()

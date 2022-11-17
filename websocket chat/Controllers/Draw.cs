@@ -109,10 +109,7 @@ namespace websocket_chat.Controllers
 
                     bool successParse = int.TryParse(Encoding.UTF8.GetString(bufferSize), out int size);
 
-                    if (!successParse)
-                        continue;
-
-                    if (PrivateBoards.Contains(id))
+                    if (!successParse || PrivateBoards.Contains(id))
                         continue;
 
                     byte[] buffer = new byte[size];
