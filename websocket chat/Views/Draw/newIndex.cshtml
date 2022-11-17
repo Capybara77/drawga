@@ -180,28 +180,49 @@
                     </span>
 
                 </button>
-                <div class="settings-container" style="display: none;">
-                    <div class="settings-save-container">
+                <section class="settings-container" style="display: none;">
+                    @* <div class="settings-save-container">
                         <button>Сохранить файл</button>
                         <img src='/icons/save.svg' alt='save icon' class='settings-icon' />
                     </div>
                     <div class="settings-clear-all-container">
                         <button>Очистить полотно</button>
                         <img src='/icons/trash.svg' alt='trash bin icon' class='settings-icon' />
-                    </div>
+                    </div> *@
+
+                    <button class='settings-item'>
+                        <div class="settings-item-icon">
+                            <?xml version="1.0" encoding="utf-8"?>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="cursor-icon fill-icon" viewBox="0 0 24 24" >
+                                <path d="M10 2L10 11L6 11L12 17L18 11L14 11L14 2L10 2 z M 2 20L2 22L22 22L22 20L2 20 z" />
+                            </svg>
+                        </div>
+                        <div class="settings-item-text">Сохранить файл</div>
+                        <div class="settings-item-shortcut">Ctrl+O</div>
+                    </button>
+
+                    <button class='settings-item'>
+                        <div class="settings-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="cursor-icon fill-icon"  viewBox="0 0 256 256"><rect width="256" height="256" fill="none"></rect><path d="M224,56a8,8,0,0,1-8,8h-8V208a16,16,0,0,1-16,16H64a16,16,0,0,1-16-16V64H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,56ZM88,32h80a8,8,0,0,0,0-16H88a8,8,0,0,0,0,16Z"></path></svg>
+                        </div>
+                        <div class="settings-item-text">Очистить полотно</div>
+                        <div class="settings-item-shortcut">Ctrl+Shift+Del</div>
+                    </button>
+
+                    <button class='settings-item'></button>
                     <div class="settings-theme-container">
                         <p>Выбрать тему</p>
                         <div>
                             <input type='radio' name='theme' id='lightTheme' checked />
-                            <label for="lightTheme">Светлая тема</label>
+                            <label for="lightTheme">Светлая</label>
                         </div>
 
                         <div>
                             <input type='radio' name='theme' id='darkTheme' />
-                            <label for="darkTheme">Тёмная тема</label>
+                            <label for="darkTheme">Тёмная</label>
                         </div>
                     </div>                    
-                </div>
+                </section>
             </div>
             <canvas id="canvas"></canvas>
         </div>

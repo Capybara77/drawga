@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 :root {
     --clr-primary: rgb(95, 61, 196);
     --clr-primary-dark: rgb(61, 8, 219);
@@ -7,7 +9,7 @@
     --clr-gray-light: rgb(211, 211, 211);
     --clr-gray-dark: rgb(138, 138, 138);
 
-    --clr-border: rgb(214, 214, 214);
+    --clr-border: rgb(230, 225, 225);
     --clr-background-transparent: rgba(255, 255, 255, 0.8);
 
     --clr-text: rgb(51, 51, 51);
@@ -15,8 +17,10 @@
     --clr-trailer: rgb(0, 0, 0);
     --clr-canvas: rgb(255, 255, 255);
 
-    --clr-icon: rgb(0, 0, 0);
-    --clr-fill: rgb(0, 0, 0);
+    --clr-icon: rgb(51, 51, 51);
+    --clr-fill: rgb(51, 51, 51);
+
+    --clr-shortcut: rgb(165, 165, 165);
 }
 
 * {
@@ -25,11 +29,12 @@
 }
 
 body {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     overflow: hidden;
 }
 
 button {
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -393,19 +398,79 @@ input[type='range']::-webkit-slider-runnable-track {
 
     text-align: start;
 }
+.settings-show-btn {
+    background-color: transparent;
+    border: none;
+    outline: none;
+
+    cursor: pointer;
+}
+
+.settings-show-icon {
+    width: 30px;
+    height: 30px;
+
+    stroke: var(--clr-icon);
+}
 
 .settings-container {
-    border: 3px solid var(--clr-border);
+    border: 2px solid var(--clr-border);
     background-color: var(--clr-background-transparent);
+    border-radius: 6px;
+    font-size: 1.1rem;
 
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
-    padding: 1rem 0.5rem;
+    padding: 0.5rem;
 }
 
-.settings-container button {
+.settings-item {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    font-size: 1rem;
+    color: var(--clr-text);
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    padding: 5px 10px;
+}
+
+.settings-item:hover {
+    background-color: rgb(238, 238, 238);
+}
+
+.settings-item-icon {
+    /* margin-top: 2px; */
+    margin-right: 5px;
+
+    width: 20px;
+    height: 20px;
+}
+
+.settings-item-text {
+    margin-right: 12px;
+    color: var(--clr-text);
+}
+
+.settings-item-shortcut {
+    margin-left: auto;
+    color: var(--clr-shortcut);
+}
+
+.settings-theme-container {
+    padding: 5px 10px;
+}
+
+/* .settings-container button {
     width: 100%;
     background-color: inherit;
     outline: none;
@@ -438,6 +503,23 @@ input[type='range']::-webkit-slider-runnable-track {
     display: flex;
     flex-direction: column;
 }
+
+.settings-show-btn {
+    background-color: transparent;
+    border: none;
+    outline: none;
+
+    cursor: pointer;
+}
+
+.settings-show-icon {
+    width: 30px;
+    height: 30px;
+
+    stroke: var(--clr-icon);
+} */
+
+/* ======================== ТЕМНАЯ ТЕМА ======================== */
 
 .darkTheme {
     --clr-primary: rgb(95, 61, 196);
@@ -475,19 +557,4 @@ input[type='range']::-webkit-slider-runnable-track {
 
     --clr-icon: #ccc;
     --clr-fill: #ccc;
-}
-
-.settings-show-btn {
-    background-color: transparent;
-    border: none;
-    outline: none;
-
-    cursor: pointer;
-}
-
-.settings-show-icon {
-    width: 30px;
-    height: 30px;
-
-    stroke: var(--clr-icon);
 }
