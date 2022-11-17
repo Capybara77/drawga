@@ -221,8 +221,8 @@ function OnSocketMessage(msg: MessageEvent) {
             }
 
             const keyFrames = {
-                transform: `translate(${+data[2] + offsetXCustom}px, ${
-                    +data[3] + offsetYCustom
+                transform: `translate(${(+data[2]) * currentZoom + offsetXCustom}px, ${
+                    (+data[3]) * currentZoom + offsetYCustom
                 }px)`,
             };
 
