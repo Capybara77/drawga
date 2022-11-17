@@ -32,7 +32,7 @@ namespace websocket_chat.Controllers
                     var buffer = new byte[1024 * 4];
 
                     await socket.ReceiveAsync(buffer, CancellationToken.None);
-
+                    
                     for (var i = 0; i < Clients.Count; i++)
                     {
                         var client = Clients[i];

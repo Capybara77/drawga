@@ -514,6 +514,7 @@ window.addEventListener('mousemove', (e) => {
 
     switch (currentShape) {
         case 'eraser': {
+            let prevCount = allObjects.length;
             allObjects = allObjects.filter((item) => {
                 if (item.typeName === 'curve') {
                     if (
@@ -528,7 +529,10 @@ window.addEventListener('mousemove', (e) => {
                 }
                 return true;
             });
-            fullReDraw();
+
+            if (prevCount !== allObjects.length){
+                fullReDraw();
+            }
             break;
         }
         case 'pointer':
