@@ -515,8 +515,14 @@ window.addEventListener('mousemove', (e) => {
     switch (currentShape) {
         case 'eraser': {
             allObjects = allObjects.filter((item) => {
-                if (item.typeName === "curve"){
-                    if ((item as CurveObject).isCloseToPoints(e.clientX - offsetXCustom, e.clientY - offsetYCustom, 10)){
+                if (item.typeName === 'curve') {
+                    if (
+                        (item as CurveObject).isCloseToPoints(
+                            e.clientX - offsetXCustom,
+                            e.clientY - offsetYCustom,
+                            10
+                        )
+                    ) {
                         return false;
                     }
                 }
@@ -731,17 +737,7 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// ================================== CLEAR ALL
-
-let clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
-clearBtn.addEventListener('click', () => {
-    allObjects = [];
-    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    socket.send('clear:::'.length as unknown as string);
-    socket.send('clear:::');
-});
-
-// ================================== SAVE
+// ================================== СОХРАНИТЬ
 
 let saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
 saveBtn.addEventListener('click', () => {
@@ -750,6 +746,18 @@ saveBtn.addEventListener('click', () => {
     a.href = data;
     a.download = 'sketch.png';
     a.click();
+});
+
+// ================================== ОЧИСТИТЬ
+
+let clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+clearBtn.addEventListener('click', () => {
+    allObjects = [];
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    socket.send('clear:::'.length as unknown as string);
+    socket.send('clear:::');
+
+    settingsContainer.style.display = 'none';
 });
 
 //  ============================ ЦВЕТА КОНСТАНТЫ
