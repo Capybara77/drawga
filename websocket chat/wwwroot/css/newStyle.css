@@ -14,6 +14,9 @@
 
     --clr-trailer: rgb(0, 0, 0);
     --clr-canvas: rgb(255, 255, 255);
+
+    --clr-icon: rgb(0, 0, 0);
+    --clr-fill: rgb(0, 0, 0);
 }
 
 * {
@@ -104,6 +107,13 @@ button {
     pointer-events: none;
     width: 20px;
     height: 100%;
+
+    color: var(--clr-icon);
+    /* fill: var(--clr-icon); */
+}
+
+.fill-icon {
+    fill: var(--clr-fill);
 }
 
 .top-btn {
@@ -436,13 +446,16 @@ input[type='range']::-webkit-slider-runnable-track {
     --clr-gray-light: rgb(211, 211, 211);
     --clr-gray-dark: rgb(138, 138, 138);
 
-    --clr-border: rgb(44, 44, 44);
+    --clr-border: rgb(65, 65, 65);
     --clr-background-transparent: rgba(49, 49, 49, 0.8);
 
     --clr-text: rgb(233, 233, 233);
     --clr-trailer: #ccc;
 
     --clr-canvas: #333;
+
+    --clr-icon: #ccc;
+    --clr-fill: #ccc;
 }
 
 :root:has(#dark-theme:checked) {
@@ -452,13 +465,16 @@ input[type='range']::-webkit-slider-runnable-track {
     --clr-gray-light: rgb(211, 211, 211);
     --clr-gray-dark: rgb(138, 138, 138);
 
-    --clr-border: rgb(44, 44, 44);
+    --clr-border: rgb(65, 65, 65);
     --clr-background-transparent: rgba(49, 49, 49, 0.8);
 
     --clr-text: rgb(233, 233, 233);
     --clr-trailer: #ccc;
 
     --clr-canvas: #333;
+
+    --clr-icon: #ccc;
+    --clr-fill: #ccc;
 }
 
 .settings-show-btn {
