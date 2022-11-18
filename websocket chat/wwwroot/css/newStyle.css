@@ -25,12 +25,13 @@
 }
 
 * {
+    font-family: 'Roboto', sans-serif;
+
     margin: 0;
     padding: 0;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
     overflow: hidden;
 }
 
@@ -135,6 +136,72 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* #pointer-btn {
+    position: relative;
+} */
+
+#pointer-btn::after {
+    content: '1';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#eraser-btn::after {
+    content: '2';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#pen-btn::after {
+    content: '3';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#rectangle-btn::after {
+    content: '4';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#line-btn::after {
+    content: '5';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#ellipse-btn::after {
+    content: '6';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
 }
 
 .active-shape {
