@@ -1,7 +1,7 @@
 import getStroke from 'perfect-freehand';
 import { RoughCanvas } from 'roughjs/bin/canvas';
 import { Drawable } from 'roughjs/bin/core';
-import { getSvgPathFromStroke, hexToRgbA } from './utils';
+import { getSvgPathFromStroke, hexToRgbA, makeid } from './utils';
 
 export abstract class BaseObject {
     color;
@@ -10,6 +10,7 @@ export abstract class BaseObject {
     typeName: string = '';
     tempObj: boolean = false;
     zoom: number = 1;
+    objId: string = makeid(5);
 
     constructor(color: string, width: number, userId: string) {
         this.color = color;

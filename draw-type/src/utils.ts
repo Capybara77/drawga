@@ -27,6 +27,7 @@ export function getTypedDrawObject(
                 strokeWidth,
                 userId,
                 zoom,
+                objId,
             } = json as RectangleObject;
 
             let r = new RectangleObject(
@@ -41,6 +42,7 @@ export function getTypedDrawObject(
                 userId
             );
 
+            r.objId = objId;
             r.zoom = zoom;
 
             return r;
@@ -56,6 +58,7 @@ export function getTypedDrawObject(
                 isCircle,
                 userId,
                 zoom,
+                objId,
             } = json as EllipseObject;
 
             let e = new EllipseObject(
@@ -70,13 +73,13 @@ export function getTypedDrawObject(
                 isCircle,
                 userId
             );
-
+            e.objId = objId;
             e.zoom = zoom;
 
             return e;
         }
         case 'line': {
-            let { color, width, startPoint, endPoint, userId, zoom } =
+            let { color, width, startPoint, endPoint, userId, zoom, objId } =
                 json as LineObject;
 
             let l = new LineObject(
@@ -89,14 +92,15 @@ export function getTypedDrawObject(
             );
 
             l.zoom = zoom;
-
+            l.objId = objId;
             return l;
         }
         case 'curve': {
-            let { pointsList, color, width, userId, zoom } =
+            let { pointsList, color, width, userId, zoom, objId } =
                 json as CurveObject;
 
             let c = new CurveObject(pointsList, color, width, ctx, userId);
+            c.objId = objId;
             c.zoom = zoom;
 
             return c;

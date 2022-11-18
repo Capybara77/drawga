@@ -2,6 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace websocket_chat.Controllers
 {
@@ -142,22 +143,13 @@ namespace websocket_chat.Controllers
 
             if (parts[0] == "delete")
             {
-                var historyToDelete = History[id].Where(bytes =>
-                {
-                    var p = Encoding.UTF8.GetString(bytes).Split(":::");
-                    if (p.Length < 2)
-                        return false;
+                string delId = (JsonConvert.DeserializeObject(parts[1]) as dynamic)?.objId.ToString();
 
-                    if (p[1] == parts[1])
-                        return true;
-
-                    return false;
-                }).ToArray();
+                var historyToDelete = History[id].Where(bytes => Encoding.UTF8.GetString(bytes).Contains(delId)).ToArray();
 
                 foreach (byte[] bytes in historyToDelete)
                 {
                     History[id].Remove(bytes);
-                    await SendData(socket, Encoding.UTF8.GetBytes($"delete:::{Encoding.UTF8.GetString(bytes)}"), id);
                 }
             }
         }

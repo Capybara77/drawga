@@ -292,7 +292,7 @@ function OnSocketMessage(msg: MessageEvent) {
             let dataToDelete = data[1];
 
             allObjects = allObjects.filter(
-                (object) => JSON.stringify(object) !== dataToDelete
+                (object) => object.objId !== (JSON.parse(dataToDelete) as BaseObject).objId
             );
 
             fullReDraw();
