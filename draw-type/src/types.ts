@@ -179,7 +179,59 @@ export class LineObject extends BaseObject {
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true;
+        x *= -1;
+        y *= -1;
+
+        let Xmin = Math.min(this.startPoint[0], this.endPoint[0]);
+        let Xmax = Math.max(this.startPoint[0], this.endPoint[0]);
+        let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
+        let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
+
+        Xmin *= this.zoom;
+        Ymin *= this.zoom;
+        Xmax *= this.zoom;
+        Ymax *= this.zoom;
+
+        let screenX = x;
+        let screenY = y;
+        let screenX1 = x + offsetX;
+        let screenY1 = y + offsetY;
+
+
+                if (
+            (((Xmin >= screenX && Xmin <= screenX1) ||
+                (Xmax >= screenX && Xmax <= screenX1)) &&
+                ((Ymin >= screenY && Ymin <= screenY1) ||
+                    (Ymax >= screenY && Ymax <= screenY1))) ||
+            (((screenX >= Xmin && screenX <= Xmax) ||
+                (screenX1 >= Xmin && screenX1 <= Xmax)) &&
+                ((screenY >= Ymin && screenY <= Ymax) ||
+                    (screenY1 >= Ymin && screenY1 <= Ymax))) ||
+            (((Xmin >= screenX && Xmin <= screenX1) ||
+                (Xmax >= screenX && Xmax <= screenX1)) &&
+                ((screenY >= Ymin && screenY <= Ymax) ||
+                    (screenY1 >= Ymin && screenY1 <= Ymax))) ||
+            (((screenX >= Xmin && screenX <= Xmax) ||
+                (screenX1 >= Xmin && screenX1 <= Xmax)) &&
+                ((Ymin >= screenY && Ymin <= screenY1) ||
+                    (Ymax >= screenY && Ymax <= screenY1)))
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    isCloseToPoints(x:number, y:number, delta: number): boolean{
+          if (Math.sqrt(Math.pow(x - this.startPoint[0], 2) + Math.pow(y - this.startPoint[1], 2)) < delta){
+            return true;
+          }
+          
+          if (Math.sqrt(Math.pow(x - this.endPoint[0], 2) + Math.pow(y - this.endPoint[1], 2)) < delta){
+            return true;
+          }
+  
+        return false;
     }
 }
 
@@ -235,7 +287,47 @@ export class RectangleObject extends BaseObject {
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true;
+        x *= -1;
+        y *= -1;
+
+        let Xmin = Math.min(this.startPoint[0], this.endPoint[0]);
+        let Xmax = Math.max(this.startPoint[0], this.endPoint[0]);
+        let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
+        let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
+
+        Xmin *= this.zoom;
+        Ymin *= this.zoom;
+        Xmax *= this.zoom;
+        Ymax *= this.zoom;
+
+        let screenX = x;
+        let screenY = y;
+        let screenX1 = x + offsetX;
+        let screenY1 = y + offsetY;
+
+
+                if (
+            (((Xmin >= screenX && Xmin <= screenX1) ||
+                (Xmax >= screenX && Xmax <= screenX1)) &&
+                ((Ymin >= screenY && Ymin <= screenY1) ||
+                    (Ymax >= screenY && Ymax <= screenY1))) ||
+            (((screenX >= Xmin && screenX <= Xmax) ||
+                (screenX1 >= Xmin && screenX1 <= Xmax)) &&
+                ((screenY >= Ymin && screenY <= Ymax) ||
+                    (screenY1 >= Ymin && screenY1 <= Ymax))) ||
+            (((Xmin >= screenX && Xmin <= screenX1) ||
+                (Xmax >= screenX && Xmax <= screenX1)) &&
+                ((screenY >= Ymin && screenY <= Ymax) ||
+                    (screenY1 >= Ymin && screenY1 <= Ymax))) ||
+            (((screenX >= Xmin && screenX <= Xmax) ||
+                (screenX1 >= Xmin && screenX1 <= Xmax)) &&
+                ((Ymin >= screenY && Ymin <= screenY1) ||
+                    (Ymax >= screenY && Ymax <= screenY1)))
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -294,6 +386,56 @@ export class EllipseObject extends BaseObject {
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-        return true;
+        x *= -1;
+        y *= -1;
+
+        let Xmin = Math.min(this.startPoint[0], this.endPoint[0]);
+        let Xmax = Math.max(this.startPoint[0], this.endPoint[0]);
+        let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
+        let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
+
+        Xmin *= this.zoom;
+        Ymin *= this.zoom;
+        Xmax *= this.zoom;
+        Ymax *= this.zoom;
+
+        let screenX = x;
+        let screenY = y;
+        let screenX1 = x + offsetX;
+        let screenY1 = y + offsetY;
+
+
+                if (
+            (((Xmin >= screenX && Xmin <= screenX1) ||
+                (Xmax >= screenX && Xmax <= screenX1)) &&
+                ((Ymin >= screenY && Ymin <= screenY1) ||
+                    (Ymax >= screenY && Ymax <= screenY1))) ||
+            (((screenX >= Xmin && screenX <= Xmax) ||
+                (screenX1 >= Xmin && screenX1 <= Xmax)) &&
+                ((screenY >= Ymin && screenY <= Ymax) ||
+                    (screenY1 >= Ymin && screenY1 <= Ymax))) ||
+            (((Xmin >= screenX && Xmin <= screenX1) ||
+                (Xmax >= screenX && Xmax <= screenX1)) &&
+                ((screenY >= Ymin && screenY <= Ymax) ||
+                    (screenY1 >= Ymin && screenY1 <= Ymax))) ||
+            (((screenX >= Xmin && screenX <= Xmax) ||
+                (screenX1 >= Xmin && screenX1 <= Xmax)) &&
+                ((Ymin >= screenY && Ymin <= screenY1) ||
+                    (Ymax >= screenY && Ymax <= screenY1)))
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    closeToCentre(x: number, y: number):boolean{
+        if (Math.sqrt(Math.pow(x - this.startPoint[0], 2) + Math.pow(y - this.startPoint[1], 2)) < Math.min(
+            Math.abs(Math.abs(this.startPoint[0]) - Math.abs(this.endPoint[0])),
+            Math.abs(Math.abs(this.startPoint[1]) - Math.abs(this.endPoint[1]))
+        )){
+            return true;
+        }
+        return false;
     }
 }

@@ -266,5 +266,5 @@ export function reDraw(
         } else {
         }
     }
-    // console.log(objects.length + "  " + counter);
+    console.log(objects.length + "  " + counter);
 }

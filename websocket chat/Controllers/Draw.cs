@@ -145,7 +145,7 @@ namespace websocket_chat.Controllers
             {
                 string delId = (JsonConvert.DeserializeObject(parts[1]) as dynamic)?.objId.ToString();
 
-                var historyToDelete = History[id].Where(bytes => Encoding.UTF8.GetString(bytes).Contains(delId)).ToArray();
+                var historyToDelete = History[id].Where(bytes => delId != null && Encoding.UTF8.GetString(bytes).Contains(delId)).ToArray();
 
                 foreach (byte[] bytes in historyToDelete)
                 {

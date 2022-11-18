@@ -292,7 +292,9 @@ function OnSocketMessage(msg: MessageEvent) {
             let dataToDelete = data[1];
 
             allObjects = allObjects.filter(
-                (object) => object.objId !== (JSON.parse(dataToDelete) as BaseObject).objId
+                (object) =>
+                    object.objId !==
+                    (JSON.parse(dataToDelete) as BaseObject).objId
             );
 
             fullReDraw();
@@ -528,7 +530,42 @@ window.addEventListener('mousemove', (e) => {
                     ) {
                         return false;
                     }
+                } else if (item.typeName === 'rectangle') {
+                    if (
+                        (item as RectangleObject).isOverlay(
+                            -e.clientX + offsetXCustom,
+                            -e.clientY + offsetYCustom,
+                            1,
+                            1
+                        )
+                    ) {
+                        return false;
+                    }
+                } else if (item.typeName === 'line') {
+                    if (
+                        (item as LineObject).isCloseToPoints(
+                            e.clientX / currentZoom -
+                                offsetXCustom / currentZoom,
+                            e.clientY / currentZoom -
+                                offsetYCustom / currentZoom,
+                            25
+                        )
+                    ) {
+                        return false;
+                    }
+                } else if (item.typeName === 'ellipse') {
+                    if (
+                        (item as EllipseObject).closeToCentre(
+                            e.clientX / currentZoom -
+                                offsetXCustom / currentZoom,
+                            e.clientY / currentZoom -
+                                offsetYCustom / currentZoom
+                        )
+                    ) {
+                        return false;
+                    }
                 }
+
                 return true;
             });
 
