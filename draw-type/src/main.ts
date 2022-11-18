@@ -221,9 +221,9 @@ function OnSocketMessage(msg: MessageEvent) {
             }
 
             const keyFrames = {
-                transform: `translate(${(+data[2]) * currentZoom + offsetXCustom}px, ${
-                    (+data[3]) * currentZoom + offsetYCustom
-                }px)`,
+                transform: `translate(${
+                    +data[2] * currentZoom + offsetXCustom
+                }px, ${+data[3] * currentZoom + offsetYCustom}px)`,
             };
 
             t.animate(keyFrames, {
@@ -519,8 +519,10 @@ window.addEventListener('mousemove', (e) => {
                 if (item.typeName === 'curve') {
                     if (
                         (item as CurveObject).isCloseToPoints(
-                            e.clientX - offsetXCustom,
-                            e.clientY - offsetYCustom,
+                            e.clientX / currentZoom -
+                                offsetXCustom / currentZoom,
+                            e.clientY / currentZoom -
+                                offsetYCustom / currentZoom,
                             10
                         )
                     ) {
