@@ -80,6 +80,7 @@ themeOptions.forEach((item) => {
 });
 
 // ======================================== LOCAL FUNCTIONS
+
 function fullReDraw() {
     cleanCanvas(ctx);
     reDraw(
@@ -729,12 +730,15 @@ window.addEventListener('wheel', (event: WheelEvent) => {
     zoomContainer.innerHTML = `${Math.floor(currentZoom * 100)}%`;
 });
 
-// ===================== CTRL Z
+// ===================== KEYDOWN event
 
 let bufferObj: BaseObject[] = [];
 
 document.addEventListener('keydown', function (event) {
-    if (event.ctrlKey && event.key.toLocaleLowerCase() === 'z') {
+    const keyValue = event.key.toLowerCase();
+    const codeValue = event.code;
+
+    if (event.ctrlKey && codeValue === 'KeyZ') {
         if (event.shiftKey) {
             if (bufferObj.length === 0) {
                 return;
@@ -771,7 +775,46 @@ document.addEventListener('keydown', function (event) {
         socket.send(messageToServer.length as unknown as string);
         socket.send(messageToServer);
     }
+
+    // shortcut
+
+    if (keyValue === '1' || codeValue === 'KeyF') {
+        shortCupShape('pointer-btn');
+    }
+
+    if (keyValue === '2' || codeValue === 'KeyE') {
+        shortCupShape('eraser-btn');
+    }
+
+    if (keyValue === '3' || codeValue === 'KeyP') {
+        shortCupShape('pen-btn');
+    }
+
+    if (keyValue === '4' || codeValue === 'KeyR') {
+        shortCupShape('rectangle-btn');
+    }
+
+    if (keyValue === '5' || codeValue === 'KeyV') {
+        shortCupShape('line-btn');
+    }
+
+    if (keyValue === '6' || codeValue === 'KeyC') {
+        shortCupShape('ellipse-btn');
+    }
 });
+
+function shortCupShape(id: string) {
+    const elem = document.getElementById(id) as HTMLButtonElement;
+    shapeBtns.forEach((op) => {
+        if (op !== elem) {
+            op.classList.remove('active-shape');
+        }
+    });
+
+    elem.classList.add('active-shape');
+
+    currentShape = elem.dataset.shapeOption as string;
+}
 
 // ================================== СОХРАНИТЬ
 
