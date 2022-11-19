@@ -243,8 +243,11 @@ function OnSocketMessage(msg: MessageEvent) {
                 position: 'right', // `left`, `center` or `right`
                 stopOnFocus: true, // Prevents dismissing of toast on hover
                 style: {
+                    // background:
+                    //     'linear-gradient(to right, rgb(227 135 22), rgb(221 45 45))',
+
                     background:
-                        'linear-gradient(to right, rgb(227 135 22), rgb(221 45 45))',
+                        'linear-gradient(90deg, rgba(255,244,0,1) 0%, rgba(255,162,0,1) 48%, rgba(255,0,0,1) 100%)',
                 },
                 onClick: function () {}, // Callback after click
             }).showToast();
@@ -273,7 +276,7 @@ function OnSocketMessage(msg: MessageEvent) {
                 stopOnFocus: true, // Prevents dismissing of toast on hover
                 style: {
                     background:
-                        'linear-gradient(to right, rgb(227 135 22), rgb(221 45 45))',
+                        'linear-gradient(90deg, rgba(0,255,141,1) 0%, rgba(0,206,255,1) 100%)',
                 },
                 onClick: function () {}, // Callback after click
             }).showToast();
@@ -315,7 +318,8 @@ function OnSocketClose() {
         position: 'right', // `left`, `center` or `right`
         stopOnFocus: true, // Prevents dismissing of toast on hover
         style: {
-            background: 'linear-gradient(to right, #00b09b, #96c93d)',
+            background:
+                'linear-gradient(90deg, rgba(255,244,0,1) 0%, rgba(255,162,0,1) 48%, rgba(255,0,0,1) 100%)',
         },
         onClick: function () {
             location.reload();
