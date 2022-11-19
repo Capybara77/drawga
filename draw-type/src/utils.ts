@@ -127,9 +127,10 @@ export function animateCursor(
 export function changeColor(
     color: string,
     ctx: CanvasRenderingContext2D,
-    trailer: HTMLDivElement
+    trailer: HTMLDivElement,
+    alpha: number
 ) {
-    ctx.fillStyle = color;
+    ctx.fillStyle = rgbaToRgba(color, alpha);
     // ctx.strokeStyle = color;
     trailer.style.backgroundColor = color;
 

@@ -895,7 +895,7 @@ for (let i = 0; i < colorsItemList.length; i++) {
         if (element === null) return;
         const clickedColor = element.style.backgroundColor;
         colorPickerButton.style.backgroundColor = clickedColor;
-        changeColor(clickedColor, ctx, trailer);
+        changeColor(clickedColor, ctx, trailer, +inputOpacity.value);
         colorListContainer.style.display = 'none';
     });
 }
@@ -906,7 +906,7 @@ colorPickerInput.addEventListener('input', (event) => {
     const newColor = '#' + element.value;
     if (newColor.length > 1) {
         colorPickerButton.style.backgroundColor = newColor;
-        changeColor(newColor, ctx, trailer);
+        changeColor(newColor, ctx, trailer, +inputOpacity.value);
     }
 });
 

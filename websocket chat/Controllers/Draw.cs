@@ -8,7 +8,7 @@ namespace websocket_chat.Controllers
 {
     public class Draw : Controller
     {
-        public static int[] PrivateBoards { get; set; } = { 7 };
+        public static int[] PrivateBoards { get; set; } = { 7, 9 };
         public static Dictionary<int, List<WebSocket>> Sockets { get; set; } = new();
         public static Dictionary<int, List<byte[]>> History { get; set; } = new();
         private const int MaxArrayLength = 10000 * 50;
@@ -38,6 +38,7 @@ namespace websocket_chat.Controllers
             if (Sockets[boardId].Count == 0)
             {
                 BoardManager.SaveBoard(boardId, $"{boardId}.board");
+                History[boardId] = new();
             }
         }
 

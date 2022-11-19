@@ -73,17 +73,21 @@ export class CurveObject extends BaseObject {
         this.ctx.fillStyle = tempColor;
     }
 
-    isCloseToPoints(x:number, y:number, delta: number){
-      if (this.pointsList.length === 0) return false;
+    isCloseToPoints(x: number, y: number, delta: number) {
+        if (this.pointsList.length === 0) return false;
 
-      for (let index = 0; index < this.pointsList.length; index++) {
-        const element = this.pointsList[index];
-        if (Math.sqrt(Math.pow(x - element[0], 2) + Math.pow(y - element[1], 2)) < delta){
-          return true;
+        for (let index = 0; index < this.pointsList.length; index++) {
+            const element = this.pointsList[index];
+            if (
+                Math.sqrt(
+                    Math.pow(x - element[0], 2) + Math.pow(y - element[1], 2)
+                ) < delta
+            ) {
+                return true;
+            }
         }
-      }
 
-      return false;
+        return false;
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
@@ -197,8 +201,7 @@ export class LineObject extends BaseObject {
         let screenX1 = x + offsetX;
         let screenY1 = y + offsetY;
 
-
-                if (
+        if (
             (((Xmin >= screenX && Xmin <= screenX1) ||
                 (Xmax >= screenX && Xmax <= screenX1)) &&
                 ((Ymin >= screenY && Ymin <= screenY1) ||
@@ -222,15 +225,25 @@ export class LineObject extends BaseObject {
         return false;
     }
 
-    isCloseToPoints(x:number, y:number, delta: number): boolean{
-          if (Math.sqrt(Math.pow(x - this.startPoint[0], 2) + Math.pow(y - this.startPoint[1], 2)) < delta){
+    isCloseToPoints(x: number, y: number, delta: number): boolean {
+        if (
+            Math.sqrt(
+                Math.pow(x - this.startPoint[0], 2) +
+                    Math.pow(y - this.startPoint[1], 2)
+            ) < delta
+        ) {
             return true;
-          }
-          
-          if (Math.sqrt(Math.pow(x - this.endPoint[0], 2) + Math.pow(y - this.endPoint[1], 2)) < delta){
+        }
+
+        if (
+            Math.sqrt(
+                Math.pow(x - this.endPoint[0], 2) +
+                    Math.pow(y - this.endPoint[1], 2)
+            ) < delta
+        ) {
             return true;
-          }
-  
+        }
+
         return false;
     }
 }
@@ -305,8 +318,7 @@ export class RectangleObject extends BaseObject {
         let screenX1 = x + offsetX;
         let screenY1 = y + offsetY;
 
-
-                if (
+        if (
             (((Xmin >= screenX && Xmin <= screenX1) ||
                 (Xmax >= screenX && Xmax <= screenX1)) &&
                 ((Ymin >= screenY && Ymin <= screenY1) ||
@@ -404,8 +416,7 @@ export class EllipseObject extends BaseObject {
         let screenX1 = x + offsetX;
         let screenY1 = y + offsetY;
 
-
-                if (
+        if (
             (((Xmin >= screenX && Xmin <= screenX1) ||
                 (Xmax >= screenX && Xmax <= screenX1)) &&
                 ((Ymin >= screenY && Ymin <= screenY1) ||
@@ -429,11 +440,26 @@ export class EllipseObject extends BaseObject {
         return false;
     }
 
-    closeToCentre(x: number, y: number):boolean{
-        if (Math.sqrt(Math.pow(x - this.startPoint[0], 2) + Math.pow(y - this.startPoint[1], 2)) < Math.min(
-            Math.abs(Math.abs(this.startPoint[0]) - Math.abs(this.endPoint[0])),
-            Math.abs(Math.abs(this.startPoint[1]) - Math.abs(this.endPoint[1]))
-        )){
+    closeToCentre(x: number, y: number): boolean {
+        if (
+            Math.sqrt(
+                Math.pow(x - this.startPoint[0], 2) +
+                    Math.pow(y - this.startPoint[1], 2)
+            ) <
+            Math.max(
+                Math.min(
+                    Math.abs(
+                        Math.abs(this.startPoint[0]) -
+                            Math.abs(this.endPoint[0])
+                    ),
+                    Math.abs(
+                        Math.abs(this.startPoint[1]) -
+                            Math.abs(this.endPoint[1])
+                    )
+                ),
+                10
+            )
+        ) {
             return true;
         }
         return false;
