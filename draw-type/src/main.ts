@@ -49,70 +49,6 @@ const confirmWrapper = document.querySelector(
     '.confirm-wrapper'
 ) as HTMLDivElement;
 
-// ======================================== LOCAL FUNCTIONS
-
-function fullReDraw() {
-    cleanCanvas(ctx);
-    reDraw(
-        allObjects,
-        offsetXCustom,
-        offsetYCustom,
-        document.documentElement.clientWidth,
-        document.documentElement.clientHeight
-    );
-}
-
-function setNewZoom() {
-    for (let index = 0; index < allObjects.length; index++) {
-        const element = allObjects[index];
-
-        element.zoom = currentZoom;
-    }
-}
-
-function showOptions(cursorId: string) {
-    const cursorName = cursorId.split('-')[0];
-    switch (cursorName) {
-        case 'pointer':
-            optionsWrapper.style.display = 'none';
-            break;
-        case 'eraser':
-            optionsWrapper.style.display = 'none';
-            break;
-        case 'pen':
-            optionsWrapper.style.display = 'flex';
-            optionsColorBorder.style.display = 'none';
-            fillStyleOptionsContainer.style.display = 'none';
-            break;
-        case 'rectangle':
-            optionsWrapper.style.display = 'flex';
-            optionsColorBorder.style.display = 'flex';
-            fillStyleOptionsContainer.style.display = 'flex';
-            break;
-        case 'line':
-            optionsWrapper.style.display = 'flex';
-            optionsColorBorder.style.display = 'none';
-            fillStyleOptionsContainer.style.display = 'none';
-            break;
-        case 'ellipse':
-            optionsWrapper.style.display = 'flex';
-            optionsColorBorder.style.display = 'flex';
-            fillStyleOptionsContainer.style.display = 'flex';
-            break;
-
-        case 'text':
-            optionsWrapper.style.display = 'none';
-            break;
-
-        case 'image':
-            optionsWrapper.style.display = 'none';
-            break;
-
-        default:
-            break;
-    }
-}
-
 // ================================================== OPTIONS
 
 const optionsWrapper = document.querySelector(
@@ -171,6 +107,7 @@ canvasElement.width = document.documentElement.clientWidth;
 const ctx = canvasElement.getContext('2d') as CanvasRenderingContext2D;
 ctx.lineWidth = 12;
 ctx.fillStyle = 'rgb(54, 79, 199)';
+trailer.style.backgroundColor = 'rgb(54, 79, 199)';
 
 let prevX = 0;
 let prevY = 0;
@@ -1021,11 +958,16 @@ for (let i = 0; i < colorsItemList.length; i++) {
 
     element.addEventListener('click', (e) => {
         const element = e.target as HTMLDivElement;
+
         if (element === null) return;
+
         const clickedColor = element.style.backgroundColor;
+
         colorPickerButton.style.backgroundColor = clickedColor;
         changeColor(clickedColor, ctx, trailer, +inputOpacity.value);
         colorListContainer.style.display = 'none';
+
+        trailer.style.backgroundColor = element.style.backgroundColor;
     });
 }
 
@@ -1171,3 +1113,67 @@ zoomContainer.addEventListener('click', (event: MouseEvent) => {
     fullReDraw();
     zoomContainer.innerHTML = '100%';
 });
+
+// ======================================== LOCAL FUNCTIONS
+
+function fullReDraw() {
+    cleanCanvas(ctx);
+    reDraw(
+        allObjects,
+        offsetXCustom,
+        offsetYCustom,
+        document.documentElement.clientWidth,
+        document.documentElement.clientHeight
+    );
+}
+
+function setNewZoom() {
+    for (let index = 0; index < allObjects.length; index++) {
+        const element = allObjects[index];
+
+        element.zoom = currentZoom;
+    }
+}
+
+function showOptions(cursorId: string) {
+    const cursorName = cursorId.split('-')[0];
+    switch (cursorName) {
+        case 'pointer':
+            optionsWrapper.style.display = 'none';
+            break;
+        case 'eraser':
+            optionsWrapper.style.display = 'none';
+            break;
+        case 'pen':
+            optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'none';
+            fillStyleOptionsContainer.style.display = 'none';
+            break;
+        case 'rectangle':
+            optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'flex';
+            fillStyleOptionsContainer.style.display = 'flex';
+            break;
+        case 'line':
+            optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'none';
+            fillStyleOptionsContainer.style.display = 'none';
+            break;
+        case 'ellipse':
+            optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'flex';
+            fillStyleOptionsContainer.style.display = 'flex';
+            break;
+
+        case 'text':
+            optionsWrapper.style.display = 'none';
+            break;
+
+        case 'image':
+            optionsWrapper.style.display = 'none';
+            break;
+
+        default:
+            break;
+    }
+}
