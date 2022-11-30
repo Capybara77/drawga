@@ -58,6 +58,14 @@ const optionsWrapper = document.querySelector(
     '.options-wrapper'
 ) as HTMLDivElement;
 
+const optionsColorBorder = document.getElementById(
+    'options-color-border'
+) as HTMLDivElement;
+
+const fillStyleOptionsContainer = document.querySelector(
+    '.fill-style-options'
+) as HTMLDivElement;
+
 // ================================================== SETTINGS
 
 const settingsButton = document.querySelector(
@@ -117,7 +125,6 @@ function setNewZoom() {
 
 function showOptions(cursorId: string) {
     const cursorName = cursorId.split('-')[0];
-    console.log(cursorName);
     switch (cursorName) {
         case 'pointer':
             optionsWrapper.style.display = 'none';
@@ -127,15 +134,23 @@ function showOptions(cursorId: string) {
             break;
         case 'pen':
             optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'none';
+            fillStyleOptionsContainer.style.display = 'none';
             break;
         case 'rectangle':
             optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'flex';
+            fillStyleOptionsContainer.style.display = 'flex';
             break;
         case 'line':
             optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'none';
+            fillStyleOptionsContainer.style.display = 'none';
             break;
         case 'ellipse':
             optionsWrapper.style.display = 'flex';
+            optionsColorBorder.style.display = 'flex';
+            fillStyleOptionsContainer.style.display = 'flex';
             break;
 
         default:
