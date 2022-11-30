@@ -165,6 +165,7 @@ canvasElement.height = document.documentElement.clientHeight;
 canvasElement.width = document.documentElement.clientWidth;
 const ctx = canvasElement.getContext('2d') as CanvasRenderingContext2D;
 ctx.lineWidth = 12;
+ctx.fillStyle = 'rgb(54, 79, 199)';
 
 let prevX = 0;
 let prevY = 0;

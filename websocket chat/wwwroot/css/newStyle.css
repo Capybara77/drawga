@@ -22,6 +22,8 @@
     --clr-fill: rgb(51, 51, 51);
 
     --clr-shortcut: rgb(165, 165, 165);
+
+    --clr-default: rgb(54, 79, 199);
 }
 
 * {
@@ -260,7 +262,7 @@ button {
     width: 30px;
     height: 30px;
     border-radius: 4px;
-    background-color: var(--clr-black);
+    background-color: var(--clr-default);
     cursor: pointer;
 }
 
