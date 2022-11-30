@@ -52,6 +52,10 @@ let currentFillStyle: string = 'hachure';
 
 const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
 
+const confirmWrapper = document.querySelector(
+    '.confirm-wrapper'
+) as HTMLDivElement;
+
 // ================================================== OPTIONS
 
 const optionsWrapper = document.querySelector(
@@ -915,6 +919,35 @@ saveBtn.addEventListener('click', () => {
 
 let clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
 clearBtn.addEventListener('click', () => {
+    confirmWrapper.style.display = 'flex';
+    // allObjects = [];
+    // ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    // socket.send('clear:::'.length as unknown as string);
+    // socket.send('clear:::');
+
+    // settingsContainer.style.display = 'none';
+    // currentShape = 'pointer';
+
+    // shapeBtns.forEach((shapeButton) => {
+    //     shapeButton.classList.remove('active-shape');
+    // });
+    // document.getElementById('pointer-btn')?.classList.add('active-shape');
+});
+
+// ================================== ПОДТВЕРДИТЬ УДАЛЕНИЕ
+
+const confirmAgreeBtn = document.getElementById(
+    'confirm-agree'
+) as HTMLButtonElement;
+const confirmCanselBtn = document.getElementById(
+    'confirm-cancel'
+) as HTMLButtonElement;
+
+confirmCanselBtn.addEventListener('click', () => {
+    confirmWrapper.style.display = 'none';
+});
+
+confirmAgreeBtn.addEventListener('click', () => {
     allObjects = [];
     ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     socket.send('clear:::'.length as unknown as string);
@@ -927,6 +960,8 @@ clearBtn.addEventListener('click', () => {
         shapeButton.classList.remove('active-shape');
     });
     document.getElementById('pointer-btn')?.classList.add('active-shape');
+
+    confirmWrapper.style.display = 'none';
 });
 
 //  ============================ ЦВЕТА КОНСТАНТЫ
