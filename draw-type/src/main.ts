@@ -18,6 +18,15 @@ import {
 import rough from 'roughjs';
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
+
+// че показывать
+// 1 курсор - ничего
+// 2 ластик - ничего
+// 3 карандаш - цвет толщина прозрачность
+// 4 квадрат - все
+// 5 линия - цвет толщина прозрачность
+// 6 круг - все
+
 // ============= CONST
 
 let allObjects: BaseObject[] = [];
@@ -42,6 +51,12 @@ let currentShape: string = 'pointer';
 let currentFillStyle: string = 'hachure';
 
 const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
+
+// ================================================== OPTIONS
+
+const optionsWrapper = document.querySelector(
+    '.options-wrapper'
+) as HTMLDivElement;
 
 // ================================================== SETTINGS
 
@@ -100,6 +115,34 @@ function setNewZoom() {
     }
 }
 
+function showOptions(cursorId: string) {
+    const cursorName = cursorId.split('-')[0];
+    console.log(cursorName);
+    switch (cursorName) {
+        case 'pointer':
+            optionsWrapper.style.display = 'none';
+            break;
+        case 'eraser':
+            optionsWrapper.style.display = 'none';
+            break;
+        case 'pen':
+            optionsWrapper.style.display = 'flex';
+            break;
+        case 'rectangle':
+            optionsWrapper.style.display = 'flex';
+            break;
+        case 'line':
+            optionsWrapper.style.display = 'flex';
+            break;
+        case 'ellipse':
+            optionsWrapper.style.display = 'flex';
+            break;
+
+        default:
+            break;
+    }
+}
+
 //  ====================================== CANVAS
 
 const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
@@ -133,7 +176,7 @@ fillStyleBtns.forEach((modeButton) => {
     });
 });
 
-// ====================================== SHAPE
+// ====================================== КУРСОР
 
 const shapeBtns = document.querySelectorAll('.top-btn');
 shapeBtns.forEach((shapeButton) => {
@@ -153,6 +196,8 @@ shapeBtns.forEach((shapeButton) => {
         elem.classList.add('active-shape');
 
         currentShape = elem.dataset.shapeOption as string;
+
+        showOptions(elem.id);
     });
 });
 
@@ -783,27 +828,39 @@ document.addEventListener('keydown', function (event) {
     // shortcut
 
     if (keyValue === '1' || codeValue === 'KeyF') {
-        shortCupShape('pointer-btn');
+        const cursorId = 'pointer-btn';
+        shortCupShape(cursorId);
+        showOptions(cursorId);
     }
 
     if (keyValue === '2' || codeValue === 'KeyE') {
-        shortCupShape('eraser-btn');
+        const cursorId = 'eraser-btn';
+        shortCupShape(cursorId);
+        showOptions(cursorId);
     }
 
     if (keyValue === '3' || codeValue === 'KeyP') {
-        shortCupShape('pen-btn');
+        const cursorId = 'pen-btn';
+        shortCupShape(cursorId);
+        showOptions(cursorId);
     }
 
     if (keyValue === '4' || codeValue === 'KeyR') {
-        shortCupShape('rectangle-btn');
+        const cursorId = 'rectangle-btn';
+        shortCupShape(cursorId);
+        showOptions(cursorId);
     }
 
     if (keyValue === '5' || codeValue === 'KeyV') {
-        shortCupShape('line-btn');
+        const cursorId = 'line-btn';
+        shortCupShape(cursorId);
+        showOptions(cursorId);
     }
 
     if (keyValue === '6' || codeValue === 'KeyC') {
-        shortCupShape('ellipse-btn');
+        const cursorId = 'ellipse-btn';
+        shortCupShape(cursorId);
+        showOptions(cursorId);
     }
 });
 
