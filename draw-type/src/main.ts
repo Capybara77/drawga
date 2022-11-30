@@ -396,10 +396,14 @@ let cursorXStart = 0;
 let cursorYStart = 0;
 
 window.addEventListener('mousedown', (event) => {
+    console.log(event.which);
+
     if (event.which === 2) {
         isResize = true;
         cursorX = event.clientX - offsetXCustom;
         cursorY = event.clientY - offsetYCustom;
+
+        canvasElement.style.cursor = 'grab';
         return;
     }
 
@@ -419,14 +423,17 @@ window.addEventListener('mousedown', (event) => {
     cursorYStart = event.clientY;
 });
 
-window.addEventListener('mouseup', (e) => {
+window.addEventListener('mouseup', (event) => {
+    if (event.which === 2) {
+        canvasElement.style.cursor = 'default';
+    }
     if (isResize) {
         isResize = false;
         return;
     }
     isDraw = false;
 
-    const element = e.target as HTMLElement;
+    const element = event.target as HTMLElement;
     if (element.id !== 'canvas') return;
 
     switch (currentShape) {
@@ -467,8 +474,8 @@ window.addEventListener('mouseup', (e) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (e.clientX - offsetXCustom) / currentZoom,
-                    (e.clientY - offsetYCustom) / currentZoom,
+                    (event.clientX - offsetXCustom) / currentZoom,
+                    (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 roughCanvas,
                 myId
@@ -490,8 +497,8 @@ window.addEventListener('mouseup', (e) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (e.clientX - offsetXCustom) / currentZoom,
-                    (e.clientY - offsetYCustom) / currentZoom,
+                    (event.clientX - offsetXCustom) / currentZoom,
+                    (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -517,8 +524,8 @@ window.addEventListener('mouseup', (e) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (e.clientX - offsetXCustom) / currentZoom,
-                    (e.clientY - offsetYCustom) / currentZoom,
+                    (event.clientX - offsetXCustom) / currentZoom,
+                    (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
