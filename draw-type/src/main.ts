@@ -403,7 +403,7 @@ window.addEventListener('mousedown', (event) => {
         cursorX = event.clientX - offsetXCustom;
         cursorY = event.clientY - offsetYCustom;
 
-        canvasElement.style.cursor = 'grab';
+        canvasElement.style.cursor = 'grabbing';
         return;
     }
 
