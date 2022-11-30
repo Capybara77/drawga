@@ -20,6 +20,16 @@
 <body>
     <div class="wrapper">
         <div id="me" class="trailer"></div>
+        <div class="confirm-wrapper" style="display: flex;">
+            <div class="confirm-container">
+                <h1 class="confirm-title">Вы точно хотите очистить всю доску?</h1>
+                <div class='hr-custom'></div>
+                <div class="confirm-btns-container">
+                    <button class="confirm-btn" id="confirm-cancel">Отменить</button>
+                    <button class="confirm-btn" id="confirm-agree">Подтвердить</button>
+                </div>
+            </div>
+        </div>
         <div class="main-container">
             <div class='cursor-container'>
                 <div class="cursor-item" title="Курсор - 'f' или 1">
@@ -144,11 +154,11 @@
              <div class="settings-wrapper">
                 <button class="settings-show-btn" id='settings-show-btn'>
                     <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class='settings-show-icon' viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="settings-show-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </span>
                 </button>
                 <section class="settings-container" style="display: none;">
-                    <button class='settings-item' id="save-btn">
+                    <button class="settings-item" id="save-btn">
                         <div class="settings-item-icon">
                             <?xml version="1.0" encoding="utf-8"?>
                             <svg xmlns="http://www.w3.org/2000/svg" class="cursor-icon fill-icon" viewBox="0 0 24 24" >
@@ -158,22 +168,22 @@
                         <div class="settings-item-text">Сохранить файл</div>
                         <div class="settings-item-shortcut">Ctrl+O</div>
                     </button>
-                    <button class='settings-item' id="clear-btn">
+                    <button class="settings-item" id="clear-btn">
                         <div class="settings-item-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" class="cursor-icon fill-icon"  viewBox="0 0 256 256"><rect width="256" height="256" fill="none"></rect><path d="M224,56a8,8,0,0,1-8,8h-8V208a16,16,0,0,1-16,16H64a16,16,0,0,1-16-16V64H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,56ZM88,32h80a8,8,0,0,0,0-16H88a8,8,0,0,0,0,16Z"></path></svg>
                         </div>
                         <div class="settings-item-text">Очистить полотно</div>
                         <div class="settings-item-shortcut">Ctrl+Shift+Del</div>
                     </button>
-                    @* <button class='settings-item'></button> *@
+                    @* <button class="settings-item"></button> *@
                     <div class="settings-theme-container">
                         <p>Выбрать тему</p>
                         <div>
-                            <input type='radio' name='theme' id='lightTheme' checked />
+                            <input type="radio" name="theme" id="lightTheme" checked />
                             <label for="lightTheme">Светлая</label>
                         </div>
                         <div>
-                            <input type='radio' name='theme' id='darkTheme' />
+                            <input type="radio" name="theme" id="darkTheme" />
                             <label for="darkTheme">Тёмная</label>
                         </div>
                     </div>                    
