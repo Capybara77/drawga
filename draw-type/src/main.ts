@@ -34,6 +34,7 @@ let currentZoom: number = 1;
 
 let isDraw: boolean = false;
 let isResize: boolean = false;
+let isOnCanvas: boolean = false;
 
 const trailer = document.getElementById('me') as HTMLDivElement;
 const myId: string = makeid(20);
@@ -417,9 +418,15 @@ window.addEventListener('mousedown', (event) => {
     if (event.button === 0) {
         const element = event.target as HTMLElement;
 
-        if (element.id !== 'canvas' || element === null) return;
+        if (element.id !== 'canvas') {
+            isOnCanvas = false;
+            return;
+        }
+
+        if (element === null) return;
 
         isDraw = true;
+        isOnCanvas = true;
 
         counter = 0;
         currentLine = [];
@@ -433,6 +440,7 @@ window.addEventListener('mouseup', (event) => {
     if (event.button === 1) {
         canvasElement.style.cursor = 'default';
     }
+    if (event.button === 2) return;
     if (isResize) {
         isResize = false;
         return;
@@ -441,6 +449,8 @@ window.addEventListener('mouseup', (event) => {
 
     const element = event.target as HTMLElement;
     if (element.id !== 'canvas') return;
+
+    if (isOnCanvas === false) return;
 
     switch (currentShape) {
         case 'pointer':
