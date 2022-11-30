@@ -94,7 +94,7 @@ button {
     transform: translate(-50%, 0);
 
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: 1rem;
     border: 2px solid var(--clr-border);
     border-radius: 5px;
@@ -194,6 +194,26 @@ button {
 
 #ellipse-btn::after {
     content: '6';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#text-btn::after {
+    content: '7';
+    position: absolute;
+    bottom: 1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    color: var(--clr-text);
+}
+
+#image-btn::after {
+    content: '8';
     position: absolute;
     bottom: 1px;
     right: -1px;

@@ -99,6 +99,14 @@ function showOptions(cursorId: string) {
             fillStyleOptionsContainer.style.display = 'flex';
             break;
 
+        case 'text':
+            optionsWrapper.style.display = 'none';
+            break;
+
+        case 'image':
+            optionsWrapper.style.display = 'none';
+            break;
+
         default:
             break;
     }
@@ -878,6 +886,18 @@ document.addEventListener('keydown', function (event) {
 
     if (keyValue === '6' || codeValue === 'KeyC') {
         const cursorId = 'ellipse-btn';
+        shortcutShape(cursorId);
+        showOptions(cursorId);
+    }
+
+    if (keyValue === '7' || codeValue === 'KeyT') {
+        const cursorId = 'text-btn';
+        shortcutShape(cursorId);
+        showOptions(cursorId);
+    }
+
+    if (keyValue === '8' || codeValue === 'KeyI') {
+        const cursorId = 'image-btn';
         shortcutShape(cursorId);
         showOptions(cursorId);
     }
