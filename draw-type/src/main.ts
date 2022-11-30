@@ -399,10 +399,14 @@ function OnSocketClose() {
 let cursorXStart = 0;
 let cursorYStart = 0;
 
-window.addEventListener('mousedown', (event) => {
-    console.log(event.which);
+// left button=0 buttons=1
+// wheel button=1 buttons=4
+// right button=2 buttons=2
 
-    if (event.which === 2) {
+window.addEventListener('mousedown', (event) => {
+    event.stopPropagation();
+
+    if (event.button === 1) {
         isResize = true;
         cursorX = event.clientX - offsetXCustom;
         cursorY = event.clientY - offsetYCustom;
@@ -410,25 +414,23 @@ window.addEventListener('mousedown', (event) => {
         canvasElement.style.cursor = 'grabbing';
         return;
     }
+    if (event.button === 0) {
+        const element = event.target as HTMLElement;
 
-    if (event.button !== 0) return;
-    event.stopPropagation();
-    const element = event.target as HTMLElement;
+        if (element.id !== 'canvas' || element === null) return;
 
-    if (element.id !== 'canvas') return;
-    if (element === null) return;
+        isDraw = true;
 
-    isDraw = true;
+        counter = 0;
+        currentLine = [];
 
-    counter = 0;
-    currentLine = [];
-
-    cursorXStart = event.clientX;
-    cursorYStart = event.clientY;
+        cursorXStart = event.clientX;
+        cursorYStart = event.clientY;
+    }
 });
 
 window.addEventListener('mouseup', (event) => {
-    if (event.which === 2) {
+    if (event.button === 1) {
         canvasElement.style.cursor = 'default';
     }
     if (isResize) {
@@ -556,22 +558,23 @@ window.addEventListener('mouseup', (event) => {
     socket.send(messageToServer);
 });
 
-window.addEventListener('mousemove', (e) => {
-    if (e.button !== 0) return;
-    const elem = e.target as HTMLElement;
-    const trailerX = e.clientX - trailer.offsetWidth / 2;
-    const trailerY = e.clientY - trailer.offsetHeight / 2;
+window.addEventListener('mousemove', (event) => {
+    if (event.button !== 0) return;
 
-    if (elem.id === 'canvas') {
+    const element = event.target as HTMLElement;
+    const trailerX = event.clientX - trailer.offsetWidth / 2;
+    const trailerY = event.clientY - trailer.offsetHeight / 2;
+
+    if (element.id === 'canvas') {
         animateCursor(trailerX, trailerY, trailer as HTMLDivElement);
 
         let memessageToServer: string =
             'cur:::' +
             myId +
             ':::' +
-            +(e.clientX / currentZoom - offsetXCustom / currentZoom) +
+            +(event.clientX / currentZoom - offsetXCustom / currentZoom) +
             ':::' +
-            +(e.clientY / currentZoom - offsetYCustom / currentZoom) +
+            +(event.clientY / currentZoom - offsetYCustom / currentZoom) +
             ':::';
 
         socket.send(memessageToServer.length as unknown as string);
@@ -579,8 +582,8 @@ window.addEventListener('mousemove', (e) => {
     }
 
     if (isResize) {
-        offsetXCustom = e.clientX - cursorX;
-        offsetYCustom = e.clientY - cursorY;
+        offsetXCustom = event.clientX - cursorX;
+        offsetYCustom = event.clientY - cursorY;
 
         fullReDraw();
         return;
@@ -588,8 +591,8 @@ window.addEventListener('mousemove', (e) => {
 
     if (!isDraw) return;
 
-    const cursorXCurrent = e.clientX;
-    const cursorYCurrent = e.clientY;
+    const cursorXCurrent = event.clientX;
+    const cursorYCurrent = event.clientY;
 
     switch (currentShape) {
         case 'eraser': {
@@ -598,9 +601,9 @@ window.addEventListener('mousemove', (e) => {
                 if (item.typeName === 'curve') {
                     if (
                         (item as CurveObject).isCloseToPoints(
-                            e.clientX / currentZoom -
+                            event.clientX / currentZoom -
                                 offsetXCustom / currentZoom,
-                            e.clientY / currentZoom -
+                            event.clientY / currentZoom -
                                 offsetYCustom / currentZoom,
                             10
                         )
@@ -610,8 +613,8 @@ window.addEventListener('mousemove', (e) => {
                 } else if (item.typeName === 'rectangle') {
                     if (
                         (item as RectangleObject).isOverlay(
-                            -e.clientX + offsetXCustom,
-                            -e.clientY + offsetYCustom,
+                            -event.clientX + offsetXCustom,
+                            -event.clientY + offsetYCustom,
                             1,
                             1
                         )
@@ -621,9 +624,9 @@ window.addEventListener('mousemove', (e) => {
                 } else if (item.typeName === 'line') {
                     if (
                         (item as LineObject).isCloseToPoints(
-                            e.clientX / currentZoom -
+                            event.clientX / currentZoom -
                                 offsetXCustom / currentZoom,
-                            e.clientY / currentZoom -
+                            event.clientY / currentZoom -
                                 offsetYCustom / currentZoom,
                             25
                         )
@@ -633,9 +636,9 @@ window.addEventListener('mousemove', (e) => {
                 } else if (item.typeName === 'ellipse') {
                     if (
                         (item as EllipseObject).closeToCentre(
-                            e.clientX / currentZoom -
+                            event.clientX / currentZoom -
                                 offsetXCustom / currentZoom,
-                            e.clientY / currentZoom -
+                            event.clientY / currentZoom -
                                 offsetYCustom / currentZoom
                         )
                     ) {
@@ -656,13 +659,13 @@ window.addEventListener('mousemove', (e) => {
 
         case 'pen':
             if (prevX == null || prevY == null || !isDraw) {
-                prevX = e.clientX;
-                prevY = e.clientY;
+                prevX = event.clientX;
+                prevY = event.clientY;
                 return;
             }
 
-            let currentX = e.clientX;
-            let currentY = e.clientY;
+            let currentX = event.clientX;
+            let currentY = event.clientY;
 
             counter++;
             if (counter % step === 0) {
@@ -813,8 +816,9 @@ let bufferObj: BaseObject[] = [];
 document.addEventListener('keydown', function (event) {
     const keyValue = event.key.toLowerCase();
     const codeValue = event.code;
+    const isCtrl = event.ctrlKey;
 
-    if (event.ctrlKey && codeValue === 'KeyZ') {
+    if (isCtrl && codeValue === 'KeyZ') {
         if (event.shiftKey) {
             if (bufferObj.length === 0) {
                 return;
@@ -856,64 +860,64 @@ document.addEventListener('keydown', function (event) {
 
     if (keyValue === '1' || codeValue === 'KeyF') {
         const cursorId = 'pointer-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '2' || codeValue === 'KeyE') {
         const cursorId = 'eraser-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '3' || codeValue === 'KeyP') {
         const cursorId = 'pen-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '4' || codeValue === 'KeyR') {
         const cursorId = 'rectangle-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '5' || codeValue === 'KeyV') {
         const cursorId = 'line-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '6' || codeValue === 'KeyC') {
         const cursorId = 'ellipse-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '7' || codeValue === 'KeyT') {
         const cursorId = 'text-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '8' || codeValue === 'KeyI') {
         const cursorId = 'image-btn';
-        shortcutShape(cursorId);
+        shortCutShape(cursorId);
         showOptions(cursorId);
     }
 });
 
-function shortcutShape(id: string) {
-    const elem = document.getElementById(id) as HTMLButtonElement;
+function shortCutShape(id: string) {
+    const element = document.getElementById(id) as HTMLButtonElement;
     shapeBtns.forEach((op) => {
-        if (op !== elem) {
+        if (op !== element) {
             op.classList.remove('active-shape');
         }
     });
 
-    elem.classList.add('active-shape');
+    element.classList.add('active-shape');
 
-    currentShape = elem.dataset.shapeOption as string;
+    currentShape = element.dataset.shapeOption as string;
 }
 
 // ================================== СОХРАНИТЬ
