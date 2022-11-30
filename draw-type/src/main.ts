@@ -19,14 +19,6 @@ import rough from 'roughjs';
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 
-// че показывать
-// 1 курсор - ничего
-// 2 ластик - ничего
-// 3 карандаш - цвет толщина прозрачность
-// 4 квадрат - все
-// 5 линия - цвет толщина прозрачность
-// 6 круг - все
-
 // ============= CONST
 
 let allObjects: BaseObject[] = [];
@@ -55,56 +47,6 @@ const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
 const confirmWrapper = document.querySelector(
     '.confirm-wrapper'
 ) as HTMLDivElement;
-
-// ================================================== OPTIONS
-
-const optionsWrapper = document.querySelector(
-    '.options-wrapper'
-) as HTMLDivElement;
-
-const optionsColorBorder = document.getElementById(
-    'options-color-border'
-) as HTMLDivElement;
-
-const fillStyleOptionsContainer = document.querySelector(
-    '.fill-style-options'
-) as HTMLDivElement;
-
-// ================================================== SETTINGS
-
-const settingsButton = document.querySelector(
-    '.settings-show-btn'
-) as HTMLButtonElement;
-const settingsContainer = document.querySelector(
-    '.settings-container'
-) as HTMLDivElement;
-
-const activeThemeValue = localStorage.getItem('theme') || 'lightTheme';
-const activeThemeElement = document.getElementById(
-    activeThemeValue
-) as HTMLInputElement;
-activeThemeElement.checked = true;
-document.documentElement.className = activeThemeValue;
-
-const themeOptions = document.querySelectorAll('input[type="radio"]');
-
-settingsButton?.addEventListener('click', () => {
-    const isHidden = settingsContainer.style.display === 'none';
-
-    if (isHidden) {
-        settingsContainer.style.display = 'flex';
-    } else {
-        settingsContainer.style.display = 'none';
-    }
-});
-
-themeOptions.forEach((item) => {
-    item.addEventListener('click', () => {
-        document.documentElement.className = item.id;
-
-        localStorage.setItem('theme', item.id);
-    });
-});
 
 // ======================================== LOCAL FUNCTIONS
 
@@ -161,6 +103,56 @@ function showOptions(cursorId: string) {
             break;
     }
 }
+
+// ================================================== OPTIONS
+
+const optionsWrapper = document.querySelector(
+    '.options-wrapper'
+) as HTMLDivElement;
+
+const optionsColorBorder = document.getElementById(
+    'options-color-border'
+) as HTMLDivElement;
+
+const fillStyleOptionsContainer = document.querySelector(
+    '.fill-style-options'
+) as HTMLDivElement;
+
+// ================================================== SETTINGS
+
+const settingsButton = document.querySelector(
+    '.settings-show-btn'
+) as HTMLButtonElement;
+const settingsContainer = document.querySelector(
+    '.settings-container'
+) as HTMLDivElement;
+
+const activeThemeValue = localStorage.getItem('theme') || 'lightTheme';
+const activeThemeElement = document.getElementById(
+    activeThemeValue
+) as HTMLInputElement;
+activeThemeElement.checked = true;
+document.documentElement.className = activeThemeValue;
+
+const themeOptions = document.querySelectorAll('input[type="radio"]');
+
+settingsButton.addEventListener('click', () => {
+    const isHidden = settingsContainer.style.display === 'none';
+
+    if (isHidden) {
+        settingsContainer.style.display = 'flex';
+    } else {
+        settingsContainer.style.display = 'none';
+    }
+});
+
+themeOptions.forEach((item) => {
+    item.addEventListener('click', () => {
+        document.documentElement.className = item.id;
+
+        localStorage.setItem('theme', item.id);
+    });
+});
 
 //  ====================================== CANVAS
 
@@ -856,42 +848,42 @@ document.addEventListener('keydown', function (event) {
 
     if (keyValue === '1' || codeValue === 'KeyF') {
         const cursorId = 'pointer-btn';
-        shortCupShape(cursorId);
+        shortcutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '2' || codeValue === 'KeyE') {
         const cursorId = 'eraser-btn';
-        shortCupShape(cursorId);
+        shortcutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '3' || codeValue === 'KeyP') {
         const cursorId = 'pen-btn';
-        shortCupShape(cursorId);
+        shortcutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '4' || codeValue === 'KeyR') {
         const cursorId = 'rectangle-btn';
-        shortCupShape(cursorId);
+        shortcutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '5' || codeValue === 'KeyV') {
         const cursorId = 'line-btn';
-        shortCupShape(cursorId);
+        shortcutShape(cursorId);
         showOptions(cursorId);
     }
 
     if (keyValue === '6' || codeValue === 'KeyC') {
         const cursorId = 'ellipse-btn';
-        shortCupShape(cursorId);
+        shortcutShape(cursorId);
         showOptions(cursorId);
     }
 });
 
-function shortCupShape(id: string) {
+function shortcutShape(id: string) {
     const elem = document.getElementById(id) as HTMLButtonElement;
     shapeBtns.forEach((op) => {
         if (op !== elem) {
@@ -906,7 +898,7 @@ function shortCupShape(id: string) {
 
 // ================================== СОХРАНИТЬ
 
-let saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
 saveBtn.addEventListener('click', () => {
     let data = canvasElement.toDataURL('imag/png');
     let a = document.createElement('a');
@@ -917,21 +909,9 @@ saveBtn.addEventListener('click', () => {
 
 // ================================== ОЧИСТИТЬ
 
-let clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
 clearBtn.addEventListener('click', () => {
     confirmWrapper.style.display = 'flex';
-    // allObjects = [];
-    // ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    // socket.send('clear:::'.length as unknown as string);
-    // socket.send('clear:::');
-
-    // settingsContainer.style.display = 'none';
-    // currentShape = 'pointer';
-
-    // shapeBtns.forEach((shapeButton) => {
-    //     shapeButton.classList.remove('active-shape');
-    // });
-    // document.getElementById('pointer-btn')?.classList.add('active-shape');
 });
 
 // ================================== ПОДТВЕРДИТЬ УДАЛЕНИЕ
