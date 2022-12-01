@@ -522,6 +522,16 @@ window.addEventListener('mouseup', (event) => {
     socket.send(messageToServer);
 });
 
+function deleteObj(obj: BaseObject) {
+    let a = JSON.stringify(obj);
+
+    let messageToServer: string = 'delete:::' + a;
+    socket.send(
+        messageToServer.length as unknown as string
+    );
+    socket.send(messageToServer);
+}
+
 window.addEventListener('mousemove', (event) => {
     if (event.button !== 0) return;
 
@@ -572,6 +582,8 @@ window.addEventListener('mousemove', (event) => {
                             10
                         )
                     ) {
+                        deleteObj(item);
+
                         return false;
                     }
                 } else if (item.typeName === 'rectangle') {
@@ -583,6 +595,7 @@ window.addEventListener('mousemove', (event) => {
                             1
                         )
                     ) {
+                        deleteObj(item);
                         return false;
                     }
                 } else if (item.typeName === 'line') {
@@ -595,6 +608,7 @@ window.addEventListener('mousemove', (event) => {
                             25
                         )
                     ) {
+                        deleteObj(item);
                         return false;
                     }
                 } else if (item.typeName === 'ellipse') {
@@ -606,6 +620,7 @@ window.addEventListener('mousemove', (event) => {
                                 offsetYCustom / currentZoom
                         )
                     ) {
+                        deleteObj(item);
                         return false;
                     }
                 }
