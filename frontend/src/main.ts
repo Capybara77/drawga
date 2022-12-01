@@ -35,6 +35,7 @@ let currentZoom: number = 1;
 let isDraw: boolean = false;
 let isResize: boolean = false;
 let isOnCanvas: boolean = false;
+let isSpacePressed: boolean = false;
 
 const trailer = document.getElementById('me') as HTMLDivElement;
 const myId: string = makeid(20);
@@ -332,6 +333,22 @@ function OnSocketClose() {
     //SetSocketEvents(socket);
 }
 
+// ================================== SPACE BAR move
+
+window.addEventListener('keydown', (event) => {
+    if (event.code === 'Space') {
+        isSpacePressed = true;
+        canvasElement.style.cursor = 'grabbing';
+    }
+});
+
+window.addEventListener('keyup', (event) => {
+    if (event.code === 'Space') {
+        isSpacePressed = false;
+        canvasElement.style.cursor = 'default';
+    }
+});
+
 // ================================== MOUSE event
 
 let cursorXStart = 0;
@@ -344,7 +361,7 @@ let cursorYStart = 0;
 window.addEventListener('mousedown', (event) => {
     event.stopPropagation();
 
-    if (event.button === 1) {
+    if (event.button === 1 || (isSpacePressed && event.button === 0)) {
         isResize = true;
         cursorX = event.clientX - offsetXCustom;
         cursorY = event.clientY - offsetYCustom;
