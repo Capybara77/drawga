@@ -1,0 +1,9 @@
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\websocket chat.exe
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\appsettings.Development.json
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\appsettings.json
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\websocket chat.dll
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\websocket chat.runtimeconfig.json
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\websocket chat.pdb
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.SpaServices.Extensions.dll
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.dll
+C:\Users\Capybara\source\repos\websocket chat\websocket chat\obj\Release\net6.0\PubTmp\Out\websocket chat.deps.json
