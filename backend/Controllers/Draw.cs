@@ -133,7 +133,7 @@ namespace websocket_chat.Controllers
             Sockets[id].Remove(socket);
             ClientDisconnect(socket, id);
         }
-
+        
         private async Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
         {
             string message = Encoding.UTF8.GetString(buffer);
