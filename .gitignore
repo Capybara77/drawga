@@ -25,7 +25,11 @@ backend/bin
 backend/obj
 backend/saves
 
+backend/obj/
+
 *.user
 
 websocket chat/
 draw-type/
+
+*.sentinel
