@@ -10,7 +10,7 @@ export abstract class BaseObject {
     typeName: string = '';
     tempObj: boolean = false;
     zoom: number = 1;
-    objId: string = makeid(5);
+    objId: string = makeid(6);
 
     constructor(color: string, width: number, userId: string) {
         this.color = color;

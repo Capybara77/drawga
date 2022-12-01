@@ -914,6 +914,15 @@ clearBtn.addEventListener('click', () => {
     confirmWrapper.style.display = 'flex';
 });
 
+// ================================== СОХРАНИТЬ НА СЕРВЕРЕ
+
+const saveServerBtn = document.getElementById('save-server-btn') as HTMLButtonElement;
+saveServerBtn.addEventListener('click', () => {
+    let message: string = "save";
+    socket.send(message.length as unknown as string);
+    socket.send(message);
+});
+
 // ================================== ПОДТВЕРДИТЬ УДАЛЕНИЕ
 
 const confirmAgreeBtn = document.getElementById(

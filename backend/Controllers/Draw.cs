@@ -117,9 +117,15 @@ namespace websocket_chat.Controllers
                     byte[] buffer = new byte[size];
 
                     await socket.ReceiveAsync(buffer, CancellationToken.None);
+                    string message = Encoding.UTF8.GetString(buffer);
 
                     AddToHistory(buffer, id);
                     await DeleteHistory(buffer, id, socket);
+
+                    if (message == "save")
+                    {
+                        BoardManager.SaveBoard(id, $"{id}.board");
+                    }
 
                     await SendData(socket, buffer, id);
                 }
