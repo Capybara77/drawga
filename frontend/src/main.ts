@@ -358,7 +358,7 @@ let cursorYStart = 0;
 // wheel button=1 buttons=4
 // right button=2 buttons=2
 
-window.addEventListener('mousedown', (event) => {
+window.addEventListener('pointerdown', (event) => {
     event.stopPropagation();
 
     if (event.button === 1 || (isSpacePressed && event.button === 0)) {
@@ -390,7 +390,7 @@ window.addEventListener('mousedown', (event) => {
     }
 });
 
-window.addEventListener('mouseup', (event) => {
+window.addEventListener('pointerup', (event) => {
     if (event.button === 1) {
         canvasElement.style.cursor = 'default';
     }
@@ -522,20 +522,9 @@ window.addEventListener('mouseup', (event) => {
     socket.send(messageToServer);
 });
 
-function deleteObj(obj: BaseObject) {
-    let a = JSON.stringify(obj);
-
-    let messageToServer: string = 'delete:::' + a;
-    socket.send(
-        messageToServer.length as unknown as string
-    );
-    socket.send(messageToServer);
-}
-
-window.addEventListener('mousemove', (event) => {
-    if (event.button !== 0) return;
-
+window.addEventListener('pointermove', (event) => {
     const element = event.target as HTMLElement;
+
     const trailerX = event.clientX - trailer.offsetWidth / 2;
     const trailerY = event.clientY - trailer.offsetHeight / 2;
 
@@ -569,6 +558,10 @@ window.addEventListener('mousemove', (event) => {
     const cursorYCurrent = event.clientY;
 
     switch (currentShape) {
+        case 'pointer': {
+            break;
+        }
+
         case 'eraser': {
             let prevCount = allObjects.length;
             allObjects = allObjects.filter((item) => {
@@ -633,10 +626,8 @@ window.addEventListener('mousemove', (event) => {
             }
             break;
         }
-        case 'pointer':
-            break;
 
-        case 'pen':
+        case 'pen': {
             if (prevX == null || prevY == null || !isDraw) {
                 prevX = event.clientX;
                 prevY = event.clientY;
@@ -669,8 +660,35 @@ window.addEventListener('mousemove', (event) => {
             prevX = currentX;
             prevY = currentY;
             break;
+        }
 
-        case 'line':
+        case 'rectangle': {
+            fullReDraw();
+
+            let rect = new RectangleObject(
+                ctx.fillStyle as string,
+                +ctx.lineWidth,
+                [
+                    (cursorXStart - offsetXCustom) / currentZoom,
+                    (cursorYStart - offsetYCustom) / currentZoom,
+                ],
+                [
+                    (cursorXCurrent - offsetXCustom) / currentZoom,
+                    (cursorYCurrent - offsetYCustom) / currentZoom,
+                ],
+                currentFillStyle,
+                roughCanvas,
+                currentBorderColor,
+                ctx.lineWidth,
+                myId
+            );
+
+            rect.zoom = currentZoom;
+            rect.draw(offsetXCustom, offsetYCustom);
+            break;
+        }
+
+        case 'line': {
             fullReDraw();
 
             let line = new LineObject(
@@ -691,7 +709,9 @@ window.addEventListener('mousemove', (event) => {
             line.draw(offsetXCustom, offsetYCustom);
 
             break;
-        case 'ellipse':
+        }
+
+        case 'ellipse': {
             fullReDraw();
 
             let ellipse = new EllipseObject(
@@ -717,30 +737,7 @@ window.addEventListener('mousemove', (event) => {
             ellipse.draw(offsetXCustom, offsetYCustom);
 
             break;
-        case 'rectangle':
-            fullReDraw();
-
-            let rect = new RectangleObject(
-                ctx.fillStyle as string,
-                +ctx.lineWidth,
-                [
-                    (cursorXStart - offsetXCustom) / currentZoom,
-                    (cursorYStart - offsetYCustom) / currentZoom,
-                ],
-                [
-                    (cursorXCurrent - offsetXCustom) / currentZoom,
-                    (cursorYCurrent - offsetYCustom) / currentZoom,
-                ],
-                currentFillStyle,
-                roughCanvas,
-                currentBorderColor,
-                ctx.lineWidth,
-                myId
-            );
-
-            rect.zoom = currentZoom;
-            rect.draw(offsetXCustom, offsetYCustom);
-            break;
+        }
 
         default:
             break;
@@ -1147,6 +1144,14 @@ zoomContainer.addEventListener('click', (event: MouseEvent) => {
 });
 
 // ======================================== LOCAL FUNCTIONS
+
+function deleteObj(obj: BaseObject) {
+    let a = JSON.stringify(obj);
+
+    let messageToServer: string = 'delete:::' + a;
+    socket.send(messageToServer.length as unknown as string);
+    socket.send(messageToServer);
+}
 
 function fullReDraw() {
     cleanCanvas(ctx);
