@@ -33,3 +33,5 @@ websocket chat/
 draw-type/
 
 *.sentinel
+
+staticwebassets.pack.sentinel
