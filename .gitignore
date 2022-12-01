@@ -2,7 +2,7 @@
 draw_old/
 websocket chat.sln
 
-draw-type/node_modules/
+frontend/node_modules/
 *.log
 *npm-debug.log*
 *yarn-debug.log*
@@ -10,8 +10,8 @@ draw-type/node_modules/
 *pnpm-debug.log*
 *lerna-debug.log*
 *.local
-draw-type/dist
-draw-type/dist-ssr
+frontend/dist
+frontend/dist-ssr
 
 *.vscode/*
 *.suo
@@ -20,9 +20,12 @@ draw-type/dist-ssr
 *.sln
 *.sw?
 
-websocket chat/.config
-websocket chat/bin
-websocket chat/obj
-websocket chat/saves
+backend/.config
+backend/bin
+backend/obj
+backend/saves
 
 *.user
+
+websocket chat/
+draw-type/

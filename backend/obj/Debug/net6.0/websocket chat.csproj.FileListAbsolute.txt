@@ -56,3 +56,32 @@ C:\Users\zapas\web_shit\projects\drawGaMain\backend\obj\Debug\net6.0\refint\webs
 C:\Users\zapas\web_shit\projects\drawGaMain\backend\obj\Debug\net6.0\websocket chat.pdb
 C:\Users\zapas\web_shit\projects\drawGaMain\backend\obj\Debug\net6.0\websocket chat.genruntimeconfig.cache
 C:\Users\zapas\web_shit\projects\drawGaMain\backend\obj\Debug\net6.0\ref\websocket chat.dll
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\appsettings.Development.json
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\appsettings.json
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\websocket chat.staticwebassets.runtime.json
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\websocket chat.exe
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\websocket chat.deps.json
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\websocket chat.runtimeconfig.json
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\websocket chat.dll
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\websocket chat.pdb
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\Microsoft.AspNetCore.SpaServices.Extensions.dll
+C:\Users\Capybara\source\repos\websocket chat\backend\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.csproj.AssemblyReference.cache
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.AssemblyInfoInputs.cache
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.AssemblyInfo.cs
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.csproj.CoreCompileInputs.cache
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.RazorAssemblyInfo.cache
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.RazorAssemblyInfo.cs
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\staticwebassets.build.json
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\staticwebassets.development.json
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\scopedcss\bundle\websocket chat.styles.css
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\scopedcss\projectbundle\websocket chat.bundle.scp.css
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.csproj.CopyComplete
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.dll
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\refint\websocket chat.dll
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.pdb
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\websocket chat.genruntimeconfig.cache
+C:\Users\Capybara\source\repos\websocket chat\backend\obj\Debug\net6.0\ref\websocket chat.dll
