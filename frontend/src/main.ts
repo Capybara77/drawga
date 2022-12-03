@@ -467,8 +467,9 @@ window.addEventListener('pointerup', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (event.clientX - offsetXCustom) / currentZoom,
-                    (event.clientY - offsetYCustom) / currentZoom,
+                    event.shiftKey ? (event.clientX - offsetXCustom) / currentZoom : (event.clientX - offsetXCustom) / currentZoom,
+                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((event.clientX - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
+                      : (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -494,8 +495,9 @@ window.addEventListener('pointerup', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (event.clientX - offsetXCustom) / currentZoom,
-                    (event.clientY - offsetYCustom) / currentZoom,
+                    event.shiftKey ? (event.clientX - offsetXCustom) / currentZoom : (event.clientX - offsetXCustom) / currentZoom,
+                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((event.clientX - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
+                      : (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -665,6 +667,11 @@ window.addEventListener('pointermove', (event) => {
         case 'rectangle': {
             fullReDraw();
 
+            if (event.shiftKey)
+            {
+                
+            }
+
             let rect = new RectangleObject(
                 ctx.fillStyle as string,
                 +ctx.lineWidth,
@@ -673,8 +680,9 @@ window.addEventListener('pointermove', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (cursorXCurrent - offsetXCustom) / currentZoom,
-                    (cursorYCurrent - offsetYCustom) / currentZoom,
+                    event.shiftKey ? (cursorXCurrent - offsetXCustom) / currentZoom : (cursorXCurrent - offsetXCustom) / currentZoom,
+                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((cursorXCurrent - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
+                      : (cursorYCurrent - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -722,8 +730,9 @@ window.addEventListener('pointermove', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    (cursorXCurrent - offsetXCustom) / currentZoom,
-                    (cursorYCurrent - offsetYCustom) / currentZoom,
+                    event.shiftKey ? (event.clientX - offsetXCustom) / currentZoom : (event.clientX - offsetXCustom) / currentZoom,
+                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((event.clientX - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
+                      : (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -1155,6 +1164,8 @@ zoomContainer.addEventListener('click', (event: MouseEvent) => {
 // ======================================== LOCAL FUNCTIONS
 
 function deleteObj(obj: BaseObject) {
+    bufferObj.push(obj);
+
     let a = JSON.stringify(obj);
 
     let messageToServer: string = 'delete:::' + a;

@@ -57,7 +57,10 @@ export class CurveObject extends BaseObject {
 
         const outlinePoints = getStroke(newLines, {
             size: this.width * this.zoom,
-            thinning: 0.7,
+            thinning: 0.5,
+            smoothing: 0.2,
+            easing: (a) => a* 0.8,
+            simulatePressure: true,
         });
 
         const pathData = getSvgPathFromStroke(outlinePoints);
