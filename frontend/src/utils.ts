@@ -249,7 +249,7 @@ export function reDraw(
     screenWidth: number,
     screenHeight: number
 ) {
-    let counter: number = 0;
+    //let counter: number = 0;
 
     for (let index = 0; index < objects.length; index++) {
         const element = objects[index];
@@ -263,7 +263,7 @@ export function reDraw(
             )
         ) {
             element.draw(offsetXCustom, offsetYCustom);
-            counter++;
+            //counter++;
         } else {
         }
     }
