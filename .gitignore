@@ -35,3 +35,6 @@ draw-type/
 *.sentinel
 
 staticwebassets.pack.sentinel
+
+*.db
+*/Migrations
