@@ -75,30 +75,6 @@ const settingsContainer = document.querySelector(
     '.settings-container'
 ) as HTMLDivElement;
 
-const activeThemeValue = localStorage.getItem('theme') || 'lightTheme';
-const activeThemeElement = document.getElementById(
-    activeThemeValue
-) as HTMLInputElement;
-activeThemeElement.checked = true;
-document.documentElement.className = activeThemeValue;
-
-const toastifyStyle = {
-    background:
-        document.documentElement.className === 'lightTheme'
-            ? 'rgba(255, 255, 255, 0.8)'
-            : 'rgba(49, 49, 49, 0.8)',
-    color:
-        document.documentElement.className === 'lightTheme'
-            ? 'rgb(51, 51, 51)'
-            : 'rgb(233, 233, 233)',
-    border: '2px solid rgb(95, 61, 196)',
-    borderRadius: '5px',
-    boxShadow: 'none',
-    fill: 'red',
-};
-
-const themeOptions = document.querySelectorAll('input[type="radio"]');
-
 settingsButton.addEventListener('click', () => {
     const isHidden = settingsContainer.style.display === 'none';
 
@@ -109,14 +85,49 @@ settingsButton.addEventListener('click', () => {
     }
 });
 
-themeOptions.forEach((item) => {
-    item.addEventListener('click', () => {
-        document.documentElement.className = item.id;
+const activeThemeValue = localStorage.getItem('theme') || 'darkTheme';
+const changeThemeBtn = document.getElementById(
+    'change-theme-btn'
+) as HTMLButtonElement;
+const themeText = document.getElementById('theme-inner-text') as HTMLDivElement;
 
-        localStorage.setItem('theme', item.id);
+const moonIcon = document.getElementById(
+    'moon-icon-container'
+) as HTMLDivElement;
+const sunIcon = document.getElementById('sun-icon-container') as HTMLDivElement;
 
-        console.log(activeThemeValue);
-    });
+document.documentElement.className = activeThemeValue;
+
+if (activeThemeValue === 'darkTheme') {
+    themeText.innerHTML = 'Светлая тема';
+    sunIcon.style.display = 'block';
+    moonIcon.style.display = 'none';
+} else {
+    themeText.innerHTML = 'Темная тема';
+    sunIcon.style.display = 'none';
+    moonIcon.style.display = 'block';
+}
+
+changeThemeBtn.addEventListener('click', () => {
+    const theme = document.documentElement.className;
+
+    if (theme.includes('darkTheme')) {
+        themeText.innerHTML = 'Темная тема';
+        document.documentElement.className = 'lightTheme';
+        localStorage.setItem('theme', 'lightTheme');
+
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+    }
+
+    if (theme.includes('lightTheme')) {
+        themeText.innerHTML = 'Светлая тема';
+        document.documentElement.className = 'darkTheme';
+        localStorage.setItem('theme', 'darkTheme');
+
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+    }
 });
 
 //  ====================================== CANVAS
@@ -184,6 +195,21 @@ shapeBtns.forEach((shapeButton) => {
 let socket: WebSocket;
 let new_uri: string = '';
 const loc: Location = window.location;
+
+const toastifyStyle = {
+    background:
+        document.documentElement.className === 'lightTheme'
+            ? 'rgba(255, 255, 255, 0.8)'
+            : 'rgba(49, 49, 49, 0.8)',
+    color:
+        document.documentElement.className === 'lightTheme'
+            ? 'rgb(51, 51, 51)'
+            : 'rgb(233, 233, 233)',
+    border: '2px solid rgb(95, 61, 196)',
+    borderRadius: '5px',
+    boxShadow: 'none',
+    fill: 'red',
+};
 
 if (loc.protocol === 'https:') {
     new_uri = 'wss:';

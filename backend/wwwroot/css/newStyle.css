@@ -48,6 +48,12 @@ button {
     padding: 0;
 }
 
+hr {
+    background-color: var(--clr-shortcut);
+    height: 2px;
+    border: none;
+}
+
 .wrapper {
     min-height: 100vh;
     display: flex;
