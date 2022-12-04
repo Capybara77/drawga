@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using Microsoft.Extensions.Hosting.Internal;
+using websocket_chat.Data;
 
 //var writer = new System.IO.StreamWriter("C:\\Temp\\ConsoleOutput.txt");
 //writer.AutoFlush = true;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<DataContext>();
 
 var app = builder.Build();
 
