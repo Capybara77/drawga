@@ -283,7 +283,7 @@ function OnSocketMessage(msg: MessageEvent) {
         if (command === 'message') {
             Toastify({
                 text: data[1],
-                duration: 66000,
+                duration: 6000,
                 //destination: "http://skorobogach-i-galoshi.tk/",
                 newWindow: true,
                 close: true,
