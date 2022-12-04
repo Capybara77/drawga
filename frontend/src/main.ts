@@ -282,7 +282,7 @@ function OnSocketMessage(msg: MessageEvent) {
                 style: {
                     background:
                         'linear-gradient(90deg, rgba(0,255,141,1) 0%, rgba(0,206,255,1) 100%)',
-                    color: "black"
+                    color: 'black',
                 },
                 onClick: function () {}, // Callback after click
             }).showToast();
@@ -326,7 +326,7 @@ function OnSocketClose() {
         style: {
             background:
                 'linear-gradient(90deg, rgba(255,244,0,1) 0%, rgba(255,162,0,1) 48%, rgba(255,0,0,1) 100%)',
-            color: "black"
+            color: 'black',
         },
         onClick: function () {
             location.reload();
@@ -470,9 +470,14 @@ window.addEventListener('pointerup', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    event.shiftKey ? (event.clientX - offsetXCustom) / currentZoom : (event.clientX - offsetXCustom) / currentZoom,
-                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((event.clientX - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
-                      : (event.clientY - offsetYCustom) / currentZoom,
+                    event.shiftKey
+                        ? (event.clientX - offsetXCustom) / currentZoom
+                        : (event.clientX - offsetXCustom) / currentZoom,
+                    event.shiftKey
+                        ? (cursorYStart - offsetYCustom) / currentZoom +
+                          ((event.clientX - offsetXCustom) / currentZoom -
+                              (cursorXStart - offsetXCustom) / currentZoom)
+                        : (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -498,9 +503,14 @@ window.addEventListener('pointerup', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    event.shiftKey ? (event.clientX - offsetXCustom) / currentZoom : (event.clientX - offsetXCustom) / currentZoom,
-                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((event.clientX - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
-                      : (event.clientY - offsetYCustom) / currentZoom,
+                    event.shiftKey
+                        ? (event.clientX - offsetXCustom) / currentZoom
+                        : (event.clientX - offsetXCustom) / currentZoom,
+                    event.shiftKey
+                        ? (cursorYStart - offsetYCustom) / currentZoom +
+                          ((event.clientX - offsetXCustom) / currentZoom -
+                              (cursorXStart - offsetXCustom) / currentZoom)
+                        : (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -670,9 +680,7 @@ window.addEventListener('pointermove', (event) => {
         case 'rectangle': {
             fullReDraw();
 
-            if (event.shiftKey)
-            {
-                
+            if (event.shiftKey) {
             }
 
             let rect = new RectangleObject(
@@ -683,9 +691,14 @@ window.addEventListener('pointermove', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    event.shiftKey ? (cursorXCurrent - offsetXCustom) / currentZoom : (cursorXCurrent - offsetXCustom) / currentZoom,
-                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((cursorXCurrent - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
-                      : (cursorYCurrent - offsetYCustom) / currentZoom,
+                    event.shiftKey
+                        ? (cursorXCurrent - offsetXCustom) / currentZoom
+                        : (cursorXCurrent - offsetXCustom) / currentZoom,
+                    event.shiftKey
+                        ? (cursorYStart - offsetYCustom) / currentZoom +
+                          ((cursorXCurrent - offsetXCustom) / currentZoom -
+                              (cursorXStart - offsetXCustom) / currentZoom)
+                        : (cursorYCurrent - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -733,9 +746,14 @@ window.addEventListener('pointermove', (event) => {
                     (cursorYStart - offsetYCustom) / currentZoom,
                 ],
                 [
-                    event.shiftKey ? (event.clientX - offsetXCustom) / currentZoom : (event.clientX - offsetXCustom) / currentZoom,
-                    event.shiftKey ? (cursorYStart - offsetYCustom) / currentZoom + ((event.clientX - offsetXCustom) / currentZoom - (cursorXStart - offsetXCustom) / currentZoom)
-                      : (event.clientY - offsetYCustom) / currentZoom,
+                    event.shiftKey
+                        ? (event.clientX - offsetXCustom) / currentZoom
+                        : (event.clientX - offsetXCustom) / currentZoom,
+                    event.shiftKey
+                        ? (cursorYStart - offsetYCustom) / currentZoom +
+                          ((event.clientX - offsetXCustom) / currentZoom -
+                              (cursorXStart - offsetXCustom) / currentZoom)
+                        : (event.clientY - offsetYCustom) / currentZoom,
                 ],
                 currentFillStyle,
                 roughCanvas,
@@ -928,9 +946,11 @@ clearBtn.addEventListener('click', () => {
 
 // ================================== СОХРАНИТЬ НА СЕРВЕРЕ
 
-const saveServerBtn = document.getElementById('save-server-btn') as HTMLButtonElement;
+const saveServerBtn = document.getElementById(
+    'save-server-btn'
+) as HTMLButtonElement;
 saveServerBtn.addEventListener('click', () => {
-    let message: string = "save";
+    let message: string = 'save';
     socket.send(message.length as unknown as string);
     socket.send(message);
 });
