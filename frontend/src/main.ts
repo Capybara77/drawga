@@ -786,8 +786,8 @@ window.addEventListener('resize', () => {
 // ====================== SCROLL EVENT
 window.addEventListener('wheel', (event: WheelEvent) => {
     // + отдалаяем, - прибавляем
-    let screenCentreX: number = document.documentElement.clientWidth / 2;
-    let screenCentreY: number = document.documentElement.clientHeight / 2;
+    let screenCentreX: number = event.clientX;
+    let screenCentreY: number = event.clientY;
 
     let normalOffsetX: number =
         (offsetXCustom + (currentZoom - 1) * screenCentreX) / currentZoom;
