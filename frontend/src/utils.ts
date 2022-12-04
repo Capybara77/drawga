@@ -133,15 +133,6 @@ export function changeColor(
     ctx.fillStyle = rgbToRgba(color, alpha);
     // ctx.strokeStyle = color;
     trailer.style.backgroundColor = color;
-
-    // const list = document.getElementsByClassName(
-    //     'trailer'
-    // ) as HTMLCollectionOf<HTMLElement>;
-
-    // for (let i = 0; i < list.length; i++) {
-    //     const item = list[i];
-    //     item.style.backgroundColor = color;
-    // }
 }
 
 export function average(a: number, b: number) {

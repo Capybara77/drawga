@@ -1056,7 +1056,9 @@ colorPickerInput.addEventListener('input', (event) => {
     const newColor = '#' + element.value;
     if (newColor.length > 1) {
         colorPickerButton.style.backgroundColor = newColor;
-        changeColor(newColor, ctx, trailer, +inputOpacity.value);
+
+        ctx.fillStyle = hexToRgbA(newColor, inputOpacity.value);
+        trailer.style.backgroundColor = newColor;
     }
 });
 
@@ -1106,10 +1108,7 @@ for (let i = 0; i < strokeColorsItemList.length; i++) {
         const clickedColor = element.style.backgroundColor;
         strokeColorPickerButton.style.backgroundColor = clickedColor;
         currentBorderColor = clickedColor;
-        // changeColor(clickedColor, ctx, trailer);
         strokeColorListContainer.style.display = 'none';
-
-        // console.log(currentBorderColor);
     });
 }
 
@@ -1120,7 +1119,6 @@ strokeColorPickerInput.addEventListener('input', (event) => {
     if (newColor.length > 1) {
         strokeColorPickerButton.style.backgroundColor = newColor;
         currentBorderColor = newColor;
-        // changeColor(newColor, ctx, trailer);
     }
 });
 
