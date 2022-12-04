@@ -414,6 +414,9 @@ export class EllipseObject extends BaseObject {
         Xmax *= this.zoom;
         Ymax *= this.zoom;
 
+        Xmin += Xmin - Xmax;
+        Ymin += Ymin - Ymax;
+
         let screenX = x;
         let screenY = y;
         let screenX1 = x + offsetX;
