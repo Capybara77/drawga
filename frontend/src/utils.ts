@@ -130,18 +130,18 @@ export function changeColor(
     trailer: HTMLDivElement,
     alpha: number
 ) {
-    ctx.fillStyle = rgbaToRgba(color, alpha);
+    ctx.fillStyle = rgbToRgba(color, alpha);
     // ctx.strokeStyle = color;
     trailer.style.backgroundColor = color;
 
-    const list = document.getElementsByClassName(
-        'trailer'
-    ) as HTMLCollectionOf<HTMLElement>;
+    // const list = document.getElementsByClassName(
+    //     'trailer'
+    // ) as HTMLCollectionOf<HTMLElement>;
 
-    for (let i = 0; i < list.length; i++) {
-        const item = list[i];
-        item.style.backgroundColor = color;
-    }
+    // for (let i = 0; i < list.length; i++) {
+    //     const item = list[i];
+    //     item.style.backgroundColor = color;
+    // }
 }
 
 export function average(a: number, b: number) {
@@ -203,10 +203,12 @@ export function hexToRgbA(hex: string, alpha = '1') {
     throw new Error('Bad Hex');
 }
 
-export function rgbaToRgba(color: string, alpha: number) {
+export function rgbToRgba(color: string, alpha: number) {
     let colorArr = color
         .slice(color.indexOf('(') + 1, color.indexOf(')'))
         .split(', ');
+
+    // (25, 25, 25) / 25, 25, 25/ [25, 25, 25]
 
     return (
         'rgba(' +

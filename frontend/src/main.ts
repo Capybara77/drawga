@@ -10,7 +10,7 @@ import {
     animateCursor,
     makeid,
     changeColor,
-    rgbaToRgba,
+    rgbToRgba,
     hexToRgbA,
     cleanCanvas,
     getTypedDrawObject,
@@ -23,19 +23,20 @@ import 'toastify-js/src/toastify.css';
 
 let allObjects: BaseObject[] = [];
 
-let offsetXCustom: number = 0;
-let offsetYCustom: number = 0;
-let cursorX: number = 0;
-let cursorY: number = 0;
-let step: number = 1;
-let counter: number = 0;
+let offsetXCustom = 0;
+let offsetYCustom = 0;
+let cursorX = 0;
+let cursorY = 0;
+let step = 1;
+let counter = 0;
 let currentLine: number[][] = [];
-let currentZoom: number = 1;
+let currentZoom = 1;
 
-let isDraw: boolean = false;
-let isResize: boolean = false;
-let isOnCanvas: boolean = false;
-let isSpacePressed: boolean = false;
+let isDraw = false;
+let isResize = false;
+let isOnCanvas = false;
+let isSpacePressed = false;
+let isColorPickerOpened = false;
 
 const trailer = document.getElementById('me') as HTMLDivElement;
 const myId: string = makeid(20);
@@ -864,6 +865,8 @@ document.addEventListener('keydown', function (event) {
 
     // shortcut
 
+    if (isColorPickerOpened === true) return;
+
     if (keyValue === '1' || codeValue === 'KeyF') {
         const cursorId = 'pointer-btn';
         shortCutShape(cursorId);
@@ -1012,6 +1015,12 @@ const strokeColorPickerInput = document.getElementById(
 // ============================ ВЫБРАТЬ ЦВЕТ ЗАРИСОВКИ
 
 colorPickerButton.addEventListener('click', (event) => {
+    if (isColorPickerOpened === true) {
+        isColorPickerOpened = false;
+    } else {
+        isColorPickerOpened = true;
+    }
+
     strokeColorListContainer.style.display = 'none';
 
     event.stopPropagation();
@@ -1051,6 +1060,14 @@ colorPickerInput.addEventListener('input', (event) => {
     }
 });
 
+colorPickerInput.addEventListener('focus', () => {
+    isColorPickerOpened = true;
+});
+
+colorPickerInput.addEventListener('blur', () => {
+    isColorPickerOpened = false;
+});
+
 document.documentElement.addEventListener('click', (event) => {
     if (
         colorListContainer.style.display === 'grid' &&
@@ -1063,6 +1080,12 @@ document.documentElement.addEventListener('click', (event) => {
 // ============================ ВЫБРАТЬ ЦВЕТ ГРАНИЦЫ
 
 strokeColorPickerButton.addEventListener('click', (event) => {
+    if (isColorPickerOpened === true) {
+        isColorPickerOpened = false;
+    } else {
+        isColorPickerOpened = true;
+    }
+
     colorListContainer.style.display = 'none';
 
     event.stopPropagation();
@@ -1099,6 +1122,16 @@ strokeColorPickerInput.addEventListener('input', (event) => {
         currentBorderColor = newColor;
         // changeColor(newColor, ctx, trailer);
     }
+});
+
+strokeColorPickerInput.addEventListener('focus', () => {
+    console.log('f');
+    isColorPickerOpened = true;
+});
+
+strokeColorPickerInput.addEventListener('blur', () => {
+    console.log('b');
+    isColorPickerOpened = false;
 });
 
 document.documentElement.addEventListener('click', (event) => {
@@ -1139,7 +1172,7 @@ const inputOpacity = document.getElementById(
 inputOpacity.addEventListener('change', () => {
     const newColor = (ctx.fillStyle as string).startsWith('#')
         ? hexToRgbA(ctx.fillStyle as string, inputOpacity.value)
-        : rgbaToRgba(ctx.fillStyle as string, +inputOpacity.value);
+        : rgbToRgba(ctx.fillStyle as string, +inputOpacity.value);
     ctx.fillStyle = newColor;
 });
 
