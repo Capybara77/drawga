@@ -5,12 +5,14 @@ import {
     RectangleObject,
     LineObject,
     CurveObject,
+    TextObject,
 } from './types';
 
 export function getTypedDrawObject(
     str: string,
     roughCanvas: RoughCanvas,
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
+    mainContainer: HTMLDivElement
 ): BaseObject | null {
     let json: BaseObject = JSON.parse(str);
     let type: string = json.typeName;
@@ -104,6 +106,42 @@ export function getTypedDrawObject(
             c.zoom = zoom;
 
             return c;
+        }
+        case 'text': {
+            let {
+                color,
+                width,
+                userId,
+                zoom,
+                objId,
+                left,
+                top,
+                fontFamily,
+                fontWeight,
+                text,
+                inputId,
+            } = json as TextObject;
+
+            const newInput = document.createElement('textarea');
+            newInput.id = makeid(5);
+            newInput.classList.add('text-element');
+            mainContainer.prepend(newInput);
+
+            let t = new TextObject(
+                fontFamily,
+                fontWeight,
+                color,
+                userId,
+                newInput,
+                top,
+                left,
+                text,
+                inputId
+            );
+            t.objId = objId;
+            t.zoom = zoom;
+
+            return t;
         }
         default:
             return null;

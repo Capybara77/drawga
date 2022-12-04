@@ -330,7 +330,12 @@ function OnSocketMessage(msg: MessageEvent) {
         }
 
         if (command === 'drawObj') {
-            let o = getTypedDrawObject(data[1], roughCanvas, ctx) as BaseObject;
+            let o = getTypedDrawObject(
+                data[1],
+                roughCanvas,
+                ctx,
+                mainContainer
+            ) as BaseObject;
 
             o.zoom = currentZoom;
 
@@ -435,34 +440,54 @@ window.addEventListener('pointerdown', (event) => {
             newInput.id = makeid(5);
             newInput.classList.add('text-element');
 
-            // newInput.style.top = `${event.clientY}px`;
-            // newInput.style.left = `${event.clientX}px`;
-
             let textObj = new TextObject(
                 'sans-serif',
                 'normal',
                 ctx.fillStyle as string,
                 myId,
                 newInput,
-                event.clientY,
-                event.clientX
+                (event.clientY - offsetYCustom) / currentZoom,
+                (event.clientX - offsetXCustom) / currentZoom,
+                '',
+                newInput.id
             );
-
+            textObj.zoom = currentZoom;
+            textObj.draw(offsetXCustom, offsetYCustom);
             allObjects.push(textObj);
 
-            mainContainer.prepend(newInput);
+            let messageToServer: string =
+                'drawObj:::' + JSON.stringify(textObj) + ':::';
 
-            newInput.style.top = `${textObj.top}px`;
-            newInput.style.left = `${textObj.left}px`;
+            socket.send(messageToServer.length as unknown as string);
+            socket.send(messageToServer);
+
+            mainContainer.prepend(newInput);
 
             // newInput.style.fontSize = textObj.
 
             newInput.addEventListener('focus', (event) => {
+                console.log('f');
                 isTyping = true;
             });
 
             newInput.addEventListener('blur', (event) => {
+                console.log('b');
                 isTyping = false;
+            });
+
+            newInput.addEventListener('input', (event) => {
+                const element = event.target as HTMLTextAreaElement;
+
+                const foundObj = allObjects.find(
+                    (item) => (item as TextObject).inputId === element.id
+                ) as TextObject;
+
+                foundObj.text = element.value;
+
+                deleteObj(foundObj);
+
+                socket.send(messageToServer.length as unknown as string);
+                socket.send(messageToServer);
             });
 
             currentShape = 'pointer';
@@ -498,8 +523,14 @@ window.addEventListener('pointerup', (event) => {
     if (isOnCanvas === false) return;
 
     switch (currentShape) {
+        case 'image': {
+            return;
+        }
+        case 'text': {
+            return;
+        }
         case 'pointer':
-            break;
+            return;
 
         case 'pen': {
             let pointsToDraw: number[][] = [];

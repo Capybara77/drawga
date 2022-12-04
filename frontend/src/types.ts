@@ -29,18 +29,24 @@ export abstract class BaseObject {
 
 export class TextObject extends BaseObject {
     typeName: string = 'text';
-    inputElement: HTMLElement;
+    inputElement: HTMLTextAreaElement;
     top: number;
     left: number;
+    fontFamily: string;
+    fontWeight: string;
+    text: string;
+    inputId: string;
 
     constructor(
         fontFamily: string,
         fontWeight: string,
         color: string,
         userId: string,
-        inputElement: HTMLElement,
+        inputElement: HTMLTextAreaElement,
         top: number,
-        left: number
+        left: number,
+        text: string,
+        inputId: string
     ) {
         super(color, 1, userId);
 
@@ -48,6 +54,12 @@ export class TextObject extends BaseObject {
         this.inputElement = inputElement;
         this.top = top;
         this.left = left;
+        this.fontFamily = fontFamily;
+        this.fontWeight = fontWeight;
+        this.text = text;
+        this.inputId = inputId;
+
+        inputElement.value = text;
     }
 
     draw(offsetX: number, offsetY: number): void {
