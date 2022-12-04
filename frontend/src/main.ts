@@ -42,8 +42,9 @@ const trailer = document.getElementById('me') as HTMLDivElement;
 const myId: string = makeid(20);
 
 let currentBorderColor = 'rgb(95, 61, 196)';
-let currentShape: string = 'pointer';
-let currentFillStyle: string = 'hachure';
+let currentShape = 'pointer';
+let currentFillStyle = 'hachure';
+let currentCursor = 'pointer';
 
 const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
 
@@ -175,6 +176,7 @@ shapeBtns.forEach((shapeButton) => {
         currentShape = elem.dataset.shapeOption as string;
 
         showOptions(elem.id);
+        changeCursor(elem.dataset.shapeOption as string);
     });
 });
 
@@ -344,14 +346,14 @@ function OnSocketClose() {
 window.addEventListener('keydown', (event) => {
     if (event.code === 'Space') {
         isSpacePressed = true;
-        canvasElement.style.cursor = 'grabbing';
+        // canvasElement.style.cursor = 'grabbing';
     }
 });
 
 window.addEventListener('keyup', (event) => {
     if (event.code === 'Space') {
         isSpacePressed = false;
-        canvasElement.style.cursor = 'default';
+        // canvasElement.style.cursor = 'default';
     }
 });
 
@@ -372,7 +374,7 @@ window.addEventListener('pointerdown', (event) => {
         cursorX = event.clientX - offsetXCustom;
         cursorY = event.clientY - offsetYCustom;
 
-        canvasElement.style.cursor = 'grabbing';
+        // canvasElement.style.cursor = 'grabbing';
         return;
     }
     if (event.button === 0) {
@@ -398,7 +400,7 @@ window.addEventListener('pointerdown', (event) => {
 
 window.addEventListener('pointerup', (event) => {
     if (event.button === 1) {
-        canvasElement.style.cursor = 'default';
+        // canvasElement.style.cursor = 'default';
     }
     if (event.button === 2) return;
     if (isResize) {
@@ -822,7 +824,7 @@ window.addEventListener('wheel', (event: WheelEvent) => {
 
 let bufferObj: BaseObject[] = [];
 
-document.addEventListener('keydown', function (event) {
+document.addEventListener('keydown', (event) => {
     const keyValue = event.key.toLowerCase();
     const codeValue = event.code;
     const isCtrl = event.ctrlKey;
@@ -958,6 +960,7 @@ saveServerBtn.addEventListener('click', () => {
     let message: string = 'save';
     socket.send(message.length as unknown as string);
     socket.send(message);
+    settingsContainer.style.display = 'none';
 });
 
 // ================================== ПОДТВЕРДИТЬ УДАЛЕНИЕ
@@ -1289,4 +1292,10 @@ function showOptions(cursorId: string) {
         default:
             break;
     }
+}
+
+function changeCursor(givenShape: string) {
+    // const path = './icons/' + givenShape + '.svg';
+    // console.log(path);
+    // canvasElement.style.cursor = `url(${path}), auto`;
 }

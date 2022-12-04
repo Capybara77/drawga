@@ -24,6 +24,9 @@
     --clr-shortcut: rgb(165, 165, 165);
 
     --clr-default: rgb(54, 79, 199);
+
+    --cursor-custom: url('/icons/custom-cursor.svg');
+    /* --cursor-custom: url('/icons/cursor-black.png'); */
 }
 
 * {
@@ -35,6 +38,7 @@
 
 body {
     overflow: hidden;
+    cursor: var(--cursor-custom), auto;
 }
 
 button {
@@ -72,6 +76,8 @@ button {
 /* ======================== КУРСОР ======================== */
 
 .trailer {
+    display: none;
+
     width: 15px;
     height: 15px;
     border-radius: 100%;
@@ -571,6 +577,9 @@ input[type='range']::-webkit-slider-runnable-track {
 
     --clr-icon: #ccc;
     --clr-fill: #ccc;
+
+    --cursor-custom: url('/icons/custom-cursor-white.svg');
+    /* --cursor-custom: url('/icons/cursor-white.png'); */
 }
 
 :root:has(#dark-theme:checked) {
@@ -591,6 +600,9 @@ input[type='range']::-webkit-slider-runnable-track {
 
     --clr-icon: #ccc;
     --clr-fill: #ccc;
+
+    --cursor-custom: url('/icons/custom-cursor-white.svg');
+    /* --cursor-custom: url('/icons/cursor-white.png'); */
 }
 
 /* ======================== ПОДТВЕРЖДЕНИЕ ======================== */
