@@ -81,6 +81,21 @@ const activeThemeElement = document.getElementById(
 activeThemeElement.checked = true;
 document.documentElement.className = activeThemeValue;
 
+const toastifyStyle = {
+    background:
+        document.documentElement.className === 'lightTheme'
+            ? 'rgba(255, 255, 255, 0.8)'
+            : 'rgba(49, 49, 49, 0.8)',
+    color:
+        document.documentElement.className === 'lightTheme'
+            ? 'rgb(51, 51, 51)'
+            : 'rgb(233, 233, 233)',
+    border: '2px solid rgb(95, 61, 196)',
+    borderRadius: '5px',
+    boxShadow: 'none',
+    fill: 'red',
+};
+
 const themeOptions = document.querySelectorAll('input[type="radio"]');
 
 settingsButton.addEventListener('click', () => {
@@ -98,6 +113,8 @@ themeOptions.forEach((item) => {
         document.documentElement.className = item.id;
 
         localStorage.setItem('theme', item.id);
+
+        console.log(activeThemeValue);
     });
 });
 
@@ -239,7 +256,7 @@ function OnSocketMessage(msg: MessageEvent) {
 
         if (command === 'disconnect') {
             Toastify({
-                text: 'User disconnected',
+                text: 'Пользователь отключился',
                 duration: 2000,
                 //destination: "http://skorobogach-i-galoshi.tk/",
                 newWindow: true,
@@ -247,14 +264,7 @@ function OnSocketMessage(msg: MessageEvent) {
                 gravity: 'bottom', // `top` or `bottom`
                 position: 'right', // `left`, `center` or `right`
                 stopOnFocus: true, // Prevents dismissing of toast on hover
-                style: {
-                    // background:
-                    //     'linear-gradient(to right, rgb(227 135 22), rgb(221 45 45))',
-
-                    background:
-                        'linear-gradient(90deg, rgba(255,244,0,1) 0%, rgba(255,162,0,1) 48%, rgba(255,0,0,1) 100%)',
-                    color: 'black',
-                },
+                style: toastifyStyle,
                 onClick: function () {}, // Callback after click
             }).showToast();
 
@@ -273,18 +283,14 @@ function OnSocketMessage(msg: MessageEvent) {
         if (command === 'message') {
             Toastify({
                 text: data[1],
-                duration: 6000,
+                duration: 66000,
                 //destination: "http://skorobogach-i-galoshi.tk/",
                 newWindow: true,
                 close: true,
                 gravity: 'bottom', // `top` or `bottom`
                 position: 'right', // `left`, `center` or `right`
                 stopOnFocus: true, // Prevents dismissing of toast on hover
-                style: {
-                    background:
-                        'linear-gradient(90deg, rgba(0,255,141,1) 0%, rgba(0,206,255,1) 100%)',
-                    color: 'black',
-                },
+                style: toastifyStyle,
                 onClick: function () {}, // Callback after click
             }).showToast();
         }
@@ -317,18 +323,14 @@ function OnSocketMessage(msg: MessageEvent) {
 
 function OnSocketClose() {
     Toastify({
-        text: 'Lost connection. Click here',
+        text: 'Соединение прервано. Нажмите здесь.',
         duration: 0,
         newWindow: true,
         close: false,
         gravity: 'bottom', // `top` or `bottom`
         position: 'right', // `left`, `center` or `right`
         stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: {
-            background:
-                'linear-gradient(90deg, rgba(255,244,0,1) 0%, rgba(255,162,0,1) 48%, rgba(255,0,0,1) 100%)',
-            color: 'black',
-        },
+        style: toastifyStyle,
         onClick: function () {
             location.reload();
         }, // Callback after click

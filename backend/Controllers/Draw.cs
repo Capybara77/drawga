@@ -25,7 +25,7 @@ namespace websocket_chat.Controllers
 
         private async void OnClientConnected(WebSocket socket, int id)
         {
-            await SendData(socket, Encoding.UTF8.GetBytes("message:::User connected"), id);
+            await SendData(socket, Encoding.UTF8.GetBytes("message:::Пользователь подключился"), id);
         }
 
         private async void EventForClient(WebSocket socket, int id)
@@ -77,7 +77,7 @@ namespace websocket_chat.Controllers
             Sockets[id].Add(socket);
 
             ClientConnected(socket, id);
-            await socket.SendAsync(Encoding.UTF8.GetBytes($"message:::Elements on the board: {History[id].Count}"), WebSocketMessageType.Text, true,
+            await socket.SendAsync(Encoding.UTF8.GetBytes($"message:::Элементов на доске: {History[id].Count}"), WebSocketMessageType.Text, true,
                 CancellationToken.None);
 
             if (!History.ContainsKey(id))
@@ -98,7 +98,7 @@ namespace websocket_chat.Controllers
 
             if (PrivateBoards.Contains(id))
             {
-                await socket.SendAsync(Encoding.UTF8.GetBytes("message:::This is a private board. You cant edit it."),
+                await socket.SendAsync(Encoding.UTF8.GetBytes("message:::Это закрытая доска. Изменения не сохраняются"),
                     WebSocketMessageType.Text, true, CancellationToken.None);
             }
 
