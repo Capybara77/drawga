@@ -806,6 +806,17 @@ window.addEventListener('pointermove', (event) => {
 });
 
 window.addEventListener('resize', () => {
+    let strokeStyleTemp = ctx.strokeStyle;
+    let fillStyleTemp = ctx.fillStyle;
+    let lineWidth = ctx.lineWidth;
+
+    canvasElement.height = window.innerHeight;
+    canvasElement.width = window.innerWidth;
+
+    ctx.strokeStyle= strokeStyleTemp;
+    ctx.fillStyle = fillStyleTemp;
+    ctx.lineWidth = lineWidth;
+
     fullReDraw();
 });
 
