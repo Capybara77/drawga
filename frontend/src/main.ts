@@ -4,6 +4,7 @@ import {
     EllipseObject,
     LineObject,
     RectangleObject,
+    TextObject,
 } from './types';
 import {
     reDraw,
@@ -37,6 +38,7 @@ let isResize = false;
 let isOnCanvas = false;
 let isSpacePressed = false;
 let isColorPickerOpened = false;
+let isTyping = false;
 
 const trailer = document.getElementById('me') as HTMLDivElement;
 const myId: string = makeid(20);
@@ -50,6 +52,10 @@ const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
 
 const confirmWrapper = document.querySelector(
     '.confirm-wrapper'
+) as HTMLDivElement;
+
+const mainContainer = document.querySelector(
+    '.main-container'
 ) as HTMLDivElement;
 
 // ================================================== OPTIONS
@@ -421,6 +427,57 @@ window.addEventListener('pointerdown', (event) => {
 
         cursorXStart = event.clientX;
         cursorYStart = event.clientY;
+
+        if (currentShape === 'text') {
+            // в #main-container
+
+            const newInput = document.createElement('textarea');
+            newInput.id = makeid(5);
+            newInput.classList.add('text-element');
+
+            // newInput.style.top = `${event.clientY}px`;
+            // newInput.style.left = `${event.clientX}px`;
+
+            let textObj = new TextObject(
+                'sans-serif',
+                'normal',
+                ctx.fillStyle as string,
+                myId,
+                newInput,
+                event.clientY,
+                event.clientX
+            );
+
+            allObjects.push(textObj);
+
+            mainContainer.prepend(newInput);
+
+            newInput.style.top = `${textObj.top}px`;
+            newInput.style.left = `${textObj.left}px`;
+
+            // newInput.style.fontSize = textObj.
+
+            newInput.addEventListener('focus', (event) => {
+                isTyping = true;
+            });
+
+            newInput.addEventListener('blur', (event) => {
+                isTyping = false;
+            });
+
+            currentShape = 'pointer';
+
+            shapeBtns.forEach((shapeButton) => {
+                shapeButton.classList.remove('active-shape');
+            });
+            document
+                .getElementById('pointer-btn')
+                ?.classList.add('active-shape');
+        }
+
+        if (currentShape === 'image') {
+            console.log('i');
+        }
     }
 });
 
@@ -813,7 +870,7 @@ window.addEventListener('resize', () => {
     canvasElement.height = window.innerHeight;
     canvasElement.width = window.innerWidth;
 
-    ctx.strokeStyle= strokeStyleTemp;
+    ctx.strokeStyle = strokeStyleTemp;
     ctx.fillStyle = fillStyleTemp;
     ctx.lineWidth = lineWidth;
 
@@ -907,6 +964,7 @@ document.addEventListener('keydown', (event) => {
     // shortcut
 
     if (isColorPickerOpened === true) return;
+    if (isTyping === true) return;
 
     if (keyValue === '1' || codeValue === 'KeyF') {
         const cursorId = 'pointer-btn';

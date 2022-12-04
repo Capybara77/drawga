@@ -28,6 +28,12 @@
 
     --cursor-custom: url('/icons/custom-cursor.svg');
     /* --cursor-custom: url('/icons/cursor-black.png'); */
+
+    --z-index-1: 10000000;
+    --z-index-2: 10000000000;
+    --z-index-3: 100000000000000;
+    --z-index-4: 100000000000000000;
+    --z-index-max: 10000000000000000000000000;
 }
 
 * {
@@ -82,7 +88,7 @@ hr {
 
 /* ======================== КУРСОР ======================== */
 
-.trailer {
+/* .trailer {
     display: none;
 
     width: 15px;
@@ -96,7 +102,7 @@ hr {
     z-index: 100000;
 
     pointer-events: none;
-}
+} */
 
 /* ======================== SHAPE ======================== */
 
@@ -322,7 +328,7 @@ hr {
     top: -2px;
     border: 2px solid var(--clr-border);
     background-color: var(--clr-background-transparent);
-    z-index: 10000;
+    z-index: var(--z-index-4);
 
     padding: 5px;
     border-radius: 4px;
@@ -631,7 +637,7 @@ input[type='range']::-webkit-slider-runnable-track {
     width: 100vw;
     height: 100vh;
 
-    z-index: 10000000000000000000000000;
+    z-index: var(--z-index-max);
 
     background-color: var(--clr-background-transparent);
 
@@ -679,4 +685,15 @@ input[type='range']::-webkit-slider-runnable-track {
 
 #confirm-agree {
     background-color: rgb(177, 97, 97);
+}
+
+/* ======================== ТЕКСТ ======================== */
+
+.text-element {
+    position: absolute !important;
+    background: transparent;
+    font-size: 2rem;
+    border: 1px solid black;
+    outline: none;
+    color: var(--clr-text);
 }

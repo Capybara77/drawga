@@ -27,6 +27,40 @@ export abstract class BaseObject {
     }
 }
 
+export class TextObject extends BaseObject {
+    typeName: string = 'text';
+    inputElement: HTMLElement;
+    top: number;
+    left: number;
+
+    constructor(
+        fontFamily: string,
+        fontWeight: string,
+        color: string,
+        userId: string,
+        inputElement: HTMLElement,
+        top: number,
+        left: number
+    ) {
+        super(color, 1, userId);
+
+        this.userId = userId;
+        this.inputElement = inputElement;
+        this.top = top;
+        this.left = left;
+    }
+
+    draw(offsetX: number, offsetY: number): void {
+        this.inputElement.style.left = this.left * this.zoom + offsetX + 'px';
+        this.inputElement.style.top = this.top * this.zoom + offsetY + 'px';
+        this.inputElement.style.fontSize = `${this.zoom * 32}px`;
+    }
+
+    isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+        return true;
+    }
+}
+
 export class CurveObject extends BaseObject {
     pointsList;
     ctx;
@@ -59,7 +93,7 @@ export class CurveObject extends BaseObject {
             size: this.width * this.zoom,
             thinning: 0.5,
             smoothing: 0.2,
-            easing: (a) => a* 0.8,
+            easing: (a) => a * 0.8,
             simulatePressure: true,
         });
 
@@ -414,16 +448,14 @@ export class EllipseObject extends BaseObject {
         Xmax *= this.zoom;
         Ymax *= this.zoom;
 
-        if (this.startPoint[0] < this.endPoint[0]){
+        if (this.startPoint[0] < this.endPoint[0]) {
             Xmin += Xmin - Xmax;
-        }
-        else{
+        } else {
             Xmax -= Xmin - Xmax;
         }
-        if (this.startPoint[1] < this.endPoint[1]){
+        if (this.startPoint[1] < this.endPoint[1]) {
             Ymin += Ymin - Ymax;
-        }
-        else{
+        } else {
             Ymax -= Ymin - Ymax;
         }
 
