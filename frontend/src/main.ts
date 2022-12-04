@@ -345,7 +345,6 @@ function OnSocketMessage(msg: MessageEvent) {
                     element.remove();
                 }
 
-
                 const newInput = document.createElement('textarea');
                 newInput.id = textObj.inputId;
                 newInput.classList.add('text-element');
