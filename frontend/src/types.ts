@@ -29,7 +29,7 @@ export abstract class BaseObject {
 
 export class TextObject extends BaseObject {
     typeName: string = 'text';
-    inputElement: HTMLTextAreaElement;
+    inputElement: HTMLTextAreaElement | null;
     top: number;
     left: number;
     fontFamily: string;
@@ -42,7 +42,7 @@ export class TextObject extends BaseObject {
         fontWeight: string,
         color: string,
         userId: string,
-        inputElement: HTMLTextAreaElement,
+        inputElement: HTMLTextAreaElement | null,
         top: number,
         left: number,
         text: string,
@@ -51,18 +51,26 @@ export class TextObject extends BaseObject {
         super(color, 1, userId);
 
         this.userId = userId;
-        this.inputElement = inputElement;
         this.top = top;
         this.left = left;
         this.fontFamily = fontFamily;
         this.fontWeight = fontWeight;
         this.text = text;
         this.inputId = inputId;
+        this.inputElement = inputElement ?? null;
 
-        inputElement.value = text;
+        if (inputElement !== null)
+        {
+            inputElement.value = text;
+        }
     }
 
     draw(offsetX: number, offsetY: number): void {
+        if (this.inputElement === null)
+        {
+            return;
+        }
+
         this.inputElement.style.left = this.left * this.zoom + offsetX + 'px';
         this.inputElement.style.top = this.top * this.zoom + offsetY + 'px';
         this.inputElement.style.fontSize = `${this.zoom * 32}px`;

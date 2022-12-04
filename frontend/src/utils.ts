@@ -13,8 +13,6 @@ export function getTypedDrawObject(
     str: string,
     roughCanvas: RoughCanvas,
     ctx: CanvasRenderingContext2D,
-    mainContainer: HTMLDivElement,
-    listener: (event: Event) => void
 ): BaseObject | null {
     let json: BaseObject = JSON.parse(str);
     let type: string = json.typeName;
@@ -124,17 +122,12 @@ export function getTypedDrawObject(
                 inputId,
             } = json as TextObject;
 
-            const newInput = document.createElement('textarea');
-            newInput.id = inputId;
-            newInput.classList.add('text-element');
-            mainContainer.prepend(newInput);
-
             let t = new TextObject(
                 fontFamily,
                 fontWeight,
                 color,
                 userId,
-                newInput,
+                null,
                 top,
                 left,
                 text,
@@ -142,8 +135,6 @@ export function getTypedDrawObject(
             );
             t.objId = objId;
             t.zoom = zoom;
-
-            t.inputElement.addEventListener('input', listener);
 
             return t;
         }

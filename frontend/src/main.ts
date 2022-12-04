@@ -335,9 +335,26 @@ function OnSocketMessage(msg: MessageEvent) {
                 data[1],
                 roughCanvas,
                 ctx,
-                mainContainer,
-                textChangedEvent
             ) as BaseObject;
+
+            if (o.typeName === 'text') {
+                let textObj = o as TextObject;
+                let oldInputs = document.querySelectorAll('#' + textObj.inputId);
+                for (let index = 0; index < oldInputs.length; index++) {
+                    const element = oldInputs[index];
+                    element.remove();
+                }
+
+
+                const newInput = document.createElement('textarea');
+                newInput.id = textObj.inputId;
+                newInput.classList.add('text-element');
+                mainContainer.prepend(newInput);
+                newInput.addEventListener('input', textChangedEvent);
+                newInput.value = textObj.text;
+
+                textObj.inputElement = newInput;
+            }
 
             o.zoom = currentZoom;
 
@@ -507,14 +524,11 @@ export function textChangedEvent(event: Event) {
     deleteObj(foundObj);
 
     let messageToServer: string =
-    'drawObj:::' +
-    JSON.stringify(foundObj) +
-    ':::';
-
+        'drawObj:::' + JSON.stringify(foundObj) + ':::';
 
     let utf8Encode = new TextEncoder();
     let array = utf8Encode.encode(messageToServer);
-    
+
     socket.send(array.length as unknown as string);
     console.log(messageToServer.length as unknown as string);
     socket.send(array);
