@@ -414,8 +414,18 @@ export class EllipseObject extends BaseObject {
         Xmax *= this.zoom;
         Ymax *= this.zoom;
 
-        Xmin += Xmin - Xmax;
-        Ymin += Ymin - Ymax;
+        if (this.startPoint[0] < this.endPoint[0]){
+            Xmin += Xmin - Xmax;
+        }
+        else{
+            Xmax -= Xmin - Xmax;
+        }
+        if (this.startPoint[1] < this.endPoint[1]){
+            Ymin += Ymin - Ymax;
+        }
+        else{
+            Ymax -= Ymin - Ymax;
+        }
 
         let screenX = x;
         let screenY = y;
