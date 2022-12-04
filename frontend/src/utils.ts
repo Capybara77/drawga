@@ -7,12 +7,14 @@ import {
     CurveObject,
     TextObject,
 } from './types';
+import {allObjects, deleteObj} from './main'
 
 export function getTypedDrawObject(
     str: string,
     roughCanvas: RoughCanvas,
     ctx: CanvasRenderingContext2D,
-    mainContainer: HTMLDivElement
+    mainContainer: HTMLDivElement,
+    listener: (event: Event) => void
 ): BaseObject | null {
     let json: BaseObject = JSON.parse(str);
     let type: string = json.typeName;
@@ -123,7 +125,7 @@ export function getTypedDrawObject(
             } = json as TextObject;
 
             const newInput = document.createElement('textarea');
-            newInput.id = makeid(5);
+            newInput.id = inputId;
             newInput.classList.add('text-element');
             mainContainer.prepend(newInput);
 
@@ -140,6 +142,8 @@ export function getTypedDrawObject(
             );
             t.objId = objId;
             t.zoom = zoom;
+
+            t.inputElement.addEventListener('input', listener);
 
             return t;
         }

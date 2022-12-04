@@ -19,10 +19,11 @@ import {
 import rough from 'roughjs';
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
+import { Socket } from './socket';
 
 // ============= CONST
 
-let allObjects: BaseObject[] = [];
+export let allObjects: BaseObject[] = [];
 
 let offsetXCustom = 0;
 let offsetYCustom = 0;
@@ -198,7 +199,7 @@ shapeBtns.forEach((shapeButton) => {
 });
 
 // ======================== SOCKET
-let socket: WebSocket;
+let socket: WebSocket = Socket.socket;
 let new_uri: string = '';
 const loc: Location = window.location;
 
@@ -334,7 +335,8 @@ function OnSocketMessage(msg: MessageEvent) {
                 data[1],
                 roughCanvas,
                 ctx,
-                mainContainer
+                mainContainer,
+                textChangedEvent
             ) as BaseObject;
 
             o.zoom = currentZoom;
@@ -475,20 +477,7 @@ window.addEventListener('pointerdown', (event) => {
                 isTyping = false;
             });
 
-            newInput.addEventListener('input', (event) => {
-                const element = event.target as HTMLTextAreaElement;
-
-                const foundObj = allObjects.find(
-                    (item) => (item as TextObject).inputId === element.id
-                ) as TextObject;
-
-                foundObj.text = element.value;
-
-                deleteObj(foundObj);
-
-                socket.send(messageToServer.length as unknown as string);
-                socket.send(messageToServer);
-            });
+            newInput.addEventListener('input', textChangedEvent);
 
             currentShape = 'pointer';
 
@@ -505,6 +494,31 @@ window.addEventListener('pointerdown', (event) => {
         }
     }
 });
+
+export function textChangedEvent(event: Event) {
+    const element = event.target as HTMLTextAreaElement;
+
+    const foundObj = allObjects.find(
+        (item) => (item as TextObject).inputId === element.id
+    ) as TextObject;
+
+    foundObj.text = element.value;
+
+    deleteObj(foundObj);
+
+    let messageToServer: string =
+    'drawObj:::' +
+    JSON.stringify(foundObj) +
+    ':::';
+
+
+    let utf8Encode = new TextEncoder();
+    let array = utf8Encode.encode(messageToServer);
+    
+    socket.send(array.length as unknown as string);
+    console.log(messageToServer.length as unknown as string);
+    socket.send(array);
+}
 
 window.addEventListener('pointerup', (event) => {
     if (event.button === 1) {
@@ -1348,14 +1362,16 @@ zoomContainer.addEventListener('click', (event: MouseEvent) => {
 
 // ======================================== LOCAL FUNCTIONS
 
-function deleteObj(obj: BaseObject) {
+export function deleteObj(obj: BaseObject) {
     bufferObj.push(obj);
 
     let a = JSON.stringify(obj);
 
     let messageToServer: string = 'delete:::' + a;
-    socket.send(messageToServer.length as unknown as string);
-    socket.send(messageToServer);
+    let utf8Encode = new TextEncoder();
+    let array = utf8Encode.encode(messageToServer);
+    socket.send(array.length as unknown as string);
+    socket.send(array);
 }
 
 function fullReDraw() {
