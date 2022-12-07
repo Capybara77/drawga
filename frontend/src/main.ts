@@ -48,6 +48,7 @@ let currentBorderColor = 'rgb(95, 61, 196)';
 let currentShape = 'pointer';
 let currentFillStyle = 'hachure';
 let currentCursor = 'pointer';
+let currentFontSize = '1rem';
 
 const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
 
@@ -65,12 +66,32 @@ const optionsWrapper = document.querySelector(
     '.options-wrapper'
 ) as HTMLDivElement;
 
+const optionsColorStroke = document.getElementById(
+    'options-color-fill'
+) as HTMLDivElement;
+
 const optionsColorBorder = document.getElementById(
     'options-color-border'
 ) as HTMLDivElement;
 
-const fillStyleOptionsContainer = document.querySelector(
-    '.fill-style-options'
+const optionsFillStyleContainer = document.getElementById(
+    'fill-style-options-container'
+) as HTMLDivElement;
+
+const optionsFontSizeContainer = document.getElementById(
+    'font-size-options-container'
+) as HTMLDivElement;
+
+const optionsColorText = document.getElementById(
+    'options-color-text'
+) as HTMLDivElement;
+
+const optionsWidthContainer = document.getElementById(
+    'width-options-container'
+) as HTMLDivElement;
+
+const optionsOpacityContainer = document.getElementById(
+    'opacity-options-container'
 ) as HTMLDivElement;
 
 // ================================================== SETTINGS
@@ -194,7 +215,6 @@ shapeBtns.forEach((shapeButton) => {
         currentShape = elem.dataset.shapeOption as string;
 
         showOptions(elem.id);
-        changeCursor(elem.dataset.shapeOption as string);
     });
 });
 
@@ -331,15 +351,13 @@ function OnSocketMessage(msg: MessageEvent) {
         }
 
         if (command === 'drawObj') {
-            let o = getTypedDrawObject(
-                data[1],
-                roughCanvas,
-                ctx,
-            ) as BaseObject;
+            let o = getTypedDrawObject(data[1], roughCanvas, ctx) as BaseObject;
 
             if (o.typeName === 'text') {
                 let textObj = o as TextObject;
-                let oldInputs = document.querySelectorAll('#' + textObj.inputId);
+                let oldInputs = document.querySelectorAll(
+                    '#' + textObj.inputId
+                );
                 for (let index = 0; index < oldInputs.length; index++) {
                     const element = oldInputs[index];
                     element.remove();
@@ -484,12 +502,10 @@ window.addEventListener('pointerdown', (event) => {
             // newInput.style.fontSize = textObj.
 
             newInput.addEventListener('focus', (event) => {
-                console.log('f');
                 isTyping = true;
             });
 
             newInput.addEventListener('blur', (event) => {
-                console.log('b');
                 isTyping = false;
             });
 
@@ -506,7 +522,6 @@ window.addEventListener('pointerdown', (event) => {
         }
 
         if (currentShape === 'image') {
-            console.log('i');
         }
     }
 });
@@ -1281,12 +1296,10 @@ strokeColorPickerInput.addEventListener('input', (event) => {
 });
 
 strokeColorPickerInput.addEventListener('focus', () => {
-    console.log('f');
     isColorPickerOpened = true;
 });
 
 strokeColorPickerInput.addEventListener('blur', () => {
-    console.log('b');
     isColorPickerOpened = false;
 });
 
@@ -1309,11 +1322,11 @@ widthBtns.forEach((optionButton) => {
 
         const elem = event.target as HTMLElement;
         ctx.lineWidth = parseInt(elem.dataset.lineWidth as string);
-        optionButton.classList.add('active-width');
+        optionButton.classList.add('active-option');
 
         widthBtns.forEach((op) => {
             if (op !== elem) {
-                op.classList.remove('active-width');
+                op.classList.remove('active-option');
             }
         });
     });
@@ -1373,6 +1386,27 @@ zoomContainer.addEventListener('click', (event: MouseEvent) => {
     zoomContainer.innerHTML = '100%';
 });
 
+// ======================================== FONT SIZE
+
+const fontSizeBtns = document.querySelectorAll('.font-size-btn');
+
+fontSizeBtns.forEach((fontSizeButton) => {
+    fontSizeButton.addEventListener('click', (event) => {
+        if (event.target === null) return;
+
+        const elem = event.target as HTMLElement;
+        currentFontSize = elem.dataset.fontSize as string;
+
+        fontSizeButton.classList.add('active-option');
+
+        fontSizeBtns.forEach((op) => {
+            if (op !== elem) {
+                op.classList.remove('active-option');
+            }
+        });
+    });
+});
+
 // ======================================== LOCAL FUNCTIONS
 
 export function deleteObj(obj: BaseObject) {
@@ -1408,39 +1442,62 @@ function setNewZoom() {
 
 function showOptions(cursorId: string) {
     const cursorName = cursorId.split('-')[0];
+
     switch (cursorName) {
         case 'pointer':
             optionsWrapper.style.display = 'none';
+
             break;
         case 'eraser':
             optionsWrapper.style.display = 'none';
+
             break;
         case 'pen':
+            hideAllOptions();
             optionsWrapper.style.display = 'flex';
-            optionsColorBorder.style.display = 'none';
-            fillStyleOptionsContainer.style.display = 'none';
+
+            optionsColorStroke.style.display = 'flex';
+            optionsOpacityContainer.style.display = 'flex';
+            optionsWidthContainer.style.display = 'flex';
+
             break;
         case 'rectangle':
+            hideAllOptions();
             optionsWrapper.style.display = 'flex';
+            optionsColorStroke.style.display = 'flex';
             optionsColorBorder.style.display = 'flex';
-            fillStyleOptionsContainer.style.display = 'flex';
+            optionsFillStyleContainer.style.display = 'flex';
+            optionsOpacityContainer.style.display = 'flex';
+            optionsWidthContainer.style.display = 'flex';
+
             break;
         case 'line':
+            hideAllOptions();
             optionsWrapper.style.display = 'flex';
-            optionsColorBorder.style.display = 'none';
-            fillStyleOptionsContainer.style.display = 'none';
+            optionsColorStroke.style.display = 'flex';
+            optionsOpacityContainer.style.display = 'flex';
+            optionsWidthContainer.style.display = 'flex';
+
             break;
         case 'ellipse':
+            hideAllOptions();
             optionsWrapper.style.display = 'flex';
             optionsColorBorder.style.display = 'flex';
-            fillStyleOptionsContainer.style.display = 'flex';
+            optionsFillStyleContainer.style.display = 'flex';
+            optionsWidthContainer.style.display = 'flex';
+            optionsColorStroke.style.display = 'flex';
+
             break;
 
         case 'text':
-            optionsWrapper.style.display = 'none';
+            hideAllOptions();
+            optionsWrapper.style.display = 'flex';
+            optionsColorText.style.display = 'flex';
+            optionsFontSizeContainer.style.display = 'flex';
             break;
 
         case 'image':
+            hideAllOptions();
             optionsWrapper.style.display = 'none';
             break;
 
@@ -1449,8 +1506,12 @@ function showOptions(cursorId: string) {
     }
 }
 
-function changeCursor(givenShape: string) {
-    // const path = './icons/' + givenShape + '.svg';
-    // console.log(path);
-    // canvasElement.style.cursor = `url(${path}), auto`;
+function hideAllOptions() {
+    optionsColorStroke.style.display = 'none';
+    optionsColorBorder.style.display = 'none';
+    optionsColorText.style.display = 'none';
+    optionsFillStyleContainer.style.display = 'none';
+    optionsFontSizeContainer.style.display = 'none';
+    optionsWidthContainer.style.display = 'none';
+    optionsOpacityContainer.style.display = 'none';
 }

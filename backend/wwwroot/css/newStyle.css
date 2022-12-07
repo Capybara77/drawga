@@ -346,14 +346,14 @@ hr {
 
 /* =========================== ШИРИНА =========================== */
 
-.options-width-container {
+.options-btns-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: stretch;
     align-items: center;
     gap: 10px;
 }
 
-.width-btn {
+.option-btn {
     width: 100%;
     background-color: var(--clr-background-transparent);
     border: none;
@@ -363,11 +363,11 @@ hr {
     cursor: pointer;
 }
 
-.options-width-container > div {
+/* .options-btns-container > div {
     flex: 1 1 0;
-}
+} */
 
-.active-width {
+.active-option {
     outline: 2px solid var(--clr-primary);
     color: var(--clr-primary);
 }
