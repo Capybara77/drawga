@@ -152,27 +152,7 @@ if (activeThemeValue === 'darkTheme') {
     moonIcon.style.display = 'block';
 }
 
-changeThemeBtn.addEventListener('click', () => {
-    const theme = document.documentElement.className;
-
-    if (theme.includes('darkTheme')) {
-        themeText.innerHTML = 'Темная тема';
-        document.documentElement.className = 'lightTheme';
-        localStorage.setItem('theme', 'lightTheme');
-
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-    }
-
-    if (theme.includes('lightTheme')) {
-        themeText.innerHTML = 'Светлая тема';
-        document.documentElement.className = 'darkTheme';
-        localStorage.setItem('theme', 'darkTheme');
-
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-    }
-});
+changeThemeBtn.addEventListener('click', changeCurrentTheme);
 
 // ====================================== FILL STYLE
 
@@ -418,16 +398,31 @@ function OnSocketClose() {
 // ================================== SPACE BAR move
 
 window.addEventListener('keydown', (event) => {
+    const switchTheme = event.ctrlKey && event.shiftKey && event.key === 'T';
+    const isDownloadFile = event.ctrlKey && event.key.toLowerCase() === 'd';
+    const isSaveOnServer = event.ctrlKey && event.shiftKey && event.key === 'O';
+
     if (event.code === 'Space') {
         isSpacePressed = true;
-        // canvasElement.style.cursor = 'grabbing';
+    }
+    if (switchTheme) {
+        event.preventDefault();
+        changeCurrentTheme();
+    }
+    if (isDownloadFile) {
+        event.preventDefault();
+        downloadFile();
+    }
+
+    if (isSaveOnServer) {
+        event.preventDefault();
+        saveOnServer();
     }
 });
 
 window.addEventListener('keyup', (event) => {
     if (event.code === 'Space') {
         isSpacePressed = false;
-        // canvasElement.style.cursor = 'default';
     }
 });
 
@@ -484,7 +479,7 @@ window.addEventListener('pointerdown', (event) => {
             newInput.style.outline = '2px dashed rgba(0, 0, 0, 0.5)';
 
             let textObj = new TextObject(
-                'sans-serif',
+                'Roboto',
                 ctx.fillStyle as string,
                 myId,
                 newInput,
@@ -1050,6 +1045,8 @@ document.addEventListener('keydown', (event) => {
 
     // shortcut
 
+    if (event.ctrlKey && event.shiftKey) return;
+
     if (isColorPickerOpened === true) return;
     if (isTyping === true) return;
 
@@ -1118,13 +1115,7 @@ function shortCutShape(id: string) {
 // ================================== СОХРАНИТЬ
 
 const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
-saveBtn.addEventListener('click', () => {
-    let data = canvasElement.toDataURL('imag/png');
-    let a = document.createElement('a');
-    a.href = data;
-    a.download = 'sketch.png';
-    a.click();
-});
+saveBtn.addEventListener('click', downloadFile);
 
 // ================================== ОЧИСТИТЬ
 
@@ -1138,12 +1129,7 @@ clearBtn.addEventListener('click', () => {
 const saveServerBtn = document.getElementById(
     'save-server-btn'
 ) as HTMLButtonElement;
-saveServerBtn.addEventListener('click', () => {
-    let message: string = 'save';
-    socket.send(message.length as unknown as string);
-    socket.send(message);
-    settingsContainer.style.display = 'none';
-});
+saveServerBtn.addEventListener('click', saveOnServer);
 
 // ================================== ПОДТВЕРДИТЬ УДАЛЕНИЕ
 
@@ -1608,4 +1594,41 @@ function hideAllOptions() {
     optionsFontSizeContainer.style.display = 'none';
     optionsWidthContainer.style.display = 'none';
     optionsOpacityContainer.style.display = 'none';
+}
+
+function changeCurrentTheme() {
+    const theme = document.documentElement.className;
+
+    if (theme.includes('darkTheme')) {
+        themeText.innerHTML = 'Темная тема';
+        document.documentElement.className = 'lightTheme';
+        localStorage.setItem('theme', 'lightTheme');
+
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+    }
+
+    if (theme.includes('lightTheme')) {
+        themeText.innerHTML = 'Светлая тема';
+        document.documentElement.className = 'darkTheme';
+        localStorage.setItem('theme', 'darkTheme');
+
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+    }
+}
+
+function downloadFile() {
+    let data = canvasElement.toDataURL('imag/png');
+    let a = document.createElement('a');
+    a.href = data;
+    a.download = 'sketch.png';
+    a.click();
+}
+
+function saveOnServer() {
+    let message: string = 'save';
+    socket.send(message.length as unknown as string);
+    socket.send(message);
+    settingsContainer.style.display = 'none';
 }
