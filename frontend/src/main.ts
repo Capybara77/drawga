@@ -21,6 +21,21 @@ import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 import { Socket } from './socket';
 
+//  ====================================== CANVAS
+
+const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+canvasElement.height = document.documentElement.clientHeight;
+canvasElement.width = document.documentElement.clientWidth;
+const ctx = canvasElement.getContext('2d') as CanvasRenderingContext2D;
+ctx.lineWidth = 12;
+ctx.fillStyle = 'rgb(54, 79, 199)';
+// trailer.style.backgroundColor = 'rgb(54, 79, 199)';
+
+let prevX = 0;
+let prevY = 0;
+
+const roughCanvas = rough.canvas(canvasElement);
+
 // ============= CONST
 
 export let allObjects: BaseObject[] = [];
@@ -48,7 +63,8 @@ let currentBorderColor = 'rgb(95, 61, 196)';
 let currentShape = 'pointer';
 let currentFillStyle = 'hachure';
 let currentCursor = 'pointer';
-let currentFontSize = '1rem';
+let currentFontSize = '10rem';
+let currentTextColor = '';
 
 const zoomContainer = document.getElementById('zoom-current') as HTMLDivElement;
 
@@ -157,21 +173,6 @@ changeThemeBtn.addEventListener('click', () => {
         moonIcon.style.display = 'none';
     }
 });
-
-//  ====================================== CANVAS
-
-const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
-canvasElement.height = document.documentElement.clientHeight;
-canvasElement.width = document.documentElement.clientWidth;
-const ctx = canvasElement.getContext('2d') as CanvasRenderingContext2D;
-ctx.lineWidth = 12;
-ctx.fillStyle = 'rgb(54, 79, 199)';
-trailer.style.backgroundColor = 'rgb(54, 79, 199)';
-
-let prevX = 0;
-let prevY = 0;
-
-const roughCanvas = rough.canvas(canvasElement);
 
 // ====================================== FILL STYLE
 
@@ -473,19 +474,26 @@ window.addEventListener('pointerdown', (event) => {
             // в #main-container
 
             const newInput = document.createElement('textarea');
-            newInput.id = makeid(5);
+            const newId = makeid(5);
+            newInput.id = newId;
             newInput.classList.add('text-element');
+            newInput.style.fontSize = currentFontSize;
+            newInput.style.color = currentTextColor;
+            // newInput.style.resize = 'none';
+            newInput.style.border = 'none';
+            newInput.style.outline = '2px dashed rgba(0, 0, 0, 0.5)';
 
             let textObj = new TextObject(
                 'sans-serif',
-                'normal',
                 ctx.fillStyle as string,
                 myId,
                 newInput,
                 (event.clientY - offsetYCustom) / currentZoom,
                 (event.clientX - offsetXCustom) / currentZoom,
                 '',
-                newInput.id
+                newInput.id,
+                currentFontSize,
+                currentTextColor
             );
             textObj.zoom = currentZoom;
             textObj.draw(offsetXCustom, offsetYCustom);
@@ -498,14 +506,20 @@ window.addEventListener('pointerdown', (event) => {
             socket.send(messageToServer);
 
             mainContainer.prepend(newInput);
+            // newInput.focus();
+            document.getElementById(newId)?.focus();
 
             // newInput.style.fontSize = textObj.
 
             newInput.addEventListener('focus', (event) => {
+                newInput.style.outline = '2px solid black';
                 isTyping = true;
             });
 
             newInput.addEventListener('blur', (event) => {
+                if (newInput.value.length !== 0) {
+                    newInput.style.outline = 'none';
+                }
                 isTyping = false;
             });
 
@@ -1184,6 +1198,86 @@ const strokeColorsItemList = document.querySelectorAll('#stroke-color-item');
 const strokeColorPickerInput = document.getElementById(
     'stroke-color-picker-input'
 ) as HTMLInputElement;
+
+const textColorPickerButton = document.getElementById(
+    'text-color-picker'
+) as HTMLButtonElement;
+const textColorListContainer = document.getElementById(
+    'text-color-list'
+) as HTMLDivElement;
+const textColorsItemList = document.querySelectorAll('#text-color-item');
+const textColorPickerInput = document.getElementById(
+    'text-color-picker-input'
+) as HTMLInputElement;
+
+// ============================ ВЫБРАТЬ ЦВЕТ ТЕКСТА
+
+textColorPickerButton.addEventListener('click', (event) => {
+    if (isColorPickerOpened === true) {
+        isColorPickerOpened = false;
+    } else {
+        isColorPickerOpened = true;
+    }
+
+    strokeColorListContainer.style.display = 'none';
+    colorListContainer.style.display = 'none';
+
+    event.stopPropagation();
+    const visible = textColorListContainer.style.display === 'grid';
+    if (visible) {
+        textColorListContainer.style.display = 'none';
+    } else {
+        textColorListContainer.style.display = 'grid';
+    }
+});
+
+for (let i = 0; i < textColorsItemList.length; i++) {
+    const element = textColorsItemList[i];
+
+    element.addEventListener('click', (e) => {
+        const element = e.target as HTMLDivElement;
+
+        if (element === null) return;
+
+        const clickedColor = element.style.backgroundColor;
+
+        textColorPickerButton.style.backgroundColor = clickedColor;
+        currentTextColor = clickedColor;
+        // changeColor(clickedColor, ctx, trailer, +inputOpacity.value);
+        textColorListContainer.style.display = 'none';
+
+        // trailer.style.backgroundColor = element.style.backgroundColor;
+    });
+}
+
+textColorPickerInput.addEventListener('input', (event) => {
+    const element = event.target as HTMLInputElement;
+    if (element === null) return;
+    const newColor = '#' + element.value;
+    if (newColor.length > 1) {
+        textColorPickerButton.style.backgroundColor = newColor;
+
+        currentTextColor = hexToRgbA(newColor, inputOpacity.value);
+        // trailer.style.backgroundColor = newColor;
+    }
+});
+
+textColorPickerInput.addEventListener('focus', () => {
+    isColorPickerOpened = true;
+});
+
+textColorPickerInput.addEventListener('blur', () => {
+    isColorPickerOpened = false;
+});
+
+document.documentElement.addEventListener('click', (event) => {
+    if (
+        textColorListContainer.style.display === 'grid' &&
+        event.target !== textColorListContainer
+    ) {
+        textColorListContainer.style.display = 'none';
+    }
+});
 
 // ============================ ВЫБРАТЬ ЦВЕТ ЗАРИСОВКИ
 
