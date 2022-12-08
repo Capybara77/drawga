@@ -488,7 +488,9 @@ window.addEventListener('pointerdown', (event) => {
                 '',
                 newInput.id,
                 currentFontSize,
-                currentTextColor
+                currentTextColor,
+                500,
+                150
             );
             textObj.zoom = currentZoom;
             textObj.draw(offsetXCustom, offsetYCustom);
@@ -519,6 +521,8 @@ window.addEventListener('pointerdown', (event) => {
             });
 
             newInput.addEventListener('input', textChangedEvent);
+            newInput.addEventListener('resize', resizeTextEvent);
+            new ResizeObserver(resize).observe(newInput);
 
             currentShape = 'pointer';
 
@@ -534,6 +538,31 @@ window.addEventListener('pointerdown', (event) => {
         }
     }
 });
+
+export function resize(){
+    
+}
+
+export function resizeTextEvent(event: Event){
+    const element = event.target as HTMLTextAreaElement;
+    const foundObj = allObjects.find(
+        (item) => (item as TextObject).inputId === element.id
+    ) as TextObject;
+
+    foundObj.width = +element.style.width;
+    foundObj.height = +element.style.height;
+
+    deleteObj(foundObj);
+
+    let messageToServer: string =
+        'drawObj:::' + JSON.stringify(foundObj) + ':::';
+
+    let utf8Encode = new TextEncoder();
+    let array = utf8Encode.encode(messageToServer);
+
+    socket.send(array.length as unknown as string);
+    socket.send(array);
+}
 
 export function textChangedEvent(event: Event) {
     const element = event.target as HTMLTextAreaElement;
@@ -558,7 +587,6 @@ export function textChangedEvent(event: Event) {
     let array = utf8Encode.encode(messageToServer);
 
     socket.send(array.length as unknown as string);
-    console.log(messageToServer.length as unknown as string);
     socket.send(array);
 }
 

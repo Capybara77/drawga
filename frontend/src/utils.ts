@@ -120,7 +120,8 @@ export function getTypedDrawObject(
                 text,
                 inputId,
                 fontSize,
-                textColor
+                textColor,
+                height,
             } = json as TextObject;
 
             let t = new TextObject(
@@ -133,7 +134,9 @@ export function getTypedDrawObject(
                 text,
                 inputId,
                 fontSize,
-                textColor
+                textColor,
+                width,
+                height
             );
             t.objId = objId;
             t.zoom = zoom;
