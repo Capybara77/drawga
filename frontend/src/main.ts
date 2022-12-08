@@ -538,6 +538,11 @@ window.addEventListener('pointerdown', (event) => {
 export function textChangedEvent(event: Event) {
     const element = event.target as HTMLTextAreaElement;
 
+    if (element.value.length > 1000)
+    {
+        return;
+    }
+
     const foundObj = allObjects.find(
         (item) => (item as TextObject).inputId === element.id
     ) as TextObject;
