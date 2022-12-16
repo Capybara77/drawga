@@ -51,7 +51,7 @@ export class TextObject extends BaseObject {
         fontSize: string,
         textColor: string,
         width: number,
-        height: number,
+        height: number
     ) {
         super(color, width, userId);
 
@@ -79,8 +79,8 @@ export class TextObject extends BaseObject {
         this.inputElement.style.left = this.left * this.zoom + offsetX + 'px';
         this.inputElement.style.top = this.top * this.zoom + offsetY + 'px';
         this.inputElement.style.fontSize = `${this.zoom * 32}px`;
-        this.inputElement.style.width = `${this.width*this.zoom}px`
-        this.inputElement.style.height = `${this.height*this.zoom}px`
+        this.inputElement.style.width = `${this.width * this.zoom}px`;
+        this.inputElement.style.height = `${this.height * this.zoom}px`;
     }
 
     isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {

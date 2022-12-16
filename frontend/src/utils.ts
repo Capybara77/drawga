@@ -7,12 +7,12 @@ import {
     CurveObject,
     TextObject,
 } from './types';
-import {allObjects, deleteObj} from './main'
+import { allObjects, deleteObj } from './main';
 
 export function getTypedDrawObject(
     str: string,
     roughCanvas: RoughCanvas,
-    ctx: CanvasRenderingContext2D,
+    ctx: CanvasRenderingContext2D
 ): BaseObject | null {
     let json: BaseObject = JSON.parse(str);
     let type: string = json.typeName;

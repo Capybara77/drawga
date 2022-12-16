@@ -585,8 +585,9 @@ window.addEventListener('pointerup', (event) => {
         case 'text': {
             return;
         }
-        case 'pointer':
+        case 'pointer': {
             return;
+        }
 
         case 'pen': {
             let pointsToDraw: number[][] = [];
@@ -667,7 +668,7 @@ window.addEventListener('pointerup', (event) => {
             break;
         }
 
-        case 'ellipse':
+        case 'ellipse': {
             fullReDraw();
 
             let ellipse = new EllipseObject(
@@ -699,6 +700,7 @@ window.addEventListener('pointerup', (event) => {
             ellipse.draw(offsetXCustom, offsetYCustom);
             allObjects.push(ellipse);
             break;
+        }
         default:
             break;
     }
