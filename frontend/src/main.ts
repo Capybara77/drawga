@@ -254,133 +254,143 @@ function OnSocketMessage(msg: MessageEvent) {
         const data = msg.data.split(':::');
         const command = data[0];
 
-        if (command === 'move') {
-            const lineWidth = ctx.lineWidth;
-            const strokeStyle = ctx.strokeStyle;
+        switch (command) {
+            case 'move': {
+                const lineWidth = ctx.lineWidth;
+                const strokeStyle = ctx.strokeStyle;
 
-            canvasElement.getContext('2d');
-            ctx.beginPath();
-            ctx.moveTo(data[1], data[2]);
-            ctx.lineTo(data[3], data[4]);
-            ctx.lineWidth = data[5];
-            ctx.strokeStyle = data[6];
-            ctx.stroke();
+                canvasElement.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(data[1], data[2]);
+                ctx.lineTo(data[3], data[4]);
+                ctx.lineWidth = data[5];
+                ctx.strokeStyle = data[6];
+                ctx.stroke();
 
-            ctx.strokeStyle = strokeStyle;
-            ctx.lineWidth = lineWidth;
-        }
-
-        if (command === 'clear') {
-            allObjects = [];
-            ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        }
-
-        if (command === 'cur') {
-            const userId = data[1];
-            let t;
-
-            t = document.getElementById(userId);
-
-            if (t === null) {
-                t = document.createElement('div');
-                t.id = userId;
-                t.className = 'trailer';
-                document.body.appendChild(t);
-                return;
+                ctx.strokeStyle = strokeStyle;
+                ctx.lineWidth = lineWidth;
+                break;
             }
+            case 'clear': {
+                allObjects = [];
+                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                break;
+            }
+            case 'cur': {
+                const userId = data[1];
+                let t;
 
-            const keyFrames = {
-                transform: `translate(${
-                    +data[2] * currentZoom + offsetXCustom
-                }px, ${+data[3] * currentZoom + offsetYCustom}px)`,
-            };
+                t = document.getElementById(userId);
 
-            t.animate(keyFrames, {
-                fill: 'forwards',
-            });
-        }
-
-        if (command === 'disconnect') {
-            Toastify({
-                text: 'Пользователь отключился',
-                duration: 2000,
-                //destination: "http://skorobogach-i-galoshi.tk/",
-                newWindow: true,
-                close: true,
-                gravity: 'bottom', // `top` or `bottom`
-                position: 'right', // `left`, `center` or `right`
-                stopOnFocus: true, // Prevents dismissing of toast on hover
-                style: toastifyStyle,
-                onClick: function () {}, // Callback after click
-            }).showToast();
-
-            let list = document.getElementsByClassName('trailer');
-
-            if (list.length === 0) return;
-
-            for (var i = 0; i < list.length; i++) {
-                if (list[i].id !== 'me') {
-                    document.body.removeChild(list[i]);
-                    i--;
+                if (t === null) {
+                    t = document.createElement('div');
+                    t.id = userId;
+                    t.className = 'trailer';
+                    document.body.appendChild(t);
+                    return;
                 }
+
+                const keyFrames = {
+                    transform: `translate(${
+                        +data[2] * currentZoom + offsetXCustom
+                    }px, ${+data[3] * currentZoom + offsetYCustom}px)`,
+                };
+
+                t.animate(keyFrames, {
+                    fill: 'forwards',
+                });
+                break;
             }
-        }
+            case 'disconnect': {
+                Toastify({
+                    text: 'Пользователь отключился',
+                    duration: 2000,
+                    //destination: "http://skorobogach-i-galoshi.tk/",
+                    newWindow: true,
+                    close: true,
+                    gravity: 'bottom', // `top` or `bottom`
+                    position: 'right', // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: toastifyStyle,
+                    onClick: function () {}, // Callback after click
+                }).showToast();
 
-        if (command === 'message') {
-            Toastify({
-                text: data[1],
-                duration: 6000,
-                //destination: "http://skorobogach-i-galoshi.tk/",
-                newWindow: true,
-                close: true,
-                gravity: 'bottom', // `top` or `bottom`
-                position: 'right', // `left`, `center` or `right`
-                stopOnFocus: true, // Prevents dismissing of toast on hover
-                style: toastifyStyle,
-                onClick: function () {}, // Callback after click
-            }).showToast();
-        }
+                let list = document.getElementsByClassName('trailer');
 
-        if (command === 'drawObj') {
-            let o = getTypedDrawObject(data[1], roughCanvas, ctx) as BaseObject;
+                if (list.length === 0) return;
 
-            if (o.typeName === 'text') {
-                let textObj = o as TextObject;
-                let oldInputs = document.querySelectorAll(
-                    '#' + textObj.inputId
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].id !== 'me') {
+                        document.body.removeChild(list[i]);
+                        i--;
+                    }
+                }
+                break;
+            }
+            case 'message': {
+                Toastify({
+                    text: data[1],
+                    duration: 6000,
+                    //destination: "http://skorobogach-i-galoshi.tk/",
+                    newWindow: true,
+                    close: true,
+                    gravity: 'bottom', // `top` or `bottom`
+                    position: 'right', // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: toastifyStyle,
+                    onClick: function () {}, // Callback after click
+                }).showToast();
+                break;
+            }
+            case 'drawObj': {
+                let o = getTypedDrawObject(
+                    data[1],
+                    roughCanvas,
+                    ctx
+                ) as BaseObject;
+
+                if (o.typeName === 'text') {
+                    let textObj = o as TextObject;
+                    let oldInputs = document.querySelectorAll(
+                        '#' + textObj.inputId
+                    );
+                    for (let index = 0; index < oldInputs.length; index++) {
+                        const element = oldInputs[index];
+                        element.remove();
+                    }
+
+                    const newInput = document.createElement('textarea');
+                    newInput.id = textObj.inputId;
+                    newInput.classList.add('text-element');
+                    mainContainer.prepend(newInput);
+                    newInput.addEventListener('input', textChangedEvent);
+                    newInput.value = textObj.text;
+
+                    textObj.inputElement = newInput;
+                }
+
+                o.zoom = currentZoom;
+
+                allObjects.push(o);
+
+                o.draw(offsetXCustom, offsetYCustom);
+                break;
+            }
+            case 'delete': {
+                let dataToDelete = data[1];
+
+                allObjects = allObjects.filter(
+                    (object) =>
+                        object.objId !==
+                        (JSON.parse(dataToDelete) as BaseObject).objId
                 );
-                for (let index = 0; index < oldInputs.length; index++) {
-                    const element = oldInputs[index];
-                    element.remove();
-                }
 
-                const newInput = document.createElement('textarea');
-                newInput.id = textObj.inputId;
-                newInput.classList.add('text-element');
-                mainContainer.prepend(newInput);
-                newInput.addEventListener('input', textChangedEvent);
-                newInput.value = textObj.text;
-
-                textObj.inputElement = newInput;
+                fullReDraw();
+                break;
             }
 
-            o.zoom = currentZoom;
-
-            allObjects.push(o);
-
-            o.draw(offsetXCustom, offsetYCustom);
-        }
-
-        if (command === 'delete') {
-            let dataToDelete = data[1];
-
-            allObjects = allObjects.filter(
-                (object) =>
-                    object.objId !==
-                    (JSON.parse(dataToDelete) as BaseObject).objId
-            );
-
-            fullReDraw();
+            default:
+                break;
         }
     } catch (e) {
         console.error(e);
@@ -551,52 +561,6 @@ window.addEventListener('pointerdown', (event) => {
 });
 
 export function resize() {}
-
-export function resizeTextEvent(event: Event) {
-    const element = event.target as HTMLTextAreaElement;
-    const foundObj = allObjects.find(
-        (item) => (item as TextObject).inputId === element.id
-    ) as TextObject;
-
-    foundObj.width = +element.style.width;
-    foundObj.height = +element.style.height;
-
-    deleteObj(foundObj);
-
-    let messageToServer: string =
-        'drawObj:::' + JSON.stringify(foundObj) + ':::';
-
-    let utf8Encode = new TextEncoder();
-    let array = utf8Encode.encode(messageToServer);
-
-    socket.send(array.length as unknown as string);
-    socket.send(array);
-}
-
-export function textChangedEvent(event: Event) {
-    const element = event.target as HTMLTextAreaElement;
-
-    if (element.value.length > 1000) {
-        return;
-    }
-
-    const foundObj = allObjects.find(
-        (item) => (item as TextObject).inputId === element.id
-    ) as TextObject;
-
-    foundObj.text = element.value;
-
-    deleteObj(foundObj);
-
-    let messageToServer: string =
-        'drawObj:::' + JSON.stringify(foundObj) + ':::';
-
-    let utf8Encode = new TextEncoder();
-    let array = utf8Encode.encode(messageToServer);
-
-    socket.send(array.length as unknown as string);
-    socket.send(array);
-}
 
 window.addEventListener('pointerup', (event) => {
     if (event.button === 1) {
@@ -1672,4 +1636,50 @@ function shortCutShape(id: string) {
     element.classList.add('active-shape');
 
     currentCursor = element.dataset.shapeOption as MyCursor;
+}
+
+export function resizeTextEvent(event: Event) {
+    const element = event.target as HTMLTextAreaElement;
+    const foundObj = allObjects.find(
+        (item) => (item as TextObject).inputId === element.id
+    ) as TextObject;
+
+    foundObj.width = +element.style.width;
+    foundObj.height = +element.style.height;
+
+    deleteObj(foundObj);
+
+    let messageToServer: string =
+        'drawObj:::' + JSON.stringify(foundObj) + ':::';
+
+    let utf8Encode = new TextEncoder();
+    let array = utf8Encode.encode(messageToServer);
+
+    socket.send(array.length as unknown as string);
+    socket.send(array);
+}
+
+export function textChangedEvent(event: Event) {
+    const element = event.target as HTMLTextAreaElement;
+
+    if (element.value.length > 1000) {
+        return;
+    }
+
+    const foundObj = allObjects.find(
+        (item) => (item as TextObject).inputId === element.id
+    ) as TextObject;
+
+    foundObj.text = element.value;
+
+    deleteObj(foundObj);
+
+    let messageToServer: string =
+        'drawObj:::' + JSON.stringify(foundObj) + ':::';
+
+    let utf8Encode = new TextEncoder();
+    let array = utf8Encode.encode(messageToServer);
+
+    socket.send(array.length as unknown as string);
+    socket.send(array);
 }
