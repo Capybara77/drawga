@@ -37,6 +37,15 @@ let prevY = 0;
 const roughCanvas = rough.canvas(canvasElement);
 
 // ============= CONST
+type MyCursor =
+    | 'pointer'
+    | 'pen'
+    | 'ellipse'
+    | 'rectangle'
+    | 'line'
+    | 'text'
+    | 'image'
+    | 'eraser';
 
 export let allObjects: BaseObject[] = [];
 
@@ -60,9 +69,9 @@ const trailer = document.getElementById('me') as HTMLDivElement;
 const myId: string = makeid(20);
 
 let currentBorderColor = 'rgb(95, 61, 196)';
-let currentShape = 'pointer';
+let currentCursor: MyCursor = 'pointer';
 let currentFillStyle = 'hachure';
-let currentCursor = 'pointer';
+// let currentCursor = 'pointer';
 let currentFontSize = '10rem';
 let currentTextColor = '';
 
@@ -193,13 +202,14 @@ shapeBtns.forEach((shapeButton) => {
 
         elem.classList.add('active-shape');
 
-        currentShape = elem.dataset.shapeOption as string;
+        currentCursor = elem.dataset.shapeOption as MyCursor;
 
         showOptions(elem.id);
     });
 });
 
 // ======================== SOCKET
+
 let socket: WebSocket = Socket.socket;
 let new_uri: string = '';
 const loc: Location = window.location;
@@ -465,7 +475,7 @@ window.addEventListener('pointerdown', (event) => {
         cursorXStart = event.clientX;
         cursorYStart = event.clientY;
 
-        if (currentShape === 'text') {
+        if (currentCursor === 'text') {
             // в #main-container
 
             const newInput = document.createElement('textarea');
@@ -504,7 +514,7 @@ window.addEventListener('pointerdown', (event) => {
 
             mainContainer.prepend(newInput);
             // newInput.focus();
-            document.getElementById(newId)?.focus();
+            // document.getElementById(newId)?.focus();
 
             // newInput.style.fontSize = textObj.
 
@@ -522,9 +532,10 @@ window.addEventListener('pointerdown', (event) => {
 
             newInput.addEventListener('input', textChangedEvent);
             newInput.addEventListener('resize', resizeTextEvent);
+
             new ResizeObserver(resize).observe(newInput);
 
-            currentShape = 'pointer';
+            currentCursor = 'pointer';
 
             shapeBtns.forEach((shapeButton) => {
                 shapeButton.classList.remove('active-shape');
@@ -534,16 +545,14 @@ window.addEventListener('pointerdown', (event) => {
                 ?.classList.add('active-shape');
         }
 
-        if (currentShape === 'image') {
+        if (currentCursor === 'image') {
         }
     }
 });
 
-export function resize(){
-    
-}
+export function resize() {}
 
-export function resizeTextEvent(event: Event){
+export function resizeTextEvent(event: Event) {
     const element = event.target as HTMLTextAreaElement;
     const foundObj = allObjects.find(
         (item) => (item as TextObject).inputId === element.id
@@ -567,8 +576,7 @@ export function resizeTextEvent(event: Event){
 export function textChangedEvent(event: Event) {
     const element = event.target as HTMLTextAreaElement;
 
-    if (element.value.length > 1000)
-    {
+    if (element.value.length > 1000) {
         return;
     }
 
@@ -606,7 +614,7 @@ window.addEventListener('pointerup', (event) => {
 
     if (isOnCanvas === false) return;
 
-    switch (currentShape) {
+    switch (currentCursor) {
         case 'image': {
             return;
         }
@@ -684,7 +692,7 @@ window.addEventListener('pointerup', (event) => {
                 ],
                 currentFillStyle,
                 roughCanvas,
-                currentBorderColor as string,
+                currentBorderColor,
                 ctx.lineWidth,
                 myId
             );
@@ -775,7 +783,7 @@ window.addEventListener('pointermove', (event) => {
     const cursorXCurrent = event.clientX;
     const cursorYCurrent = event.clientY;
 
-    switch (currentShape) {
+    switch (currentCursor) {
         case 'pointer': {
             break;
         }
@@ -1132,19 +1140,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-function shortCutShape(id: string) {
-    const element = document.getElementById(id) as HTMLButtonElement;
-    shapeBtns.forEach((op) => {
-        if (op !== element) {
-            op.classList.remove('active-shape');
-        }
-    });
-
-    element.classList.add('active-shape');
-
-    currentShape = element.dataset.shapeOption as string;
-}
-
 // ================================== СОХРАНИТЬ
 
 const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
@@ -1184,7 +1179,7 @@ confirmAgreeBtn.addEventListener('click', () => {
     socket.send('clear:::');
 
     settingsContainer.style.display = 'none';
-    currentShape = 'pointer';
+    currentCursor = 'pointer';
 
     shapeBtns.forEach((shapeButton) => {
         shapeButton.classList.remove('active-shape');
@@ -1664,4 +1659,17 @@ function saveOnServer() {
     socket.send(message.length as unknown as string);
     socket.send(message);
     settingsContainer.style.display = 'none';
+}
+
+function shortCutShape(id: string) {
+    const element = document.getElementById(id) as HTMLButtonElement;
+    shapeBtns.forEach((op) => {
+        if (op !== element) {
+            op.classList.remove('active-shape');
+        }
+    });
+
+    element.classList.add('active-shape');
+
+    currentCursor = element.dataset.shapeOption as MyCursor;
 }
