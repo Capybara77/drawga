@@ -66,6 +66,11 @@ let isColorPickerOpened = false;
 let isTyping = false;
 
 const trailer = document.getElementById('me') as HTMLDivElement;
+
+if (trailer.id === 'me') {
+    trailer.style.opacity = '0';
+}
+
 const myId: string = makeid(20);
 
 let currentBorderColor = 'rgb(95, 61, 196)';
@@ -721,7 +726,7 @@ window.addEventListener('pointermove', (event) => {
     const trailerY = event.clientY - trailer.offsetHeight / 2;
 
     if (element.id === 'canvas') {
-        animateCursor(trailerX, trailerY, trailer as HTMLDivElement);
+        animateCursor(trailerX, trailerY, trailer);
 
         let memessageToServer: string =
             'cur:::' +

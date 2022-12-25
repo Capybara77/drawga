@@ -88,8 +88,8 @@ hr {
 
 /* ======================== КУРСОР ======================== */
 
-/* .trailer {
-    display: none;
+.trailer {
+    display: block;
 
     width: 15px;
     height: 15px;
@@ -102,7 +102,7 @@ hr {
     z-index: 100000;
 
     pointer-events: none;
-} */
+}
 
 /* ======================== SHAPE ======================== */
 
