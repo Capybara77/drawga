@@ -565,7 +565,33 @@ window.addEventListener('pointerdown', (event) => {
     }
 });
 
-export function resize() {}
+export function resizeTextEvent(event: Event) {
+    const element = event.target as HTMLTextAreaElement;
+    const foundObj = allObjects.find(
+        (item) => (item as TextObject).inputId === element.id
+    ) as TextObject;
+
+    foundObj.width = +element.style.width;
+    foundObj.height = +element.style.height;
+
+    deleteObj(foundObj);
+
+    let messageToServer: string =
+        'drawObj:::' + JSON.stringify(foundObj) + ':::';
+
+    let utf8Encode = new TextEncoder();
+    let array = utf8Encode.encode(messageToServer);
+
+    socket.send(array.length as unknown as string);
+    socket.send(array);
+}
+
+export function textChangedEvent(event: Event) {
+    const element = event.target as HTMLTextAreaElement;
+
+    if (element.value.length > 1000) {
+        return;
+    }
 
 window.addEventListener('pointerup', (event) => {
     if (event.button === 1) {
@@ -897,20 +923,130 @@ window.addEventListener('pointermove', (event) => {
         case 'line': {
             fullReDraw();
 
-            let line = new LineObject(
+            // let line;
+
+            // if (event.shiftKey) {
+            //     // Calculate the slope of the line
+            //     const slope =
+            //         (cursorYCurrent - cursorYStart) /
+            //         (cursorXCurrent - cursorXStart);
+
+            //     if (Math.abs(slope) <= 1) {
+            //         // Horizontal or 45-degree line
+            //         if (Math.abs(Math.abs(slope) - 1) < 0.6) {
+            //             // 45-degree line
+            //             // мб нужно найти длину отрезка
+            //             let d = Math.sqrt(Math.pow(cursorXStart - cursorXCurrent, 2) + Math.pow(cursorYStart - cursorYCurrent, 2));
+
+            //             line = new LineObject(
+            //                 ctx.fillStyle as string,
+            //                 +ctx.lineWidth,
+            //                 [
+            //                     (cursorXStart - offsetXCustom) / currentZoom,
+            //                     (cursorYStart - offsetYCustom) / currentZoom,
+            //                 ],
+            //                 [
+            //                     ((cursorXStart + d * Math.cos(45)) - offsetXCustom) / currentZoom,
+            //                     ((cursorYStart + d * Math.sin(45)) - offsetYCustom) / currentZoom,
+            //                 ],
+            //                 roughCanvas,
+            //                 myId
+            //             );
+            //         } else {
+            //             // Horizontal line
+            //             line = new LineObject(
+            //                 ctx.fillStyle as string,
+            //                 +ctx.lineWidth,
+            //                 [
+            //                     (cursorXStart - offsetXCustom) / currentZoom,
+            //                     (cursorYStart - offsetYCustom) / currentZoom,
+            //                 ],
+            //                 [
+            //                     (cursorXCurrent - offsetXCustom) / currentZoom,
+            //                     (cursorYStart - offsetYCustom) / currentZoom,
+            //                 ],
+            //                 roughCanvas,
+            //                 myId
+            //             );
+            //         }
+            //     } else {
+            //         // Vertical line
+            //         line = new LineObject(
+            //             ctx.fillStyle as string,
+            //             +ctx.lineWidth,
+            //             [
+            //                 (cursorXStart - offsetXCustom) / currentZoom,
+            //                 (cursorYStart - offsetYCustom) / currentZoom,
+            //             ],
+            //             [
+            //                 (cursorXStart - offsetXCustom) / currentZoom,
+            //                 (cursorYCurrent - offsetYCustom) / currentZoom,
+            //             ],
+            //             roughCanvas,
+            //             myId
+            //         );
+            //     }
+            // } else {
+            //     // Normal line (not drawn in a straight line)
+            //     line = new LineObject(
+            //         ctx.fillStyle as string,
+            //         +ctx.lineWidth,
+            //         [
+            //             (cursorXStart - offsetXCustom) / currentZoom,
+            //             (cursorYStart - offsetYCustom) / currentZoom,
+            //         ],
+            //         [
+            //             (cursorXCurrent - offsetXCustom) / currentZoom,
+            //             (cursorYCurrent - offsetYCustom) / currentZoom,
+            //         ],
+            //         roughCanvas,
+            //         myId
+            //     );
+            // }
+
+            let line;
+            if (event.shiftKey) {
+              // Calculate the slope of the line
+              const slope = (cursorYCurrent - cursorYStart) / (cursorXCurrent - cursorXStart);
+
+              // Set the endpoints of the line so that it is drawn in a straight line
+              // (horizontally, vertically, or at a 45-degree angle)
+              if (Math.abs(slope) <= 1) {
+                // Horizontal or 45-degree line
+                line = new LineObject(
+                  ctx.fillStyle as string,
+                  +ctx.lineWidth,
+                  [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
+                  [(cursorXCurrent- offsetXCustom) / currentZoom,( cursorYStart - offsetYCustom) / currentZoom],
+                  roughCanvas,
+                  myId
+                );
+              } else {
+                // Vertical line
+                line = new LineObject(
+                  ctx.fillStyle as string,
+                  +ctx.lineWidth,
+                  [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
+                  [(cursorXStart - offsetXCustom) / currentZoom, (cursorYCurrent - offsetYCustom) / currentZoom],
+                  roughCanvas,
+                  myId
+                );
+              }
+            } else {
+              // Normal line (not drawn in a straight line)
+              line = new LineObject(
                 ctx.fillStyle as string,
                 +ctx.lineWidth,
                 [
-                    (cursorXStart - offsetXCustom) / currentZoom,
-                    (cursorYStart - offsetYCustom) / currentZoom,
+                  (cursorXStart - offsetXCustom) / currentZoom,
+                  (cursorYStart - offsetYCustom) / currentZoom,
                 ],
-                [
-                    (cursorXCurrent - offsetXCustom) / currentZoom,
-                    (cursorYCurrent - offsetYCustom) / currentZoom,
-                ],
+                [      (cursorXCurrent - offsetXCustom) / currentZoom,      (cursorYCurrent - offsetYCustom) / currentZoom,    ],
                 roughCanvas,
                 myId
-            );
+              );
+            }
+
             line.zoom = currentZoom;
             line.draw(offsetXCustom, offsetYCustom);
 

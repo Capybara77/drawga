@@ -3,6 +3,7 @@ import { RoughCanvas } from 'roughjs/bin/canvas';
 import { Drawable } from 'roughjs/bin/core';
 import { getSvgPathFromStroke, hexToRgbA, makeid } from './utils';
 
+
 export abstract class BaseObject {
     color;
     width;
