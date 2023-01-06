@@ -565,33 +565,7 @@ window.addEventListener('pointerdown', (event) => {
     }
 });
 
-export function resizeTextEvent(event: Event) {
-    const element = event.target as HTMLTextAreaElement;
-    const foundObj = allObjects.find(
-        (item) => (item as TextObject).inputId === element.id
-    ) as TextObject;
-
-    foundObj.width = +element.style.width;
-    foundObj.height = +element.style.height;
-
-    deleteObj(foundObj);
-
-    let messageToServer: string =
-        'drawObj:::' + JSON.stringify(foundObj) + ':::';
-
-    let utf8Encode = new TextEncoder();
-    let array = utf8Encode.encode(messageToServer);
-
-    socket.send(array.length as unknown as string);
-    socket.send(array);
-}
-
-export function textChangedEvent(event: Event) {
-    const element = event.target as HTMLTextAreaElement;
-
-    if (element.value.length > 1000) {
-        return;
-    }
+export function resize() {}
 
 window.addEventListener('pointerup', (event) => {
     if (event.button === 1) {
