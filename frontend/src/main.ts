@@ -92,37 +92,16 @@ const mainContainer = document.querySelector(
 
 // ================================================== OPTIONS
 
-const optionsWrapper = document.querySelector(
-    '.options-wrapper'
-) as HTMLDivElement;
-
-const optionsColorStroke = document.getElementById(
-    'options-color-fill'
-) as HTMLDivElement;
-
-const optionsColorBorder = document.getElementById(
-    'options-color-border'
-) as HTMLDivElement;
-
-const optionsFillStyleContainer = document.getElementById(
-    'fill-style-options-container'
-) as HTMLDivElement;
-
-const optionsFontSizeContainer = document.getElementById(
-    'font-size-options-container'
-) as HTMLDivElement;
-
-const optionsColorText = document.getElementById(
-    'options-color-text'
-) as HTMLDivElement;
-
-const optionsWidthContainer = document.getElementById(
-    'width-options-container'
-) as HTMLDivElement;
-
-const optionsOpacityContainer = document.getElementById(
-    'opacity-options-container'
-) as HTMLDivElement;
+const [
+    optionsWrapper,
+    optionsColorStroke,
+    optionsColorBorder,
+    optionsFillStyleContainer,
+    optionsFontSizeContainer,
+    optionsColorText,
+    optionsWidthContainer,
+    optionsOpacityContainer,
+] = createOptions();
 
 // ================================================== SETTINGS
 
@@ -980,45 +959,62 @@ window.addEventListener('pointermove', (event) => {
 
             let line;
             if (event.shiftKey) {
-              // Calculate the slope of the line
-              const slope = (cursorYCurrent - cursorYStart) / (cursorXCurrent - cursorXStart);
+                // Calculate the slope of the line
+                const slope =
+                    (cursorYCurrent - cursorYStart) /
+                    (cursorXCurrent - cursorXStart);
 
-              // Set the endpoints of the line so that it is drawn in a straight line
-              // (horizontally, vertically, or at a 45-degree angle)
-              if (Math.abs(slope) <= 1) {
-                // Horizontal or 45-degree line
-                line = new LineObject(
-                  ctx.fillStyle as string,
-                  +ctx.lineWidth,
-                  [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
-                  [(cursorXCurrent- offsetXCustom) / currentZoom,( cursorYStart - offsetYCustom) / currentZoom],
-                  roughCanvas,
-                  myId
-                );
-              } else {
-                // Vertical line
-                line = new LineObject(
-                  ctx.fillStyle as string,
-                  +ctx.lineWidth,
-                  [(cursorXStart - offsetXCustom) / currentZoom, (cursorYStart - offsetYCustom) / currentZoom],
-                  [(cursorXStart - offsetXCustom) / currentZoom, (cursorYCurrent - offsetYCustom) / currentZoom],
-                  roughCanvas,
-                  myId
-                );
-              }
+                // Set the endpoints of the line so that it is drawn in a straight line
+                // (horizontally, vertically, or at a 45-degree angle)
+                if (Math.abs(slope) <= 1) {
+                    // Horizontal or 45-degree line
+                    line = new LineObject(
+                        ctx.fillStyle as string,
+                        +ctx.lineWidth,
+                        [
+                            (cursorXStart - offsetXCustom) / currentZoom,
+                            (cursorYStart - offsetYCustom) / currentZoom,
+                        ],
+                        [
+                            (cursorXCurrent - offsetXCustom) / currentZoom,
+                            (cursorYStart - offsetYCustom) / currentZoom,
+                        ],
+                        roughCanvas,
+                        myId
+                    );
+                } else {
+                    // Vertical line
+                    line = new LineObject(
+                        ctx.fillStyle as string,
+                        +ctx.lineWidth,
+                        [
+                            (cursorXStart - offsetXCustom) / currentZoom,
+                            (cursorYStart - offsetYCustom) / currentZoom,
+                        ],
+                        [
+                            (cursorXStart - offsetXCustom) / currentZoom,
+                            (cursorYCurrent - offsetYCustom) / currentZoom,
+                        ],
+                        roughCanvas,
+                        myId
+                    );
+                }
             } else {
-              // Normal line (not drawn in a straight line)
-              line = new LineObject(
-                ctx.fillStyle as string,
-                +ctx.lineWidth,
-                [
-                  (cursorXStart - offsetXCustom) / currentZoom,
-                  (cursorYStart - offsetYCustom) / currentZoom,
-                ],
-                [      (cursorXCurrent - offsetXCustom) / currentZoom,      (cursorYCurrent - offsetYCustom) / currentZoom,    ],
-                roughCanvas,
-                myId
-              );
+                // Normal line (not drawn in a straight line)
+                line = new LineObject(
+                    ctx.fillStyle as string,
+                    +ctx.lineWidth,
+                    [
+                        (cursorXStart - offsetXCustom) / currentZoom,
+                        (cursorYStart - offsetYCustom) / currentZoom,
+                    ],
+                    [
+                        (cursorXCurrent - offsetXCustom) / currentZoom,
+                        (cursorYCurrent - offsetYCustom) / currentZoom,
+                    ],
+                    roughCanvas,
+                    myId
+                );
             }
 
             line.zoom = currentZoom;
@@ -1272,38 +1268,41 @@ confirmAgreeBtn.addEventListener('click', () => {
 
 //  ============================ ЦВЕТА КОНСТАНТЫ
 
-const colorPickerButton = document.querySelector(
-    '.color-picker'
-) as HTMLButtonElement;
-const colorListContainer = document.getElementById(
-    'color-list'
-) as HTMLDivElement;
-const colorsItemList = document.querySelectorAll('#color-item');
-const colorPickerInput = document.getElementById(
+const [
+    colorPickerButton,
+    colorListContainer,
+    colorsItemList,
+    colorPickerInput,
+] = createColorElements(
+    '.color-picker',
+    'color-list',
+    '#color-item',
     'color-picker-input'
-) as HTMLInputElement;
+);
 
-const strokeColorPickerButton = document.getElementById(
-    'stroke-color-picker'
-) as HTMLButtonElement;
-const strokeColorListContainer = document.getElementById(
-    'stroke-color-list'
-) as HTMLDivElement;
-const strokeColorsItemList = document.querySelectorAll('#stroke-color-item');
-const strokeColorPickerInput = document.getElementById(
+const [
+    strokeColorPickerButton,
+    strokeColorListContainer,
+    strokeColorsItemList,
+    strokeColorPickerInput,
+] = createColorElements(
+    'stroke-color-picker',
+    'stroke-color-list',
+    '#stroke-color-item',
     'stroke-color-picker-input'
-) as HTMLInputElement;
+);
 
-const textColorPickerButton = document.getElementById(
-    'text-color-picker'
-) as HTMLButtonElement;
-const textColorListContainer = document.getElementById(
-    'text-color-list'
-) as HTMLDivElement;
-const textColorsItemList = document.querySelectorAll('#text-color-item');
-const textColorPickerInput = document.getElementById(
+const [
+    textColorPickerButton,
+    textColorListContainer,
+    textColorsItemList,
+    textColorPickerInput,
+] = createColorElements(
+    '#text-color-picker',
+    'text-color-list',
+    '#text-color-item',
     'text-color-picker-input'
-) as HTMLInputElement;
+);
 
 // ============================ ВЫБРАТЬ ЦВЕТ ТЕКСТА
 
@@ -1799,4 +1798,63 @@ export function textChangedEvent(event: Event) {
 
     socket.send(array.length as unknown as string);
     socket.send(array);
+}
+
+function createColorElements(
+    picker: string,
+    container: string,
+    list: string,
+    input: string
+): [HTMLButtonElement, HTMLDivElement, NodeListOf<Element>, HTMLInputElement] {
+    const pickerButton = document.querySelector(picker) as HTMLButtonElement;
+    const listContainer = document.getElementById(container) as HTMLDivElement;
+    const itemList = document.querySelectorAll(list);
+    const pickerInput = document.getElementById(input) as HTMLInputElement;
+
+    return [pickerButton, listContainer, itemList, pickerInput];
+}
+
+function createOptions(): HTMLDivElement[] {
+    const optionsWrapper = document.querySelector(
+        '.options-wrapper'
+    ) as HTMLDivElement;
+
+    const optionsColorStroke = document.getElementById(
+        'options-color-fill'
+    ) as HTMLDivElement;
+
+    const optionsColorBorder = document.getElementById(
+        'options-color-border'
+    ) as HTMLDivElement;
+
+    const optionsFillStyleContainer = document.getElementById(
+        'fill-style-options-container'
+    ) as HTMLDivElement;
+
+    const optionsFontSizeContainer = document.getElementById(
+        'font-size-options-container'
+    ) as HTMLDivElement;
+
+    const optionsColorText = document.getElementById(
+        'options-color-text'
+    ) as HTMLDivElement;
+
+    const optionsWidthContainer = document.getElementById(
+        'width-options-container'
+    ) as HTMLDivElement;
+
+    const optionsOpacityContainer = document.getElementById(
+        'opacity-options-container'
+    ) as HTMLDivElement;
+
+    return [
+        optionsWrapper,
+        optionsColorStroke,
+        optionsColorBorder,
+        optionsFillStyleContainer,
+        optionsFontSizeContainer,
+        optionsColorText,
+        optionsWidthContainer,
+        optionsOpacityContainer,
+    ];
 }
