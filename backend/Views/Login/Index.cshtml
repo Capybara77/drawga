@@ -11,9 +11,27 @@
 					<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
 				</div>
 				<span>или с помощью почты и пароля</span>
-				<input required pattern="[A-Za-zА-Яа-яЁё]{2,20}" title="Введите имя на русском или английском языке от 2 до 20 символов" type="text" placeholder="Ваше Имя" name="name" />
-				<input required  type="email" placeholder="Ваша Почта" name="email" />
-				<input required  type="password" placeholder="Ваш Пароль" name="password" />
+				<input 
+					required 
+					pattern="[A-Za-zА-Яа-яЁё]{2,20}" 
+					title="Введите имя на русском или английском языке от 2 до 20 символов" 
+					type="text" 
+					placeholder="Ваше Имя" 
+					name="name" 
+				/>
+				<input 
+					required
+					type="email" 
+					placeholder="Ваша Почта" 
+					name="email" 
+					title="Введите корректный email-адрес"
+				/>
+				<input 
+					required  
+					type="password" 
+					placeholder="Ваш Пароль" 
+					name="password" 
+				/>
 				<button class='register-button'>Регистрация</button>
 			</form>
 		</div>
@@ -26,7 +44,10 @@
 					<!-- <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a> -->
 				</div>
                 <span>or use your account</span>
-                <h1>@Model</h1>
+				@if (!string.IsNullOrWhiteSpace(Model))
+				{
+					<h1>@Model</h1>
+				}
 				<input required  type="email" placeholder="Ваша Почта" name="email" />
 				<input required  type="password" placeholder="Ваш Пароль" name="password" />
 				<a href="#">Забыли пароль?</a>
