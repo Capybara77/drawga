@@ -1,0 +1,81 @@
+﻿@model string
+
+<div class="login-wrapper">
+	<div class="container" id="container">
+		<div class="form-container sign-up-container">
+			<form class='register-form' action="/login/register" method="post" >
+				<h1 class='form-heading'>Создайте Аккаунт</h1>
+				<div class="social-container">
+					<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+					<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+					<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+				</div>
+				<span>или с помощью почты и пароля</span>
+				<input required pattern="[A-Za-zА-Яа-яЁё]{2,20}" title="Введите имя на русском или английском языке от 2 до 20 символов" type="text" placeholder="Ваше Имя" name="name" />
+				<input required  type="email" placeholder="Ваша Почта" name="email" />
+				<input required  type="password" placeholder="Ваш Пароль" name="password" />
+				<button class='register-button'>Регистрация</button>
+			</form>
+		</div>
+		<div class="form-container sign-in-container">
+			<form class='login-form' action="/login/login" method="post">
+				<h1 class='form-heading'>Войдите в свой Аккаунт</h1>
+				<div class="social-container">
+					<!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
+					<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+					<!-- <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a> -->
+				</div>
+                <span>or use your account</span>
+                <h1>@Model</h1>
+				<input required  type="email" placeholder="Ваша Почта" name="email" />
+				<input required  type="password" placeholder="Ваш Пароль" name="password" />
+				<a href="#">Забыли пароль?</a>
+				<button class='login-button'>Вход</button>
+			</form>
+		</div>
+		<div class="overlay-container">
+			<div class="overlay">
+				<div class="overlay-panel overlay-left">
+					<h1>Здравсвуйте!</h1>
+					<p>Чтобы оставаться с нами на связи пожалуйста введите ваши персональные данные</p>
+					<button class="ghost" id="signIn">Вход</button>
+				</div>
+				<div class="overlay-panel overlay-right">
+					<h1>Добро пожаловать!</h1>
+					<p>Введите персональные данные и начните ваше приключение с нами</p>
+					<button class="ghost" id="signUp">Регистрация</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+// ===== для смены окон
+const signUpButtonGhost = document.getElementById('signUp');
+const signInButtonGhost = document.getElementById('signIn');
+const container = document.getElementById('container');
+
+signUpButtonGhost.addEventListener('click', () => {
+	container.classList.add("right-panel-active");
+});
+
+signInButtonGhost.addEventListener('click', () => {
+	container.classList.remove("right-panel-active");
+});
+// ======
+
+// const loginButton = document.querySelector('.login-button')
+
+// loginButton.addEventListener('click', () => {
+	
+// })
+
+const loginForm = document.querySelector('.login-form')
+const registerForm = document.querySelector('.register-form')
+
+loginForm.addEventListener('submit', () => {
+
+})
+</script>

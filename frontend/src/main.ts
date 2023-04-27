@@ -1286,7 +1286,7 @@ const [
     strokeColorsItemList,
     strokeColorPickerInput,
 ] = createColorElements(
-    'stroke-color-picker',
+    '#stroke-color-picker',
     'stroke-color-list',
     '#stroke-color-item',
     'stroke-color-picker-input'

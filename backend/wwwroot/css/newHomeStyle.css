@@ -1,0 +1,238 @@
+/* makes sizing simpler */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* remove default spacing */
+/* force styling of type through styling, rather than elements */
+
+* {
+    margin: 0;
+    padding: 0;
+    font: inherit;
+}
+
+/* dark mode user-agent-styles */
+
+html {
+    /*color-scheme: light dark;*/
+    color-scheme: light;
+}
+
+/* min body height */
+
+body {
+    /* min-height: 100vh; */
+}
+
+/* responsive images/videos */
+img,
+picture,
+svg,
+video {
+    display: block;
+    max-width: 100%;
+}
+
+/* ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+:root {
+    --clr-primary: rgb(95, 61, 196);
+    --clr-primary-dark: rgb(75, 48, 156);
+    --clr-primary-light: rgb(126, 85, 250);
+    --clr-primary-active: rgba(95, 61, 196, 0.4);
+    --clr-white: rgb(255, 255, 255);
+    --clr-black: rgb(0, 0, 0);
+    --clr-gray-light: rgb(211, 211, 211);
+    --clr-gray-dark: rgb(138, 138, 138);
+    --clr-border: rgb(230, 225, 225);
+    --clr-background-transparent: rgba(255, 255, 255, 0.8);
+    --clr-hover: rgb(238, 238, 238);
+    --clr-text: rgb(51, 51, 51);
+    --clr-trailer: rgb(0, 0, 0);
+    --clr-canvas: rgb(255, 255, 255);
+    --clr-icon: rgb(51, 51, 51);
+    --clr-fill: rgb(51, 51, 51);
+    --clr-shortcut: rgb(165, 165, 165);
+    --clr-default: rgb(54, 79, 199);
+    --cursor-custom: url('/icons/custom-cursor.svg');
+    /* --cursor-custom: url('/icons/cursor-black.png'); */
+
+    --z-index-1: 10000000;
+    --z-index-2: 10000000000;
+    --z-index-3: 100000000000000;
+    --z-index-4: 100000000000000000;
+    --z-index-max: 10000000000000000000000000;
+    --transition-simple: all 200ms ease-in-out;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.wrapper {
+    max-width: 1150px;
+    margin-inline: auto;
+    height: 100%;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    /* border-bottom: 1px solid #ccc; */
+    background-color: var(--clr-white);
+    z-index: 20;
+    -webkit-box-shadow: 0px 3px 12px -3px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0px 3px 12px -3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 3px 12px -3px rgba(0, 0, 0, 0.2);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10px;
+}
+
+.button {
+    background-color: transparent;
+    outline: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.header-title {
+    color: #333;
+    text-decoration: none;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.heading {
+    font-size: 3.5rem;
+    font-weight: 500;
+    line-height: 0.96;
+}
+
+.sub-heading {
+    font-size: 1.5rem;
+}
+
+.login-buttons-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.login-button {
+    transition: var(--transition-simple);
+}
+
+    .login-button:hover {
+        color: var(--clr-primary);
+    }
+
+.register-button {
+    background-color: var(--clr-primary);
+    padding: 10px 15px;
+    border-radius: 7px;
+    color: var(--clr-white);
+    transition: var(--transition-simple);
+}
+
+    .register-button:hover {
+        background-color: var(--clr-primary-dark);
+    }
+
+/* ======================= hero */
+
+.main {
+    max-width: 1150px;
+    margin-inline: auto;
+    /* height: 100vh; */
+    /* scroll-snap-type: y mandatory;
+    scroll-behavior: smooth; */
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8rem;
+}
+
+.hero {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    scroll-snap-align: center;
+}
+
+.hero-text {
+    max-width: 500px;
+}
+
+.create-button {
+    background-color: var(--clr-primary);
+    padding: 10px 15px;
+    border-radius: 7px;
+    color: var(--clr-white);
+    transition: var(--transition-simple);
+}
+
+.hero-create-button:hover {
+    background-color: var(--clr-primary-dark);
+}
+
+/* ========================== about */
+
+.about {
+    /* height: 100vh; */
+    /* scroll-snap-align: center; */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.about-text {
+    max-width: 500px;
+}
+
+/* =========================== foter */
+
+.footer {
+    width: 100%;
+    /* border-top: 1px solid var(--clr-border); */
+    color: var(--clr-gray-dark);
+    background-color: var(--clr-white);
+}
+
+.wrapper {
+    max-width: 1150px;
+    margin-inline: auto;
+}
+
+.footer-container {
+    padding: 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

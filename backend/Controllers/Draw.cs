@@ -20,7 +20,7 @@ namespace websocket_chat.Controllers
         public Draw()
         {
             ClientDisconnect += SaveBoard;
-            ClientDisconnect += EventForClient;
+            ClientDisconnect += EventForClientDisconnect;
             ClientConnected += OnClientConnected;
         }
 
@@ -29,7 +29,7 @@ namespace websocket_chat.Controllers
             await SendData(socket, Encoding.UTF8.GetBytes("message:::Пользователь подключился"), id);
         }
 
-        private async void EventForClient(WebSocket socket, int id)
+        private async void EventForClientDisconnect(WebSocket socket, int id)
         {
             await SendData(socket, Encoding.UTF8.GetBytes("disconnect:::"), id);
         }
@@ -83,6 +83,13 @@ namespace websocket_chat.Controllers
 
             if (!History.ContainsKey(id))
                 History.Add(id, new());
+            
+
+            // удалить потом
+            // if (History[id].Count > MaxArrayLength)
+            // {
+            //     History[id].RemoveRange(0, History[id].Count - MaxArrayLength);
+            // }
 
             try
             {
@@ -203,7 +210,7 @@ namespace websocket_chat.Controllers
         ~Draw()
         {
             ClientDisconnect -= SaveBoard;
-            ClientDisconnect -= EventForClient;
+            ClientDisconnect -= EventForClientDisconnect;
             ClientConnected -= OnClientConnected;
         }
     }

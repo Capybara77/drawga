@@ -1,7 +1,57 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<main class='main'>
+    <div class="main-wrapper">
+        <section id='hero' class='hero'>
+            <div class="text-container hero-text">
+                <h1 class='heading'>
+                    Воплотите свои идеи в жизнь
+                </h1>
+                <h2 class='sub-heading'>
+                    Визуализируйте свои идеи на доске и работайте над ними самостоятельно или совместно с другими участниками.
+                </h2>
+                <a class="" href="/login/login">
+                    <button class="button create-button">
+                        Создайте доску
+                    </button>
+                </a>
+            </div>
+            <div class="hero-image">
+                <img src='https://thumb.tildacdn.com/tild3633-3264-4261-b762-623861616639/-/resize/649x/-/format/webp/Group_39.png' alt='hero image' />
+            </div>
+        </section>
+        <section id='about' class='about'>
+            <div class="about-image">
+                <img src='https://thumb.tildacdn.com/tild6564-3036-4233-a163-646233343831/-/resize/572x/-/format/webp/fix.png' />
+            </div>
+            <div class="text-container about-text">
+                <h1 class='heading'>
+                    Для учебы
+                </h1>
+                <h2 class='sub-heading'>
+                    На нашей доске вы можете решать задачи по учебе в удобной и интерактивной форме. Вы можете использовать доску, чтобы создавать диаграммы, графики, схемы, рисунки и многое другое, что поможет вам лучше понять учебный материал.
+                </h2>
+                <button class="button create-button">
+                    Начните обучение
+                </button>
+            </div>
+        </section>
+        <section id='about' class='about'>
+            <div class="text-container about-text">
+                <h1 class='heading'>
+                    Для развлечений
+                </h1>
+                <h2 class='sub-heading'>
+                    На нашей доске вы можете проявить свою творческую натуру и нарисовать что угодно, создать красивые диаграммы и графики, играть в игры и многое другое. Доска предоставляет множество интерактивных возможностей для того, чтобы разнообразить ваш досуг и получить удовольствие от творчества
+                </h2>
+                <button class="button create-button">
+                </button>
+            </div>
+            <div class="about-image">
+                <img src='/img/drawga.png' />
+            </div>
+        </section>
+
+    </div>
+</main>
