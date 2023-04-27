@@ -15,7 +15,7 @@ namespace websocket_chat.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("Login");
         }
 
         [HttpPost]
@@ -25,7 +25,7 @@ namespace websocket_chat.Controllers
             User? user = DataContext.Users.FirstOrDefault(user1 => user1.Password == password && user1.Email == email);
             if (user == null)
             {
-                return View("~/Views/Login/Index.cshtml", "Неверный логин или пароль");
+                return View("~/Views/Login/Login.cshtml", "Неверный логин или пароль");
                 return LocalRedirect("/login");
             }
 

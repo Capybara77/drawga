@@ -17,7 +17,7 @@ namespace websocket_chat.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("Home");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

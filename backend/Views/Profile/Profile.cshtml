@@ -1,0 +1,41 @@
+﻿
+@section Scripts
+{
+    <script src="/js/search.js"></script>
+}
+
+<main class="user-wrapper">
+    <div class="user-container">
+        <div class="boards-container">
+            <h1 class="user-title">Ваши доски</h1>
+            <div class="boards-filter-container">
+                <input class="boards-find"
+                       type="text"
+                       placeholder="Название доски" />
+                <div class="filter-buttons-container">
+                    <button class="filter-button boards-create">
+                        Создать доску
+                    </button>
+                    <button class="filter-button boards-clear-all">
+                        Удалить все
+                    </button>
+                </div>
+            </div>
+
+            <ul class="boards-list">
+                @for (int i = 0; i < 6; i++)
+                {
+                    <li class="board-item">
+                        <div class="board" >
+                            <button class="user-button board-item-delete">
+                                <img src="/icons/x-circle.svg"
+                                     class="board-item-delete-icon" />
+                            </button>
+                        </div>
+                        <h2 class="board-item-title">Title@(i)</h2>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</main>

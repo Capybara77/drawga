@@ -61,6 +61,8 @@ video {
     --clr-shortcut: rgb(165, 165, 165);
     --clr-default: rgb(54, 79, 199);
     --cursor-custom: url('/icons/custom-cursor.svg');
+    --clr-red: rgb(196, 61, 106);
+
     /* --cursor-custom: url('/icons/cursor-black.png'); */
 
     --z-index-1: 10000000;
