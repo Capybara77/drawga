@@ -12,17 +12,27 @@
 <body>
     <header class='header'>
         <div class='wrapper'>
-                <nav class='header-container'>
-                    <a href='/' class='header-title'>
-                        <h1>
-                            DrawGa
-                        </h1>
-                    </a>
-                    <div class='login-buttons-container'>                
-                        <button class='button login-button'>Вход</button>
-                        <button class='button register-button'>Регистрация</button>
+            <nav class='header-container'>
+                <a href='/' class='header-title'>
+                    <h1>
+                        DrawGa
+                    </h1>
+                </a>
+                @if (Context.User.Identity is { IsAuthenticated: true })
+                {
+                    <div class='login-buttons-container'>
+                        <button class='button register-button' onclick="location.replace('/profile')">Профиль</button>
+                        <button class='button login-button' onclick="location.replace('/login/logout')">Выйти</button>
                     </div>
-                </nav>
+                }
+                else
+                {
+                    <div class='login-buttons-container'>
+                        <button class='button login-button' onclick="location.replace('/login')">Вход</button>
+                        <button class='button register-button' onclick="location.replace('/login/register')">Регистрация</button>
+                    </div>
+                }
+            </nav>
         </div>
     </header>
 
@@ -44,7 +54,7 @@
             </div>
         </div>
     </footer>
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <!-- <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> -->
     <script src="~/js/site.js" asp-append-version="true"></script>

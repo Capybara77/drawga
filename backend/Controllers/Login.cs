@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Web;
 using websocket_chat.Data;
 using websocket_chat.Models;
 
@@ -13,10 +17,7 @@ namespace websocket_chat.Controllers
             DataContext = dataContext;
         }
 
-        public IActionResult Index()
-        {
-            return View("Login");
-        }
+        public IActionResult Index() => View("Login");
 
         [HttpPost]
         [Route("/login/login")]
@@ -29,7 +30,40 @@ namespace websocket_chat.Controllers
                 return LocalRedirect("/login");
             }
 
+            List<Claim> claims = new List<Claim>
+            {
+                new(ClaimsIdentity.DefaultNameClaimType, email),
+                new(ClaimsIdentity.DefaultRoleClaimType, "user")
+            };
+
+            ClaimsIdentity ci = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsPrincipal cp = new ClaimsPrincipal(ci);
+
+            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp, new AuthenticationProperties
+            {
+                ExpiresUtc = DateTimeOffset.Now + new TimeSpan(365, 0, 0)
+            });
+
+            if (HttpContext.Request.Headers.ContainsKey("referer"))
+            {
+                var refererUrl = new Uri(HttpContext.Request.Headers["referer"]);
+                string urlPara = HttpUtility.ParseQueryString(refererUrl.Query).Get("ReturnUrl");
+                if (!string.IsNullOrWhiteSpace(urlPara))
+                    return LocalRedirect(urlPara);
+            }
+
             return LocalRedirect("/profile");
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return LocalRedirect("/");
+        }
+
+        public IActionResult Register()
+        {
+            return View();
         }
 
         [HttpPost]

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Hosting.Internal;
 using websocket_chat.Data;
 
@@ -13,6 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DataContext>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+{
+    options.Cookie.MaxAge = new TimeSpan(365, 0, 0, 0);
+    options.ExpireTimeSpan = new TimeSpan(365, 0, 0, 0);
+    options.AccessDeniedPath = "/login/noaccess";
+    options.LoginPath = "/login";
+    options.LogoutPath = "/login/logout";
+});
 
 var app = builder.Build();
 
@@ -29,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
