@@ -117,7 +117,7 @@
 }
 .filter-button:hover {
     /* background-color: var(--clr-primary-dark); */
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .boards-filter-container {

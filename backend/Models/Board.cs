@@ -6,5 +6,6 @@
         public User User { get; set; }
         public int BoardId { get; set; }
         public bool Private { get; set; }
+        public string Name { get; set; }
     }
 }
