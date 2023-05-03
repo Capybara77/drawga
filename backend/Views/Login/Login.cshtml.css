@@ -4,14 +4,14 @@ li {
 }
 
 .login-wrapper {
-    height: 100vh;
-    display: grid;
-    place-items: center;
+    max-width: 800px;
+    margin: 12rem auto;
+    padding-inline: 1rem;
 }
 
 .signup__container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
 
     border-radius: 7px;
 
@@ -21,7 +21,7 @@ li {
 }
 
 .container__child {
-    padding: 2rem;
+    padding: 1rem;
 }
 
 .signup__thumbnail {
@@ -30,6 +30,7 @@ li {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 2rem;
     align-items: center;
     border-radius: 7px;
     height: 100%;
@@ -38,6 +39,7 @@ li {
 }
 
 .thumbnail__links a {
+    text-align: center;
     color: white;
     text-decoration: none;
 }
@@ -129,4 +131,14 @@ li {
 
 .signup__link:hover {
     color: #333;
+}
+
+@media (min-width: 600px) {
+    .signup__container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .container__child {
+        padding: 2rem;
+    }
 }
