@@ -134,6 +134,8 @@ li {
 .signup__link {
     color: #787878;
     transition: color 200ms ease;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .signup__link:hover {
