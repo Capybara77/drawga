@@ -4,8 +4,9 @@ li {
 }
 
 .login-wrapper {
-    max-width: 800px;
-    margin: 12rem auto;
+    height: 90dvh;
+    display: grid;
+    place-items: center;
     padding-inline: 1rem;
 }
 

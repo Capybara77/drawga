@@ -25,6 +25,7 @@ html {
 /* min body height */
 
 body {
+    /* overflow-y: scroll !important; */
     /* min-height: 100vh; */
 }
 
@@ -143,9 +144,9 @@ body {
     transition: var(--transition-simple);
 }
 
-    .login-button:hover {
-        color: var(--clr-primary);
-    }
+.login-button:hover {
+    color: var(--clr-primary);
+}
 
 .register-button {
     background-color: var(--clr-primary);
@@ -155,9 +156,9 @@ body {
     transition: var(--transition-simple);
 }
 
-    .register-button:hover {
-        background-color: var(--clr-primary-dark);
-    }
+.register-button:hover {
+    background-color: var(--clr-primary-dark);
+}
 
 /* ======================= hero */
 
