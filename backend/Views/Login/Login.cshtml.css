@@ -4,17 +4,21 @@ li {
 }
 
 .login-wrapper {
-    height: 90dvh;
+    min-height: 90dvh;
     display: grid;
     place-items: center;
-    padding-inline: 1rem;
+    padding-inline: 2rem;
 }
 
 .signup__container {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
 
+    width: 100%;
+
     border-radius: 7px;
+    margin-top: 10rem;
+    margin-bottom: 10rem;
 
     -webkit-box-shadow: 3px 4px 8px 0px rgba(34, 60, 80, 0.2);
     -moz-box-shadow: 3px 4px 8px 0px rgba(34, 60, 80, 0.2);
@@ -141,5 +145,9 @@ li {
 
     .container__child {
         padding: 2rem;
+    }
+
+    .signup__container {
+        max-width: 800px;
     }
 }
