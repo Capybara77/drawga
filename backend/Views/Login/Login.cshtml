@@ -4,43 +4,31 @@
     <div class="signup__container">
         <div class="container__child signup__thumbnail">
             <div class="thumbnail__logo">
-                <img src='/icons/loginIcon.svg' />
-                <h1 class="signup-heading logo__text">Spectre</h1>
+                <h1 class="signup-heading logo__text">DrawGa</h1>
             </div>
-            <div class="thumbnail__content text-center">
-                <h1 class="signup-heading heading--primary">Welcome to MI6.</h1>
-                <h2 class="signup-subheading heading--secondary">Are you ready to join the elite?</h2>
+            <div class="thumbnail__content ">
+                <h1 class="signup-heading heading--primary">Добро пожаловать</h1>
+                <h2 class="signup-subheading heading--secondary">Готовы приступить?</h2>
             </div>
-            <div class="thumbnail__links">
-                <ul class="list-inline m-b-0 text-center">
-                    <li><a href="http://alexdevero.com/" target="_blank"><i class="fa fa-globe"></i></a></li>
-                    <li><a href="https://www.behance.net/alexdevero" target="_blank"><fa class="fa fa-behance"></fa></a></li>
-                    <li><a href="https://github.com/alexdevero" target="_blank"><i class="fa fa-github"></i></a></li>
-                    <li><a href="https://twitter.com/alexdevero" target="_blank"><i class="fa fa-twitter"></i></a></li>
-                </ul>
-            </div>
-            <div class="signup__overlay"></div>
+            <ul class="thumbnail__links">
+                <li><a href="https://github.com/alexdevero" target="_blank">Гит</a></li>
+            </ul>
         </div>
-        <div class="container__child signup__form">
+        <div class="container__child signup__form__container">
             <form action="/login/login" method="post">
-            <h1 class="message">@Model</h1>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input class="form-control" type="text" name="email" id="email" placeholder="james.bond@spectre.com" required />
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input class="form-control" type="password" name="password" id="password" placeholder="********" required />
-                </div>
-                <div class="m-t-lg">
-                    <ul class="list-inline">
-                        <li>
-                            <input class="btn btn--form" type="submit" value="Войти" />
-                        </li>
-                        <li>
-                            <a class="signup__link" href="/login/register">Создать аккаунт</a>
-                        </li>
-                    </ul>
+                <div class="signup__form">
+                    <div class="form-group">
+                        <label class="label" for="email">Почта</label>
+                        <input class="form-control" type="text" name="email" id="email" placeholder="james.bond@spectre.com" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="password">Пароль</label>
+                        <input class="form-control" type="password" name="password" id="password" placeholder="********" required />
+                    </div>
+                    <div class="signup-buttons">
+                        <input class="btn btn--form" type="submit" value="Войти" />
+                        <a class="signup__link" href="/login/register">Создать аккаунт</a>
+                    </div>
                 </div>
             </form>
         </div>
