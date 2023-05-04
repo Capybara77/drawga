@@ -125,13 +125,13 @@ body {
 }
 
 .heading {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 500;
     line-height: 0.96;
 }
 
 .sub-heading {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .login-buttons-container {
@@ -176,19 +176,33 @@ body {
     justify-content: center;
     align-items: center;
     gap: 8rem;
+    padding-inline: 2rem;
 }
 
 .hero {
     height: 100vh;
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    scroll-snap-align: center;
+    gap: 2rem;
+    /* scroll-snap-align: center; */
+    /* margin-top: 10rem; */
 }
 
 .hero-text {
+    text-align: center;
     max-width: 500px;
+    order: 2;
+}
+
+.hero-image {
+    display: none;
+    border: 1px solid #eee;
+    padding: 7px;
+    border-radius: 5px;
+    order: 1;
 }
 
 .create-button {
@@ -197,6 +211,10 @@ body {
     border-radius: 7px;
     color: var(--clr-white);
     transition: var(--transition-simple);
+}
+
+.create-button:hover {
+    background-color: var(--clr-primary-dark);
 }
 
 .hero-create-button:hover {
@@ -239,4 +257,42 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+}
+
+.hero-start-links {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (min-width: 650px) {
+    .hero {
+        flex-direction: row;
+        margin-top: 5rem;
+    }
+
+    .hero-text {
+        order: 1;
+        text-align: start;
+    }
+
+    .hero-image {
+        display: block;
+        order: 2;
+    }
+
+    .heading {
+        font-size: 3.5rem;
+    }
+
+    .sub-heading {
+        font-size: 1.5rem;
+    }
+
+    .hero-start-links {
+        justify-content: start;
+    }
 }
