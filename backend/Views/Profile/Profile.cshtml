@@ -23,6 +23,17 @@
                 </div>
             </div>
 
+            <div class="modal-submit" style="display: none;">
+                <div class="modal-submit-content">
+                    <h1 class="modal-header">Вы уверены, что хотите удалить все доски?</h1>
+                    <p>Это действие нельзя отменить</p>
+                    <div class="modal-buttons">
+                        <button class="modal-button modal-submit-button">Да, удалить</button>
+                        <button class="modal-button modal-cancel-button">Отменить</button>
+                    </div>
+                </div>
+            </div>
+
             <ul class="boards-list">
                 @for (int i = 0; i < Model.Count; i++)
                 {
@@ -40,3 +51,29 @@
         </div>
     </div>
 </main>
+
+
+<script>
+    const clearAllButton = document.querySelector('.boards-clear-all')
+    const modalWindow = document.querySelector('.modal-submit')
+    const modalSubmitButton = document.querySelector('.modal-submit-button')
+    const modalCancelButton = document.querySelector('.modal-cancel-button')
+
+    clearAllButton.addEventListener('click', () => {
+        modalWindow.style.display = "grid"
+    })
+
+    modalSubmitButton.addEventListener('click', () => {
+        modalWindow.style.display = "none"
+    })
+
+    modalCancelButton.addEventListener('click', () => {
+        modalWindow.style.display = "none"
+    })
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalWindow) {
+            modalWindow.style.display = "none"
+        }
+    })
+</script>

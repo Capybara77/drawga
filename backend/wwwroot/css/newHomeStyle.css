@@ -271,7 +271,7 @@ body {
 @media (min-width: 650px) {
     .hero {
         flex-direction: row;
-        margin-top: 5rem;
+        margin-top: 3rem;
     }
 
     .hero-text {
