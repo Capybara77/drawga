@@ -19,26 +19,26 @@ esbuild@^0.15.9:
   optionalDependencies:
     "@esbuild/android-arm" "0.15.13"
     "@esbuild/linux-loong64" "0.15.13"
-    "esbuild-android-64" "0.15.13"
-    "esbuild-android-arm64" "0.15.13"
-    "esbuild-darwin-64" "0.15.13"
-    "esbuild-darwin-arm64" "0.15.13"
-    "esbuild-freebsd-64" "0.15.13"
-    "esbuild-freebsd-arm64" "0.15.13"
-    "esbuild-linux-32" "0.15.13"
-    "esbuild-linux-64" "0.15.13"
-    "esbuild-linux-arm" "0.15.13"
-    "esbuild-linux-arm64" "0.15.13"
-    "esbuild-linux-mips64le" "0.15.13"
-    "esbuild-linux-ppc64le" "0.15.13"
-    "esbuild-linux-riscv64" "0.15.13"
-    "esbuild-linux-s390x" "0.15.13"
-    "esbuild-netbsd-64" "0.15.13"
-    "esbuild-openbsd-64" "0.15.13"
-    "esbuild-sunos-64" "0.15.13"
-    "esbuild-windows-32" "0.15.13"
-    "esbuild-windows-64" "0.15.13"
-    "esbuild-windows-arm64" "0.15.13"
+    esbuild-android-64 "0.15.13"
+    esbuild-android-arm64 "0.15.13"
+    esbuild-darwin-64 "0.15.13"
+    esbuild-darwin-arm64 "0.15.13"
+    esbuild-freebsd-64 "0.15.13"
+    esbuild-freebsd-arm64 "0.15.13"
+    esbuild-linux-32 "0.15.13"
+    esbuild-linux-64 "0.15.13"
+    esbuild-linux-arm "0.15.13"
+    esbuild-linux-arm64 "0.15.13"
+    esbuild-linux-mips64le "0.15.13"
+    esbuild-linux-ppc64le "0.15.13"
+    esbuild-linux-riscv64 "0.15.13"
+    esbuild-linux-s390x "0.15.13"
+    esbuild-netbsd-64 "0.15.13"
+    esbuild-openbsd-64 "0.15.13"
+    esbuild-sunos-64 "0.15.13"
+    esbuild-windows-32 "0.15.13"
+    esbuild-windows-64 "0.15.13"
+    esbuild-windows-arm64 "0.15.13"
 
 function-bind@^1.1.1:
   version "1.1.1"
@@ -50,14 +50,14 @@ has@^1.0.3:
   resolved "https://registry.npmjs.org/has/-/has-1.0.3.tgz"
   integrity sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==
   dependencies:
-    "function-bind" "^1.1.1"
+    function-bind "^1.1.1"
 
 is-core-module@^2.9.0:
   version "2.11.0"
   resolved "https://registry.npmjs.org/is-core-module/-/is-core-module-2.11.0.tgz"
   integrity sha512-RRjxlvLDkD1YJwDbroBHMb+cukurkDWNyHx7D3oNB5x9rb5ogcksMC5wHCadcXoo67gVr/+3GFySh3134zi6rw==
   dependencies:
-    "has" "^1.0.3"
+    has "^1.0.3"
 
 nanoid@^3.3.4:
   version "3.3.4"
@@ -94,42 +94,42 @@ points-on-path@^0.2.1:
   resolved "https://registry.npmjs.org/points-on-path/-/points-on-path-0.2.1.tgz"
   integrity sha512-25ClnWWuw7JbWZcgqY/gJ4FQWadKxGWk+3kR/7kD0tCaDtPPMj7oHu2ToLaVhfpnHrZzYby2w6tUA0eOIuUg8g==
   dependencies:
-    "path-data-parser" "0.1.0"
-    "points-on-curve" "0.2.0"
+    path-data-parser "0.1.0"
+    points-on-curve "0.2.0"
 
 postcss@^8.4.18:
   version "8.4.18"
   resolved "https://registry.npmjs.org/postcss/-/postcss-8.4.18.tgz"
   integrity sha512-Wi8mWhncLJm11GATDaQKobXSNEYGUHeQLiQqDFG1qQ5UTDPTEvKw0Xt5NsTpktGTwLps3ByrWsBrG0rB8YQ9oA==
   dependencies:
-    "nanoid" "^3.3.4"
-    "picocolors" "^1.0.0"
-    "source-map-js" "^1.0.2"
+    nanoid "^3.3.4"
+    picocolors "^1.0.0"
+    source-map-js "^1.0.2"
 
 resolve@^1.22.1:
   version "1.22.1"
   resolved "https://registry.npmjs.org/resolve/-/resolve-1.22.1.tgz"
   integrity sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==
   dependencies:
-    "is-core-module" "^2.9.0"
-    "path-parse" "^1.0.7"
-    "supports-preserve-symlinks-flag" "^1.0.0"
+    is-core-module "^2.9.0"
+    path-parse "^1.0.7"
+    supports-preserve-symlinks-flag "^1.0.0"
 
 rollup@^2.79.1:
   version "2.79.1"
   resolved "https://registry.npmjs.org/rollup/-/rollup-2.79.1.tgz"
   integrity sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==
   optionalDependencies:
-    "fsevents" "~2.3.2"
+    fsevents "~2.3.2"
 
 roughjs@^4.5.2:
   version "4.5.2"
   resolved "https://registry.npmjs.org/roughjs/-/roughjs-4.5.2.tgz"
   integrity sha512-2xSlLDKdsWyFxrveYWk9YQ/Y9UfK38EAMRNkYkMqYBJvPX8abCa9PN0x3w02H8Oa6/0bcZICJU+U95VumPqseg==
   dependencies:
-    "path-data-parser" "^0.1.0"
-    "points-on-curve" "^0.2.0"
-    "points-on-path" "^0.2.1"
+    path-data-parser "^0.1.0"
+    points-on-curve "^0.2.0"
+    points-on-path "^0.2.1"
 
 source-map-js@^1.0.2:
   version "1.0.2"
@@ -156,9 +156,9 @@ vite@^3.2.3:
   resolved "https://registry.npmjs.org/vite/-/vite-3.2.3.tgz"
   integrity sha512-h8jl1TZ76eGs3o2dIBSsvXDLb1m/Ec1iej8ZMdz+PsaFUsftZeWe2CZOI3qogEsMNaywc17gu0q6cQDzh/weCQ==
   dependencies:
-    "esbuild" "^0.15.9"
-    "postcss" "^8.4.18"
-    "resolve" "^1.22.1"
-    "rollup" "^2.79.1"
+    esbuild "^0.15.9"
+    postcss "^8.4.18"
+    resolve "^1.22.1"
+    rollup "^2.79.1"
   optionalDependencies:
-    "fsevents" "~2.3.2"
+    fsevents "~2.3.2"
