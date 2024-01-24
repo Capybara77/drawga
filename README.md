@@ -27,4 +27,4 @@ DrawGa - это многопользовательская онлайн-доск
 -   ASP.NET
 -   SQLite
 
-## Ссылка: https://draw.ga/Draw
+## Ссылка [atusue.ru](https://atusue.ru/draw?id=3)
