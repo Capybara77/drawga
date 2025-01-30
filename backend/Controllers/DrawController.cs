@@ -1,13 +1,12 @@
-﻿using System.Collections.Concurrent;
-using System.Net.Sockets;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
+using Drawga.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace websocket_chat.Controllers
+namespace Drawga.Controllers
 {
-    public class Draw : Controller
+    public class DrawController : Controller
     {
         public static int[] PrivateBoards { get; set; } = { 7, 9 };
         public static Dictionary<int, List<WebSocket>> Sockets { get; set; } = new();
@@ -17,7 +16,7 @@ namespace websocket_chat.Controllers
         public event Action<WebSocket, int> ClientDisconnect;
         public event Action<WebSocket, int> ClientConnected;
 
-        public Draw()
+        public DrawController()
         {
             ClientDisconnect += SaveBoard;
             ClientDisconnect += EventForClientDisconnect;
@@ -207,7 +206,7 @@ namespace websocket_chat.Controllers
             }
         }
 
-        ~Draw()
+        ~DrawController()
         {
             ClientDisconnect -= SaveBoard;
             ClientDisconnect -= EventForClientDisconnect;

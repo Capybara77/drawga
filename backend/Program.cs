@@ -3,7 +3,7 @@ using System.Net.WebSockets;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Hosting.Internal;
-using websocket_chat.Data;
+using Drawga.Data;
 
 //var writer = new System.IO.StreamWriter("C:\\Temp\\ConsoleOutput.txt");
 //writer.AutoFlush = true;

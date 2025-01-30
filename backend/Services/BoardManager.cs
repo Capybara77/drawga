@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Newtonsoft.Json;
 
-namespace websocket_chat.Controllers
+namespace Drawga.Services
 {
     public class BoardManager
     {
@@ -28,7 +28,7 @@ namespace websocket_chat.Controllers
 
             string pathToFile = $"{PathToSaves}/{fileName}";
 
-            if (File.Exists(pathToFile)) 
+            if (File.Exists(pathToFile))
                 File.Delete(pathToFile);
 
             File.WriteAllText(pathToFile, JsonConvert.SerializeObject(Boards[id]));

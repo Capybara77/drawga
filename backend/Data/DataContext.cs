@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using websocket_chat.Models;
+﻿using Drawga.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace websocket_chat.Data
+namespace Drawga.Data
 {
     public class DataContext : DbContext
     {

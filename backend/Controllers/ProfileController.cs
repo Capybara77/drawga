@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Drawga.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using websocket_chat.Data;
 
-namespace websocket_chat.Controllers
+namespace Drawga.Controllers
 {
     [Authorize]
-    public class Profile : Controller
+    public class ProfileController : Controller
     {
         public DataContext Context { get; }
 
-        public Profile(DataContext context)
+        public ProfileController(DataContext context)
         {
             Context = context;
         }

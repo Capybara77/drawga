@@ -3,16 +3,16 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Web;
-using websocket_chat.Data;
-using websocket_chat.Models;
+using Drawga.Data;
+using Drawga.Models;
 
-namespace websocket_chat.Controllers
+namespace Drawga.Controllers
 {
-    public class Login : Controller
+    public class LoginController : Controller
     {
         public DataContext DataContext { get; }
 
-        public Login(DataContext dataContext)
+        public LoginController(DataContext dataContext)
         {
             DataContext = dataContext;
         }

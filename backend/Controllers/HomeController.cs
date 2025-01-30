@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using websocket_chat.Data;
-using websocket_chat.Models;
+using Drawga.Data;
+using Drawga.Models;
 
-namespace websocket_chat.Controllers
+namespace Drawga.Controllers
 {
     public class HomeController : Controller
     {

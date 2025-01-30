@@ -1,4 +1,4 @@
-﻿namespace websocket_chat.Models
+﻿namespace Drawga.Models
 {
     public class Board
     {
