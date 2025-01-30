@@ -3,6 +3,7 @@ import {
     CurveObject,
     EllipseObject,
     LineObject,
+    MyCursor,
     RectangleObject,
     TextObject,
 } from './types';
@@ -15,11 +16,11 @@ import {
     hexToRgbA,
     cleanCanvas,
     getTypedDrawObject,
+    createOptions,
 } from './utils';
 import rough from 'roughjs';
-import Toastify from 'toastify-js';
-import 'toastify-js/src/toastify.css';
 import { Socket } from './socket';
+import { closeToast, disconnectToast, testToast } from './toastify';
 
 //  ====================================== CANVAS
 
@@ -37,15 +38,6 @@ let prevY = 0;
 const roughCanvas = rough.canvas(canvasElement);
 
 // ============= CONST
-type MyCursor =
-    | 'pointer'
-    | 'pen'
-    | 'ellipse'
-    | 'rectangle'
-    | 'line'
-    | 'text'
-    | 'image'
-    | 'eraser';
 
 export let allObjects: BaseObject[] = [];
 
@@ -198,21 +190,6 @@ let socket: WebSocket = Socket.socket;
 let new_uri: string = '';
 const loc: Location = window.location;
 
-const toastifyStyle = {
-    background:
-        document.documentElement.className === 'lightTheme'
-            ? 'rgba(255, 255, 255, 0.8)'
-            : 'rgba(49, 49, 49, 0.8)',
-    color:
-        document.documentElement.className === 'lightTheme'
-            ? 'rgb(51, 51, 51)'
-            : 'rgb(233, 233, 233)',
-    border: '2px solid rgb(95, 61, 196)',
-    borderRadius: '5px',
-    boxShadow: 'none',
-    fill: 'red',
-};
-
 if (loc.protocol === 'https:') {
     new_uri = 'wss:';
 } else {
@@ -286,18 +263,7 @@ function OnSocketMessage(msg: MessageEvent) {
                 break;
             }
             case 'disconnect': {
-                Toastify({
-                    text: 'Пользователь отключился',
-                    duration: 2000,
-                    //destination: "http://skorobogach-i-galoshi.tk/",
-                    newWindow: true,
-                    close: true,
-                    gravity: 'bottom', // `top` or `bottom`
-                    position: 'right', // `left`, `center` or `right`
-                    stopOnFocus: true, // Prevents dismissing of toast on hover
-                    style: toastifyStyle,
-                    onClick: function () {}, // Callback after click
-                }).showToast();
+                disconnectToast();
 
                 let list = document.getElementsByClassName('trailer');
 
@@ -312,18 +278,7 @@ function OnSocketMessage(msg: MessageEvent) {
                 break;
             }
             case 'message': {
-                Toastify({
-                    text: data[1],
-                    duration: 6000,
-                    //destination: "http://skorobogach-i-galoshi.tk/",
-                    newWindow: true,
-                    close: true,
-                    gravity: 'bottom', // `top` or `bottom`
-                    position: 'right', // `left`, `center` or `right`
-                    stopOnFocus: true, // Prevents dismissing of toast on hover
-                    style: toastifyStyle,
-                    onClick: function () {}, // Callback after click
-                }).showToast();
+                testToast(data[1]);
                 break;
             }
             case 'drawObj': {
@@ -382,21 +337,7 @@ function OnSocketMessage(msg: MessageEvent) {
 }
 
 function OnSocketClose() {
-    Toastify({
-        text: 'Соединение прервано. Нажмите здесь.',
-        duration: 0,
-        newWindow: true,
-        close: false,
-        gravity: 'bottom', // `top` or `bottom`
-        position: 'right', // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: toastifyStyle,
-        onClick: function () {
-            location.reload();
-        }, // Callback after click
-    }).showToast();
-    //socket = new WebSocket(new_uri);
-    //SetSocketEvents(socket);
+    closeToast();
 }
 
 // ================================== SPACE BAR move
@@ -1812,49 +1753,4 @@ function createColorElements(
     const pickerInput = document.getElementById(input) as HTMLInputElement;
 
     return [pickerButton, listContainer, itemList, pickerInput];
-}
-
-function createOptions(): HTMLDivElement[] {
-    const optionsWrapper = document.querySelector(
-        '.options-wrapper'
-    ) as HTMLDivElement;
-
-    const optionsColorStroke = document.getElementById(
-        'options-color-fill'
-    ) as HTMLDivElement;
-
-    const optionsColorBorder = document.getElementById(
-        'options-color-border'
-    ) as HTMLDivElement;
-
-    const optionsFillStyleContainer = document.getElementById(
-        'fill-style-options-container'
-    ) as HTMLDivElement;
-
-    const optionsFontSizeContainer = document.getElementById(
-        'font-size-options-container'
-    ) as HTMLDivElement;
-
-    const optionsColorText = document.getElementById(
-        'options-color-text'
-    ) as HTMLDivElement;
-
-    const optionsWidthContainer = document.getElementById(
-        'width-options-container'
-    ) as HTMLDivElement;
-
-    const optionsOpacityContainer = document.getElementById(
-        'opacity-options-container'
-    ) as HTMLDivElement;
-
-    return [
-        optionsWrapper,
-        optionsColorStroke,
-        optionsColorBorder,
-        optionsFillStyleContainer,
-        optionsFontSizeContainer,
-        optionsColorText,
-        optionsWidthContainer,
-        optionsOpacityContainer,
-    ];
 }

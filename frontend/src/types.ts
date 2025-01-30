@@ -3,6 +3,15 @@ import { RoughCanvas } from 'roughjs/bin/canvas';
 import { Drawable } from 'roughjs/bin/core';
 import { getSvgPathFromStroke, hexToRgbA, makeid } from './utils';
 
+export type MyCursor =
+    | 'pointer'
+    | 'pen'
+    | 'ellipse'
+    | 'rectangle'
+    | 'line'
+    | 'text'
+    | 'image'
+    | 'eraser';
 
 export abstract class BaseObject {
     color;

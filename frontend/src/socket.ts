@@ -1,3 +1,3 @@
-export module Socket {
+export namespace Socket {
     export let socket: WebSocket;
 }

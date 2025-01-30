@@ -300,3 +300,48 @@ export function reDraw(
     }
     // console.log(objects.length + "  " + counter);
 }
+
+export function createOptions(): HTMLDivElement[] {
+    const optionsWrapper = document.querySelector(
+        '.options-wrapper'
+    ) as HTMLDivElement;
+
+    const optionsColorStroke = document.getElementById(
+        'options-color-fill'
+    ) as HTMLDivElement;
+
+    const optionsColorBorder = document.getElementById(
+        'options-color-border'
+    ) as HTMLDivElement;
+
+    const optionsFillStyleContainer = document.getElementById(
+        'fill-style-options-container'
+    ) as HTMLDivElement;
+
+    const optionsFontSizeContainer = document.getElementById(
+        'font-size-options-container'
+    ) as HTMLDivElement;
+
+    const optionsColorText = document.getElementById(
+        'options-color-text'
+    ) as HTMLDivElement;
+
+    const optionsWidthContainer = document.getElementById(
+        'width-options-container'
+    ) as HTMLDivElement;
+
+    const optionsOpacityContainer = document.getElementById(
+        'opacity-options-container'
+    ) as HTMLDivElement;
+
+    return [
+        optionsWrapper,
+        optionsColorStroke,
+        optionsColorBorder,
+        optionsFillStyleContainer,
+        optionsFontSizeContainer,
+        optionsColorText,
+        optionsWidthContainer,
+        optionsOpacityContainer,
+    ];
+}
