@@ -45,7 +45,17 @@ let cursorYStart = 0;
 
 const myId = '123';
 
+const resizeCanvas = () => {
+  if (canvasElement.value) {
+    canvasElement.value.width = window.innerWidth;
+    canvasElement.value.height = window.innerHeight;
+    ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+    roughCanvas.value = rough.canvas(canvasElement.value);
+  }
+};
+
 onMounted(() => {
+  resizeCanvas();
   roughCanvas.value = rough.canvas(canvasElement.value as HTMLCanvasElement);
   ctx.value = canvasElement.value?.getContext('2d') as CanvasRenderingContext2D;
 });
@@ -57,18 +67,17 @@ const reDraw = (
   screenWidth: number,
   screenHeight: number,
 ) => {
-  let counter: number = 0;
+
+console.log(offsetXCustom + "  " + offsetYCustom + "  " + screenWidth + "   " + screenHeight)
 
   for (let index = 0; index < objects.length; index++) {
     const element = objects[index];
 
     if (element.isOverlay(offsetXCustom, offsetYCustom, screenWidth, screenHeight)) {
       element.draw(offsetXCustom, offsetYCustom);
-      counter++;
     } else {
     }
   }
-  // console.log(objects.length + "  " + counter);
 };
 
 const cleanCanvas = () => {
@@ -81,13 +90,14 @@ const cleanCanvas = () => {
 };
 
 const fullReDraw = () => {
+  console.log(allObjects.value)
   cleanCanvas();
   reDraw(
     allObjects.value,
     offsetXCustom.value,
     offsetYCustom.value,
     canvasElement.value?.clientWidth ?? 0,
-    canvasElement.value?.clientHeight ?? 0,
+    canvasElement.value?.clientHeight ?? 0
   );
 };
 
@@ -226,8 +236,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         myId,
       );
       curve.zoom = currentZoom;
-      allObjects.value.push(curve);
-
+      //allObjects.value.push(curve);
+      allObjects.value = [...allObjects.value, curve];
       fullReDraw();
       break;
     }
