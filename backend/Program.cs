@@ -1,13 +1,5 @@
-using System.Diagnostics;
-using System.Net.WebSockets;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Hosting.Internal;
 using Drawga.Data;
-
-//var writer = new System.IO.StreamWriter("C:\\Temp\\ConsoleOutput.txt");
-//writer.AutoFlush = true;
-//Console.SetOut(writer);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +18,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    //app.UseHsts();
-}
 app.UseWebSockets();
 
 //app.UseHttpsRedirection();
@@ -49,12 +35,20 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.UseSpa(spaBuilder =>
+//app.UseSpa(spaBuilder =>
+//{
+//    if (app.Environment.IsDevelopment())
+//    {
+//        spaBuilder.UseProxyToSpaDevelopmentServer("http://localhost:5173/");
+//    }
+//});
+
+app.Use(GetVueMain);
+
+async Task GetVueMain(HttpContext context, RequestDelegate arg2)
 {
-    if (app.Environment.IsDevelopment())
-    {
-        spaBuilder.UseProxyToSpaDevelopmentServer("http://localhost:5173/");
-    }
-});
+    context.Response.ContentType = "text/html";
+    await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+}
 
 app.Run();
