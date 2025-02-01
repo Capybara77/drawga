@@ -10,7 +10,9 @@ import rough from 'roughjs';
 import { useColorsStore } from './stores/colors';
 import { useCursorStore } from './stores/cursor';
 import { BaseObject, CurveObject, EllipseObject, LineObject, RectangleObject } from './types';
+import { WebSocketService } from '@/services/WebSocketService';
 
+const socket = ref(new WebSocketService());
 const cursorStore = useCursorStore();
 const colorStore = useColorsStore();
 
@@ -58,6 +60,8 @@ onMounted(() => {
   resizeCanvas();
   roughCanvas.value = rough.canvas(canvasElement.value as HTMLCanvasElement);
   ctx.value = canvasElement.value?.getContext('2d') as CanvasRenderingContext2D;
+
+  createSocketConnection();
 });
 
 const reDraw = (
@@ -67,8 +71,7 @@ const reDraw = (
   screenWidth: number,
   screenHeight: number,
 ) => {
-
-console.log(offsetXCustom + "  " + offsetYCustom + "  " + screenWidth + "   " + screenHeight)
+  console.log(offsetXCustom + '  ' + offsetYCustom + '  ' + screenWidth + '   ' + screenHeight);
 
   for (let index = 0; index < objects.length; index++) {
     const element = objects[index];
@@ -90,14 +93,14 @@ const cleanCanvas = () => {
 };
 
 const fullReDraw = () => {
-  console.log(allObjects.value)
+  console.log(allObjects.value);
   cleanCanvas();
   reDraw(
     allObjects.value,
     offsetXCustom.value,
     offsetYCustom.value,
     canvasElement.value?.clientWidth ?? 0,
-    canvasElement.value?.clientHeight ?? 0
+    canvasElement.value?.clientHeight ?? 0,
   );
 };
 
@@ -688,6 +691,29 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
   }
 };
+
+const handleClose = (event: CustomEvent) => {
+  console.log('Соединение закрыто', event.detail);
+};
+
+const handleMove = (event: CustomEvent) => {
+  const data = event.detail as string[];
+  // реализовать
+  console.log('Получена команда move:', data);
+};
+
+const handleClear = (event: CustomEvent) => {
+  console.log('Получена команда clear', event.detail);
+  // Здесь можно выполнить очистку canvas, обновить состояние и т.п.
+};
+
+function createSocketConnection() {
+  socket.value.addEventListener('move', handleMove as EventListener);
+  socket.value.addEventListener('clear', handleClear as EventListener);
+  socket.value.addEventListener('close', handleClose as EventListener);
+
+  socket.value.send({ command: 'test', message: 'Hello, server' });
+}
 </script>
 
 <template>
