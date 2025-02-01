@@ -2,7 +2,7 @@ FROM node:current-alpine3.20 as node
 WORKDIR ./frontend
 COPY ./frontend .
 RUN npm i
-RUN npm run build
+RUN npm run build-only
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 as build
 
