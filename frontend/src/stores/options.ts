@@ -3,21 +3,21 @@ import { defineStore } from 'pinia';
 const defaultState = {
   allOptions: {
     colors: [
-      'rgb(0, 0, 0)',
-      'rgb(52, 58, 64)',
-      'rgb(73, 80, 87)',
-      'rgb(201, 42, 42)',
-      'rgb(166, 30, 77)',
-      'rgb(134, 46, 156)',
-      'rgb(95, 61, 196)',
-      'rgb(54, 79, 199)',
-      'rgb(24, 100, 171)',
-      'rgb(11, 114, 133)',
-      'rgb(8, 127, 91)',
-      'rgb(43, 138, 62)',
-      'rgb(92, 148, 13)',
-      'rgb(230, 119, 0)',
-      'rgb(217, 72, 15)',
+      '000000',
+      '343a40',
+      '495057',
+      'c92a2a',
+      'a61e4d',
+      '862e9c',
+      '5f3dc4',
+      '364fc7',
+      '1864ab',
+      '0b7285',
+      '087f5b',
+      '2b8a3e',
+      '5c940d',
+      'e67700',
+      'd9480f',
     ],
     lineWidths: [
       {
@@ -54,9 +54,9 @@ const defaultState = {
     fillStyles: ['hachure', 'solid', 'zigzag', 'cross-hatch', 'dashed', 'zigzag-line'],
   },
   colors: {
-    fillColor: 'rgb(95, 61, 196)',
-    borderColor: 'rgb(95, 61, 196)',
-    textColor: 'rgb(0, 0, 0)',
+    fillColor: '5f3dc4',
+    borderColor: 'a61e4d',
+    textColor: '000000',
   },
   lineWidth: 12,
   textSize: '1rem',
@@ -66,6 +66,13 @@ const defaultState = {
 
 export const useOptionsStore = defineStore('options', {
   state: () => defaultState,
+  getters: {
+    getterColors: (state) => ({
+      fillColor: '#' + state.colors.fillColor,
+      borderColor: '#' + state.colors.borderColor,
+      textColor: '#' + state.colors.textColor,
+    }),
+  },
   actions: {
     setFillColor(color: string) {
       this.colors.fillColor = color;

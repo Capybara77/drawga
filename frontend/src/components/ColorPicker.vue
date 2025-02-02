@@ -12,8 +12,8 @@ const props = defineProps<{
       v-for="color in props.colorsList"
       :key="color"
       class="color-item"
-      :id="'color-item-' + color"
-      :style="{ backgroundColor: color }"
+      :id="'color-item-#' + color"
+      :style="{ backgroundColor: `#${color}` }"
       @click="() => props.onClick(color)"
     ></div>
   </div>

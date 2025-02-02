@@ -62,7 +62,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
         <div
           class="color-picker"
           @click="toggleFillColor"
-          :style="{ backgroundColor: optionsStore.colors.fillColor }"
+          :style="{ backgroundColor: optionsStore.getterColors.fillColor }"
         ></div>
 
         <ColorPicker
@@ -89,7 +89,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
           class="color-picker"
           id="stroke-color-picker"
           @click="toggleBorderColor"
-          :style="{ backgroundColor: optionsStore.colors.borderColor }"
+          :style="{ backgroundColor: optionsStore.getterColors.borderColor }"
         ></div>
 
         <ColorPicker
@@ -116,7 +116,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
           class="color-picker"
           id="text-color-picker"
           @click="toggleTextColor"
-          :style="{ backgroundColor: optionsStore.colors.textColor }"
+          :style="{ backgroundColor: optionsStore.getterColors.textColor }"
         ></div>
 
         <ColorPicker
