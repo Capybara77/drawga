@@ -200,3 +200,198 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     </div>
   </div>
 </template>
+
+<style>
+.options-wrapper {
+  width: 200px;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translate(0, -60%);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  border: 2px solid var(--clr-border);
+  border-radius: 5px;
+
+  padding: 10px;
+  background-color: var(--clr-background-transparent);
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* ======================== ВЫБОР ЦВЕТА  ======================== */
+
+.options-color-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.color-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.color-container input {
+  width: 100px;
+  padding: 8px 10px;
+}
+
+.color-picker {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: var(--clr-default);
+  cursor: pointer;
+}
+
+#stroke-color-picker {
+  background-color: var(--clr-primary);
+}
+
+.color-picker-input {
+  outline: 2px solid var(--clr-border);
+  border-radius: 4px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding-left: 7px;
+}
+
+.color-picker-input input {
+  border: none;
+  outline: none;
+  background-color: var(--clr-background-transparent);
+}
+
+.color-list {
+  position: absolute;
+  left: 30px;
+  top: -2px;
+  border: 2px solid var(--clr-border);
+  background-color: var(--clr-background-transparent);
+  z-index: var(--z-index-4);
+
+  padding: 5px;
+  border-radius: 4px;
+
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.color-item {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}
+
+/* =========================== ШИРИНА =========================== */
+
+.options-btns-container {
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-btn {
+  width: 100%;
+  background-color: var(--clr-background-transparent);
+  border: none;
+  outline: 2px solid var(--clr-border);
+  padding: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* .options-btns-container > div {
+    flex: 1 1 0;
+} */
+
+.active-option {
+  outline: 2px solid var(--clr-primary);
+  color: var(--clr-primary);
+}
+
+/*  ======================== ПРОЗРАЧНОСТЬ  ======================== */
+
+#input-opacity {
+  width: 100%;
+  cursor: pointer;
+}
+
+input[type='range'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background-color: var(--clr-primary);
+}
+
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: var(--clr-primary-dark);
+  transition: background 0.3s ease-in-out;
+}
+
+input[type='range']::-moz-range-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: var(--clr-primary-dark);
+  transition: background 0.3s ease-in-out;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+/* ======================== ЗАЛИВКА ======================== */
+
+.fill-style-options-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.15rem;
+}
+
+.fill-style-btn {
+  background-color: var(--clr-background-transparent);
+  border: 2ps solid var(--clr-primary-dark);
+  border-radius: 7px;
+  aspect-ratio: 1 / 1;
+  font-size: 0.9rem;
+
+  transition: border 200ms ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.active-fill-style {
+  outline: 2px solid var(--clr-primary);
+  color: var(--clr-primary-dark);
+}
+</style>

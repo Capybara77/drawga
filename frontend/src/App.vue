@@ -4,12 +4,12 @@ import CursorContainer from './components/CursorContainer.vue';
 import OptionsContainer from './components/OptionsContainer.vue';
 import SettingsContainer from './components/SettingsContainer.vue';
 import ZoomContainer from './components/ZoomContainer.vue';
-
 import CanvasContainer from './components/CanvasContainer.vue';
+import TrailerComponent from './components/TrailerComponent.vue';
 </script>
 
 <template>
-  <div id="me" class="trailer"></div>
+  <TrailerComponent />
   <Confirm />
   <CursorContainer />
   <OptionsContainer />

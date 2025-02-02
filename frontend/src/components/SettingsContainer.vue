@@ -136,3 +136,88 @@
     </section>
   </div>
 </template>
+
+<style>
+.settings-wrapper {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 1.125rem;
+
+  text-align: start;
+}
+.settings-show-btn {
+  background-color: transparent;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+}
+
+.settings-show-icon {
+  width: 30px;
+  height: 30px;
+
+  stroke: var(--clr-icon);
+}
+
+.settings-container {
+  border: 2px solid var(--clr-border);
+  background-color: var(--clr-background-transparent);
+  border-radius: 6px;
+  font-size: 1.1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  padding: 0.5rem;
+}
+
+.settings-item {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  font-size: 1rem;
+  color: var(--clr-text);
+  background-color: transparent;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  padding: 5px 10px;
+}
+
+.settings-item:hover {
+  background-color: var(--clr-hover);
+}
+
+.settings-item-icon {
+  margin-right: 5px;
+
+  width: 20px;
+  height: 20px;
+}
+
+.settings-item-text {
+  margin-right: 12px;
+  color: var(--clr-text);
+}
+
+.settings-item-shortcut {
+  margin-left: auto;
+  color: var(--clr-shortcut);
+}
+
+.settings-theme-container {
+  padding: 5px 10px;
+}
+</style>
