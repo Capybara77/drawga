@@ -320,39 +320,40 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       break;
     }
 
-    // case 'ellipse': {
-    //   fullReDraw();
+    case 'ellipse': {
+      fullReDraw();
 
-    //   const ellipse = new EllipseObject(
-    //     optionsStore.fillStyle,
-    //   optionsStore.lineWidth,
-    //     [
-    //       (cursorXStart - offsetXCustom.value) / currentZoom,
-    //       (cursorYStart - offsetYCustom.value) / currentZoom,
-    //     ],
-    //     [
-    //       event.shiftKey
-    //         ? (event.clientX - offsetXCustom.value) / currentZoom
-    //         : (event.clientX - offsetXCustom.value) / currentZoom,
-    //       event.shiftKey
-    //         ? (cursorYStart - offsetYCustom.value) / currentZoom +
-    //           ((event.clientX - offsetXCustom.value) / currentZoom -
-    //             (cursorXStart - offsetXCustom.value) / currentZoom)
-    //         : (event.clientY - offsetYCustom.value) / currentZoom,
-    //     ],
-    //      optionsStore.colors.fillColor,
-    //     roughCanvas.value,
-    //      optionsStore.colors.borderColor,
-    //     optionsStore.lineWidth,
-    //     false,
-    //     myId,
-    //   );
+      const ellipse = new EllipseObject(
+        optionsStore.colors.fillColor,
+        optionsStore.lineWidth,
+        [
+          (cursorXStart - offsetXCustom.value) / currentZoom,
+          (cursorYStart - offsetYCustom.value) / currentZoom,
+        ],
+        [
+          event.shiftKey
+            ? (event.clientX - offsetXCustom.value) / currentZoom
+            : (event.clientX - offsetXCustom.value) / currentZoom,
+          event.shiftKey
+            ? (cursorYStart - offsetYCustom.value) / currentZoom +
+              ((event.clientX - offsetXCustom.value) / currentZoom -
+                (cursorXStart - offsetXCustom.value) / currentZoom)
+            : (event.clientY - offsetYCustom.value) / currentZoom,
+        ],
+        optionsStore.fillStyle,
+        roughCanvas.value,
+        optionsStore.colors.borderColor,
+        optionsStore.lineWidth,
+        false,
+        myId,
+      );
 
-    //   ellipse.zoom = currentZoom;
-    //   ellipse.draw(offsetXCustom.value, offsetYCustom.value);
-    //   allObjects.value.push(ellipse);
-    //   break;
-    // }
+      ellipse.zoom = currentZoom;
+      ellipse.draw(offsetXCustom.value, offsetYCustom.value);
+      allObjects.value.push(ellipse);
+      break;
+    }
+
     default:
       break;
   }
@@ -667,39 +668,39 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
     }
 
-    // case 'ellipse': {
-    //   fullReDraw();
+    case 'ellipse': {
+      fullReDraw();
 
-    //   const ellipse = new EllipseObject(
-    //     optionsStore.fillStyle,
-    //   optionsStore.lineWidth,
-    //     [
-    //       (cursorXStart - offsetXCustom.value) / currentZoom,
-    //       (cursorYStart - offsetYCustom.value) / currentZoom,
-    //     ],
-    //     [
-    //       event.shiftKey
-    //         ? (event.clientX - offsetXCustom.value) / currentZoom
-    //         : (event.clientX - offsetXCustom.value) / currentZoom,
-    //       event.shiftKey
-    //         ? (cursorYStart - offsetYCustom.value) / currentZoom +
-    //           ((event.clientX - offsetXCustom.value) / currentZoom -
-    //             (cursorXStart - offsetXCustom.value) / currentZoom)
-    //         : (event.clientY - offsetYCustom.value) / currentZoom,
-    //     ],
-    //      optionsStore.colors.fillColor,
-    //     roughCanvas.value,
-    //      optionsStore.colors.borderColor,
-    //     optionsStore.lineWidth,
-    //     false,
-    //     myId,
-    //   );
+      const ellipse = new EllipseObject(
+        optionsStore.colors.fillColor,
+        optionsStore.lineWidth,
+        [
+          (cursorXStart - offsetXCustom.value) / currentZoom,
+          (cursorYStart - offsetYCustom.value) / currentZoom,
+        ],
+        [
+          event.shiftKey
+            ? (event.clientX - offsetXCustom.value) / currentZoom
+            : (event.clientX - offsetXCustom.value) / currentZoom,
+          event.shiftKey
+            ? (cursorYStart - offsetYCustom.value) / currentZoom +
+              ((event.clientX - offsetXCustom.value) / currentZoom -
+                (cursorXStart - offsetXCustom.value) / currentZoom)
+            : (event.clientY - offsetYCustom.value) / currentZoom,
+        ],
+        optionsStore.fillStyle,
+        roughCanvas.value,
+        optionsStore.colors.borderColor,
+        optionsStore.lineWidth,
+        false,
+        myId,
+      );
 
-    //   ellipse.zoom = currentZoom;
-    //   ellipse.draw(offsetXCustom.value, offsetYCustom.value);
+      ellipse.zoom = currentZoom;
+      ellipse.draw(offsetXCustom.value, offsetYCustom.value);
 
-    //   break;
-    // }
+      break;
+    }
 
     default:
       break;
