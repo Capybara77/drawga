@@ -6,6 +6,7 @@ import {
   RectangleObject,
   EllipseObject,
 } from '@/constructors';
+import { testToast } from '@/services/toastify';
 import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
@@ -18,6 +19,10 @@ const socket = ref(new WebSocketService());
 
 const handleClose = (event: CustomEvent) => {
   console.log('Соединение закрыто', event.detail);
+};
+
+const handleMessage = (event: CustomEvent) => {
+  testToast(event.detail[1]);
 };
 
 const handleMove = (event: CustomEvent) => {
@@ -71,6 +76,7 @@ function createSocketConnection() {
   socket.value.addEventListener('move', handleMove as EventListener);
   socket.value.addEventListener('clear', handleClear as EventListener);
   socket.value.addEventListener('close', handleClose as EventListener);
+  socket.value.addEventListener('message', handleMessage as EventListener);
 
   socket.value.send({ command: 'test', message: 'Hello, server' });
 }
@@ -191,7 +197,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     case 'image': {
       return;
     }
-    
+
     case 'text': {
       return;
     }
