@@ -8,8 +8,18 @@ import ColorPicker from './ColorPicker.vue';
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
-const hiddenCursors: MyCursor[] = ['pointer', 'eraser', 'text', 'image'];
-const isOptionsHidden = computed(() => hiddenCursors.includes(cursorStore.cursor as MyCursor));
+const cursorsForHideAll: MyCursor[] = ['pointer', 'eraser', 'text', 'image'];
+const showFill: MyCursor[] = ['ellipse', 'line', 'line', 'pen', 'rectangle'];
+const showStroke: MyCursor[] = ['ellipse', 'rectangle'];
+const showText: MyCursor[] = ['text'];
+const showFillType: MyCursor[] = ['rectangle', 'ellipse'];
+
+const isOptionsHidden = computed(() => cursorsForHideAll.includes(cursorStore.cursor as MyCursor));
+
+const isFillColor = computed(() => showFill.includes(cursorStore.cursor as MyCursor));
+const isStrokeColor = computed(() => showStroke.includes(cursorStore.cursor as MyCursor));
+const isTextColor = computed(() => showText.includes(cursorStore.cursor as MyCursor));
+const isFillType = computed(() => showFillType.includes(cursorStore.cursor as MyCursor));
 
 const isFillColorOpen = ref(false);
 const isBorderColorOpen = ref(false);
@@ -56,7 +66,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
 
 <template>
   <div class="options-wrapper" :style="{ display: isOptionsHidden ? 'none' : 'flex' }">
-    <div class="options-color-container" id="options-color-fill">
+    <div class="options-color-container" id="options-color-fill" v-if="isFillColor">
       <p>Цвет зарисовки</p>
       <div class="color-container">
         <div
@@ -82,7 +92,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
         </div>
       </div>
     </div>
-    <div class="options-color-container" id="options-color-border">
+    <div class="options-color-container" id="options-color-border" v-if="isStrokeColor">
       <p>Цвет границы</p>
       <div class="color-container">
         <div
@@ -109,7 +119,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
         </div>
       </div>
     </div>
-    <div class="options-color-container" id="options-color-text">
+    <div class="options-color-container" id="options-color-text" v-if="isTextColor">
       <p>Цвет текста</p>
       <div class="color-container">
         <div
@@ -154,7 +164,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
         </div>
       </div>
     </div>
-    <div class="options-container" id="font-size-options-container">
+    <div class="options-container" id="font-size-options-container" v-if="isTextColor">
       <p>Размер текста</p>
       <div class="options-btns-container">
         <div v-for="textSize in optionsStore.allOptions.textSizes">
@@ -183,7 +193,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
         v-model.lazy="optionsStore.opacity"
       />
     </div>
-    <div class="options-container" id="fill-style-options-container">
+    <div class="options-container" id="fill-style-options-container" v-if="isFillType">
       <p>Стиль заливки</p>
       <div class="fill-style-options-container">
         <button
