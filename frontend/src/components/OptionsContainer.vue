@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useColorsStore } from '@/stores/colors';
+import { useOptionsStore } from '@/stores/options';
 import { useCursorStore } from '@/stores/cursor';
 import type { MyCursor } from '@/types';
 import { computed, ref } from 'vue';
 import ColorPicker from './ColorPicker.vue';
 
 const cursorStore = useCursorStore();
-const colorsStore = useColorsStore();
+const optionsStore = useOptionsStore();
 
 const hiddenCursors: MyCursor[] = ['pointer', 'eraser', 'text', 'image'];
 const isOptionsHidden = computed(() => hiddenCursors.includes(cursorStore.cursor as MyCursor));
@@ -39,13 +39,13 @@ const toggleTextColor = () => {
 const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   switch (variant) {
     case 'fill':
-      colorsStore.setFillColor(color);
+      optionsStore.setFillColor(color);
       break;
     case 'border':
-      colorsStore.setBorderColor(color);
+      optionsStore.setBorderColor(color);
       break;
     case 'text':
-      colorsStore.setTextColor(color);
+      optionsStore.setTextColor(color);
       break;
     default:
       break;
@@ -62,12 +62,12 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
         <div
           class="color-picker"
           @click="toggleFillColor"
-          :style="{ backgroundColor: colorsStore.fillColor }"
+          :style="{ backgroundColor: optionsStore.colors.fillColor }"
         ></div>
 
         <ColorPicker
           :is-open="isFillColorOpen"
-          :colors-list="colorsStore.allColors"
+          :colors-list="optionsStore.allOptions.colors"
           @click="(color) => pickColor(color, 'fill')"
         />
 
@@ -77,7 +77,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
             placeholder="000000"
             type="text"
             id="color-picker-input"
-            v-model="colorsStore.fillColor"
+            v-model="optionsStore.colors.fillColor"
           />
         </div>
       </div>
@@ -89,12 +89,12 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
           class="color-picker"
           id="stroke-color-picker"
           @click="toggleBorderColor"
-          :style="{ backgroundColor: colorsStore.borderColor }"
+          :style="{ backgroundColor: optionsStore.colors.borderColor }"
         ></div>
 
         <ColorPicker
           :is-open="isBorderColorOpen"
-          :colors-list="colorsStore.allColors"
+          :colors-list="optionsStore.allOptions.colors"
           @click="(color) => pickColor(color, 'border')"
         />
 
@@ -104,7 +104,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
             placeholder="000000"
             type="text"
             id="stroke-color-picker-input"
-            v-model="colorsStore.borderColor"
+            v-model="optionsStore.colors.borderColor"
           />
         </div>
       </div>
@@ -116,12 +116,12 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
           class="color-picker"
           id="text-color-picker"
           @click="toggleTextColor"
-          :style="{ backgroundColor: colorsStore.textColor }"
+          :style="{ backgroundColor: optionsStore.colors.textColor }"
         ></div>
 
         <ColorPicker
           :is-open="isTextColorOpen"
-          :colors-list="colorsStore.allColors"
+          :colors-list="optionsStore.allOptions.colors"
           @click="(color) => pickColor(color, 'text')"
         />
 
@@ -131,7 +131,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
             placeholder="000000"
             type="text"
             id="text-color-picker-input"
-            v-model="colorsStore.textColor"
+            v-model="optionsStore.colors.textColor"
           />
         </div>
       </div>
@@ -139,23 +139,17 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     <div class="options-container" id="width-options-container">
       <p>Толщина линии</p>
       <div class="options-btns-container">
-        <div>
-          <button class="option-btn width-btn" id="small-width-btn" data-line-width="5">
-            smol
-          </button>
-        </div>
-        <div>
+        <div v-for="lineSize in optionsStore.allOptions.lineWidths">
           <button
-            class="option-btn width-btn active-option"
-            id="middle-width-btn"
-            data-line-width="12"
+            :class="
+              'option-btn width-btn' +
+              (optionsStore.lineWidth === lineSize.value ? ' active-option' : '')
+            "
+            :data-line-width="lineSize.value"
+            :key="lineSize.value"
+            @click="() => optionsStore.setLineWidth(lineSize.value)"
           >
-            norm
-          </button>
-        </div>
-        <div>
-          <button class="option-btn width-btn" id="large-width-btn" data-line-width="20">
-            larj
+            {{ lineSize.label }}
           </button>
         </div>
       </div>
@@ -163,45 +157,45 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     <div class="options-container" id="font-size-options-container">
       <p>Размер текста</p>
       <div class="options-btns-container">
-        <div>
-          <button class="option-btn font-size-btn" id="font-s-btn" data-font-size="0.875rem">
-            S
-          </button>
-        </div>
-        <div>
+        <div v-for="textSize in optionsStore.allOptions.textSizes">
           <button
-            class="option-btn font-size-btn active-option"
-            id="font-m-btn"
-            data-font-size="1rem"
+            :class="
+              'option-btn font-size-btn ' +
+              (optionsStore.textSize === textSize.value ? 'active-option' : '')
+            "
+            :data-font-size="textSize.value"
+            :key="textSize.value"
+            @click="() => optionsStore.setTextSize(textSize.value)"
           >
-            M
-          </button>
-        </div>
-        <div>
-          <button class="option-btn font-size-btn" id="font-l-btn" data-font-size="1.2rem">
-            L
-          </button>
-        </div>
-        <div>
-          <button class="option-btn font-size-btn" id="font-xl-btn" data-font-size="1.5rem">
-            XL
+            {{ textSize.label }}
           </button>
         </div>
       </div>
     </div>
     <div class="options-container" id="opacity-options-container">
       <p>Прозрачность линии</p>
-      <input type="range" min="0.1" max="1" value="1" step="0.1" id="input-opacity" />
+      <input
+        type="range"
+        min="0.1"
+        max="1"
+        step="0.1"
+        id="input-opacity"
+        v-model.lazy="optionsStore.opacity"
+      />
     </div>
     <div class="options-container" id="fill-style-options-container">
       <p>Стиль заливки</p>
       <div class="fill-style-options-container">
-        <button class="fill-style-btn active-fill-style" data-fill-option="hachure">hachure</button>
-        <button class="fill-style-btn" data-fill-option="solid">solid</button>
-        <button class="fill-style-btn" data-fill-option="zigzag">zigzag</button>
-        <button class="fill-style-btn" data-fill-option="cross-hatch">cross-hatch</button>
-        <button class="fill-style-btn" data-fill-option="dashed">dashed</button>
-        <button class="fill-style-btn" data-fill-option="zigzag-line">zigzag-line</button>
+        <button
+          v-for="fillStyle in optionsStore.allOptions.fillStyles"
+          @click="() => optionsStore.setFillStyle(fillStyle)"
+          :key="fillStyle"
+          :class="
+            'fill-style-btn ' + (optionsStore.fillStyle === fillStyle ? 'active-fill-style' : '')
+          "
+        >
+          {{ fillStyle }}
+        </button>
       </div>
     </div>
   </div>

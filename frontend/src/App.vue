@@ -7,14 +7,14 @@ import SettingsContainer from './components/SettingsContainer.vue';
 import ZoomContainer from './components/ZoomContainer.vue';
 import rough from 'roughjs';
 
-import { useColorsStore } from './stores/colors';
+import { useOptionsStore } from './stores/options';
 import { useCursorStore } from './stores/cursor';
 import { BaseObject, CurveObject, EllipseObject, LineObject, RectangleObject } from './types';
 import { WebSocketService } from './services/webSocketService';
 
 const socket = ref(new WebSocketService());
 const cursorStore = useCursorStore();
-const colorStore = useColorsStore();
+const optionsStore = useOptionsStore();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
 const ctx = ref();
@@ -47,6 +47,15 @@ let cursorYStart = 0;
 
 const myId = '123';
 
+onMounted(() => {
+  resizeCanvas();
+  roughCanvas.value = rough.canvas(canvasElement.value as HTMLCanvasElement);
+  ctx.value = canvasElement.value?.getContext('2d') as CanvasRenderingContext2D;
+  ctx.value.lineWidth = 12;
+
+  createSocketConnection();
+});
+
 const resizeCanvas = () => {
   if (canvasElement.value) {
     canvasElement.value.width = window.innerWidth;
@@ -55,14 +64,6 @@ const resizeCanvas = () => {
     roughCanvas.value = rough.canvas(canvasElement.value);
   }
 };
-
-onMounted(() => {
-  resizeCanvas();
-  roughCanvas.value = rough.canvas(canvasElement.value as HTMLCanvasElement);
-  ctx.value = canvasElement.value?.getContext('2d') as CanvasRenderingContext2D;
-
-  createSocketConnection();
-});
 
 const reDraw = (
   objects: BaseObject[],
@@ -106,7 +107,6 @@ const fullReDraw = () => {
 
 const onCanvasPointerDown = (event: PointerEvent) => {
   if (event.button === 0) {
-    console.log('123123');
     const element = event.target as HTMLElement;
 
     if (element.id !== 'canvas') {
@@ -435,7 +435,6 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     // }
 
     case 'pen': {
-      console.log('12312312');
       if (prevX.value == null || prevY.value == null || !isDraw.value) {
         prevX.value = event.clientX;
         prevY.value = event.clientY;
@@ -456,8 +455,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
         const curve = new CurveObject(
           currentLine.value,
-          ctx.value.fillStyle as string,
-          ctx.value.lineWidth,
+          optionsStore.colors.fillColor,
+          optionsStore.lineWidth,
           ctx.value,
           myId,
         );
