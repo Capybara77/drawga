@@ -61,7 +61,7 @@ const defaultState = {
   lineWidth: 12,
   textSize: '1rem',
   fillStyle: 'hachure',
-  opacity: 0.5,
+  opacity: 1,
 };
 
 export const useOptionsStore = defineStore('options', {
@@ -72,6 +72,20 @@ export const useOptionsStore = defineStore('options', {
       borderColor: '#' + state.colors.borderColor,
       textColor: '#' + state.colors.textColor,
     }),
+    getterColorsWithOpacity: (state) => {
+      const hexToRgb = (hex: string) => {
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `${r}, ${g}, ${b}`;
+      };
+
+      return {
+        fillColor: `rgba(${hexToRgb(state.colors.fillColor)}, ${state.opacity})`,
+        borderColor: `rgba(${hexToRgb(state.colors.borderColor)}, ${state.opacity})`,
+        textColor: `rgba(${hexToRgb(state.colors.textColor)}, ${state.opacity})`,
+      };
+    },
   },
   actions: {
     setFillColor(color: string) {

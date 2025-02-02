@@ -130,7 +130,7 @@ const getNewCurve = () => {
   const curveProps: CurveProps = {
     userId: myId,
     ctx: ctx.value as CanvasRenderingContext2D,
-    color: optionsStore.getterColors.fillColor,
+    color: optionsStore.getterColorsWithOpacity.fillColor,
     pointsList: currentLine.value,
     width: optionsStore.lineWidth,
   };
@@ -218,7 +218,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       fullReDraw();
 
       const lineObjectProps: LineProps = {
-        color: optionsStore.getterColors.fillColor,
+        color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         roughCanvas: roughCanvas.value,
         userId: myId,
@@ -243,11 +243,11 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       fullReDraw();
 
       const rectangleProps: RectangleProps = {
-        color: optionsStore.getterColors.fillColor,
+        color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColors.borderColor,
+        stroke: optionsStore.getterColorsWithOpacity.borderColor,
         strokeWidth: optionsStore.lineWidth,
         userId: myId,
         startPoint: [
@@ -278,7 +278,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       fullReDraw();
 
       const ellipseProps: EllipseProps = {
-        color: optionsStore.getterColors.fillColor,
+        color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         startPoint: [
           (cursorXStart - offsetXCustom.value) / currentZoom,
@@ -296,7 +296,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         ],
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColors.borderColor,
+        stroke: optionsStore.getterColorsWithOpacity.borderColor,
         strokeWidth: optionsStore.lineWidth,
         isCircle: false,
         userId: myId,
@@ -447,11 +447,11 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       }
 
       const rectangleProps: RectangleProps = {
-        color: optionsStore.getterColors.fillColor,
+        color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColors.borderColor,
+        stroke: optionsStore.getterColorsWithOpacity.borderColor,
         strokeWidth: optionsStore.lineWidth,
         userId: myId,
         startPoint: [
@@ -481,7 +481,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       fullReDraw();
 
       let lineObjectProps: LineProps = {
-        color: optionsStore.getterColors.fillColor,
+        color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         roughCanvas: roughCanvas.value,
         userId: myId,
@@ -541,7 +541,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       fullReDraw();
 
       const ellipseProps: EllipseProps = {
-        color: optionsStore.getterColors.fillColor,
+        color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         startPoint: [
           (cursorXStart - offsetXCustom.value) / currentZoom,
@@ -559,7 +559,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         ],
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColors.borderColor,
+        stroke: optionsStore.getterColorsWithOpacity.borderColor,
         strokeWidth: optionsStore.lineWidth,
         isCircle: false,
         userId: myId,
