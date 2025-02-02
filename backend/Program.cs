@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Drawga.Data;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,11 @@ app.UseWebSockets();
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Environment.CurrentDirectory, "dist")),
+});
 
 app.UseRouting();
 
@@ -48,7 +54,7 @@ app.Use(GetVueMain);
 async Task GetVueMain(HttpContext context, RequestDelegate arg2)
 {
     context.Response.ContentType = "text/html";
-    await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+    await context.Response.SendFileAsync(Path.Combine("dist", "index.html"));
 }
 
 app.Run();

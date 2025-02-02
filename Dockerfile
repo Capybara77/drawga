@@ -15,7 +15,7 @@ RUN dotnet publish "Drawga.csproj" -c Release -o /publish
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 
 WORKDIR /app
-COPY --from=node /frontend/dist ./wwwroot
+COPY --from=node /frontend/dist ./dist
 COPY --from=build /publish ./
 
 EXPOSE 80
