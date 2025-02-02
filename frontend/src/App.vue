@@ -10,7 +10,7 @@ import ZoomContainer from './components/ZoomContainer.vue';
 import { WebSocketService } from './services/webSocketService';
 import { useCursorStore } from './stores/cursor';
 import { useOptionsStore } from './stores/options';
-import { BaseObject, CurveObject, LineObject } from './types';
+import { BaseObject, CurveObject, LineObject, RectangleObject } from './types';
 
 const socket = ref(new WebSocketService());
 const cursorStore = useCursorStore();
@@ -51,7 +51,7 @@ onMounted(() => {
   resizeCanvas();
   roughCanvas.value = rough.canvas(canvasElement.value as HTMLCanvasElement);
   ctx.value = canvasElement.value?.getContext('2d') as CanvasRenderingContext2D;
-  ctx.value.lineWidth = 12;
+  optionsStore.lineWidth = 12;
 
   createSocketConnection();
 });
@@ -274,38 +274,38 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       fullReDraw();
       break;
     }
-    // case 'rectangle': {
-    //   fullReDraw();
+    case 'rectangle': {
+      fullReDraw();
 
-    //   const rect = new RectangleObject(
-    //     optionsStore.fillStyle,
-    //   optionsStore.lineWidth,
-    //     [
-    //       (cursorXStart - offsetXCustom.value) / currentZoom,
-    //       (cursorYStart - offsetYCustom.value) / currentZoom,
-    //     ],
-    //     [
-    //       event.shiftKey
-    //         ? (event.clientX - offsetXCustom.value) / currentZoom
-    //         : (event.clientX - offsetXCustom.value) / currentZoom,
-    //       event.shiftKey
-    //         ? (cursorYStart - offsetYCustom.value) / currentZoom +
-    //           ((event.clientX - offsetXCustom.value) / currentZoom -
-    //             (cursorXStart - offsetXCustom.value) / currentZoom)
-    //         : (event.clientY - offsetYCustom.value) / currentZoom,
-    //     ],
-    //     colorStore.fillColor,
-    //     roughCanvas.value,
-    //     colorStore.borderColor,
-    //     ctx.value.lineWidth,
-    //     myId,
-    //   );
+      const rect = new RectangleObject(
+        optionsStore.colors.fillColor,
+        optionsStore.lineWidth,
+        [
+          (cursorXStart - offsetXCustom.value) / currentZoom,
+          (cursorYStart - offsetYCustom.value) / currentZoom,
+        ],
+        [
+          event.shiftKey
+            ? (event.clientX - offsetXCustom.value) / currentZoom
+            : (event.clientX - offsetXCustom.value) / currentZoom,
+          event.shiftKey
+            ? (cursorYStart - offsetYCustom.value) / currentZoom +
+              ((event.clientX - offsetXCustom.value) / currentZoom -
+                (cursorXStart - offsetXCustom.value) / currentZoom)
+            : (event.clientY - offsetYCustom.value) / currentZoom,
+        ],
+        optionsStore.fillStyle,
+        roughCanvas.value,
+        optionsStore.colors.borderColor,
+        optionsStore.lineWidth,
+        myId,
+      );
 
-    //   rect.zoom = currentZoom;
-    //   rect.draw(offsetXCustom.value, offsetYCustom.value);
-    //   allObjects.value.push(rect);
-    //   break;
-    // }
+      rect.zoom = currentZoom;
+      rect.draw(offsetXCustom.value, offsetYCustom.value);
+      allObjects.value.push(rect);
+      break;
+    }
 
     // case 'ellipse': {
     //   fullReDraw();
@@ -327,10 +327,10 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     //             (cursorXStart - offsetXCustom.value) / currentZoom)
     //         : (event.clientY - offsetYCustom.value) / currentZoom,
     //     ],
-    //     colorStore.fillColor,
+    //      optionsStore.colors.fillColor,
     //     roughCanvas.value,
-    //     colorStore.borderColor,
-    //     ctx.value.lineWidth,
+    //      optionsStore.colors.borderColor,
+    //     optionsStore.lineWidth,
     //     false,
     //     myId,
     //   );
@@ -470,40 +470,40 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
     }
 
-    // case 'rectangle': {
-    //   fullReDraw();
+    case 'rectangle': {
+      fullReDraw();
 
-    //   if (event.shiftKey) {
-    //   }
+      if (event.shiftKey) {
+      }
 
-    //   const rect = new RectangleObject(
-    //     optionsStore.fillStyle,
-    //   optionsStore.lineWidth,
-    //     [
-    //       (cursorXStart - offsetXCustom.value) / currentZoom,
-    //       (cursorYStart - offsetYCustom.value) / currentZoom,
-    //     ],
-    //     [
-    //       event.shiftKey
-    //         ? (cursorXCurrent - offsetXCustom.value) / currentZoom
-    //         : (cursorXCurrent - offsetXCustom.value) / currentZoom,
-    //       event.shiftKey
-    //         ? (cursorYStart - offsetYCustom.value) / currentZoom +
-    //           ((cursorXCurrent - offsetXCustom.value) / currentZoom -
-    //             (cursorXStart - offsetXCustom.value) / currentZoom)
-    //         : (cursorYCurrent - offsetYCustom.value) / currentZoom,
-    //     ],
-    //     colorStore.fillColor,
-    //     roughCanvas.value,
-    //     colorStore.borderColor,
-    //     ctx.value.lineWidth,
-    //     myId,
-    //   );
+      const rect = new RectangleObject(
+        optionsStore.colors.fillColor,
+        optionsStore.lineWidth,
+        [
+          (cursorXStart - offsetXCustom.value) / currentZoom,
+          (cursorYStart - offsetYCustom.value) / currentZoom,
+        ],
+        [
+          event.shiftKey
+            ? (cursorXCurrent - offsetXCustom.value) / currentZoom
+            : (cursorXCurrent - offsetXCustom.value) / currentZoom,
+          event.shiftKey
+            ? (cursorYStart - offsetYCustom.value) / currentZoom +
+              ((cursorXCurrent - offsetXCustom.value) / currentZoom -
+                (cursorXStart - offsetXCustom.value) / currentZoom)
+            : (cursorYCurrent - offsetYCustom.value) / currentZoom,
+        ],
+        optionsStore.fillStyle,
+        roughCanvas.value,
+        optionsStore.colors.borderColor,
+        optionsStore.lineWidth,
+        myId,
+      );
 
-    //   rect.zoom = currentZoom;
-    //   rect.draw(offsetXCustom.value, offsetYCustom.value);
-    //   break;
-    // }
+      rect.zoom = currentZoom;
+      rect.draw(offsetXCustom.value, offsetYCustom.value);
+      break;
+    }
 
     case 'line': {
       fullReDraw();
@@ -674,10 +674,10 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //             (cursorXStart - offsetXCustom.value) / currentZoom)
     //         : (event.clientY - offsetYCustom.value) / currentZoom,
     //     ],
-    //     colorStore.fillColor,
+    //      optionsStore.colors.fillColor,
     //     roughCanvas.value,
-    //     colorStore.borderColor,
-    //     ctx.value.lineWidth,
+    //      optionsStore.colors.borderColor,
+    //     optionsStore.lineWidth,
     //     false,
     //     myId,
     //   );
