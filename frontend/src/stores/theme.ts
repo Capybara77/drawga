@@ -20,8 +20,10 @@ export const useThemeStore = defineStore('theme', {
     },
     toggleTheme() {
       const newTheme = this.theme === 'lightTheme' ? 'darkTheme' : 'lightTheme';
+
       this.theme = newTheme;
       localStorage.setItem(THEME_KEY, newTheme);
+      document.documentElement.className = newTheme;
     },
   },
 });

@@ -37,6 +37,7 @@
   align-items: center;
 
   min-height: 41px;
+  color: var(--clr-text);
 }
 
 .zoom-btn {
@@ -45,6 +46,7 @@
   height: 30px;
   background: transparent;
   border: none;
+  color: var(--clr-text);
 
   font-size: 1.2rem;
 

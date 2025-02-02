@@ -268,12 +268,15 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   align-items: center;
   gap: 5px;
   padding-left: 7px;
+
+  color: var(--clr-text);
 }
 
 .color-picker-input input {
   border: none;
   outline: none;
   background-color: var(--clr-background-transparent);
+  color: var(--clr-text);
 }
 
 .color-list {
@@ -315,6 +318,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   padding: 6px;
   border-radius: 5px;
   cursor: pointer;
+  color: var(--clr-text);
 }
 
 /* .options-btns-container > div {
@@ -323,7 +327,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
 
 .active-option {
   outline: 2px solid var(--clr-primary);
-  color: var(--clr-primary);
+  /* color: var(--clr-primary); */
 }
 
 /*  ======================== ПРОЗРАЧНОСТЬ  ======================== */
@@ -380,10 +384,11 @@ input[type='range']::-webkit-slider-runnable-track {
 
 .fill-style-btn {
   background-color: var(--clr-background-transparent);
-  border: 2ps solid var(--clr-primary-dark);
+  border: none;
   border-radius: 7px;
   aspect-ratio: 1 / 1;
   font-size: 0.9rem;
+  color: var(--clr-text);
 
   transition: border 200ms ease;
   cursor: pointer;
@@ -392,6 +397,11 @@ input[type='range']::-webkit-slider-runnable-track {
 
 .active-fill-style {
   outline: 2px solid var(--clr-primary);
-  color: var(--clr-primary-dark);
+  /* color: var(--clr-primary-dark); */
+}
+
+.options-color-container,
+.options-container > p {
+  color: var(--clr-text);
 }
 </style>
