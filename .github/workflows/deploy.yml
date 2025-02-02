@@ -33,7 +33,7 @@ jobs:
           git clone https://github.com/Capybara77/drawga.git .
           git checkout to-vue
           
-          docker builder prune
+          docker builder prune -f
           docker build -t drawga .
           
           # Запускаем новый контейнер
