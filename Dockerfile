@@ -1,7 +1,7 @@
 FROM node:current-alpine3.20 as node
 WORKDIR ./frontend
 COPY ./frontend .
-RUN npm install-g yarn
+RUN npm install -g yarn
 RUN npm i
 RUN npm run build-only
 
