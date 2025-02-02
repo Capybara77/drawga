@@ -191,9 +191,11 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     case 'image': {
       return;
     }
+    
     case 'text': {
       return;
     }
+
     case 'pointer': {
       return;
     }
@@ -239,6 +241,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       fullReDraw();
       break;
     }
+
     case 'rectangle': {
       fullReDraw();
 
