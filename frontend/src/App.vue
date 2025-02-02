@@ -1,23 +1,23 @@
 <script setup lang="ts">
+import rough from 'roughjs';
 import { onMounted, ref, useTemplateRef } from 'vue';
 import Confirm from './components/ConfirmContainer.vue';
 import CursorContainer from './components/CursorContainer.vue';
 import OptionsContainer from './components/OptionsContainer.vue';
 import SettingsContainer from './components/SettingsContainer.vue';
 import ZoomContainer from './components/ZoomContainer.vue';
-import rough from 'roughjs';
 
-import { useOptionsStore } from './stores/options';
-import { useCursorStore } from './stores/cursor';
-import { BaseObject, CurveObject, EllipseObject, LineObject, RectangleObject } from './types';
 import { WebSocketService } from './services/webSocketService';
+import { useCursorStore } from './stores/cursor';
+import { useOptionsStore } from './stores/options';
+import { BaseObject, CurveObject } from './types';
 
 const socket = ref(new WebSocketService());
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
-const ctx = ref();
+const ctx = ref<CanvasRenderingContext2D>();
 const roughCanvas = ref();
 
 const allObjects = ref<BaseObject[]>([]);
@@ -56,6 +56,18 @@ onMounted(() => {
   createSocketConnection();
 });
 
+const getNewCurve = () => {
+  const curve = new CurveObject(
+    currentLine.value,
+    optionsStore.colors.fillColor,
+    optionsStore.lineWidth,
+    ctx.value as CanvasRenderingContext2D,
+    myId,
+  );
+
+  return curve;
+};
+
 const resizeCanvas = () => {
   if (canvasElement.value) {
     canvasElement.value.width = window.innerWidth;
@@ -72,7 +84,7 @@ const reDraw = (
   screenWidth: number,
   screenHeight: number,
 ) => {
-  console.log(offsetXCustom + '  ' + offsetYCustom + '  ' + screenWidth + '   ' + screenHeight);
+  // console.log(offsetXCustom + '  ' + offsetYCustom + '  ' + screenWidth + '   ' + screenHeight);
 
   for (let index = 0; index < objects.length; index++) {
     const element = objects[index];
@@ -85,7 +97,7 @@ const reDraw = (
 };
 
 const cleanCanvas = () => {
-  ctx.value.clearRect(
+  ctx.value?.clearRect(
     0,
     0,
     document.documentElement.clientWidth,
@@ -94,7 +106,7 @@ const cleanCanvas = () => {
 };
 
 const fullReDraw = () => {
-  console.log(allObjects.value);
+  // console.log(allObjects.value);
   cleanCanvas();
   reDraw(
     allObjects.value,
@@ -231,13 +243,9 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         pointsToDraw.push([element[0] * currentZoom, element[1] * currentZoom]);
       }
 
-      const curve = new CurveObject(
-        currentLine.value,
-        ctx.value.fillStyle as string,
-        +ctx.value.lineWidth,
-        ctx.value,
-        myId,
-      );
+      const curve = getNewCurve();
+
+      console.log('curve !!!!', curve);
       curve.zoom = currentZoom;
       //allObjects.value.push(curve);
       allObjects.value = [...allObjects.value, curve];
@@ -248,8 +256,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     //   fullReDraw();
 
     //   const line = new LineObject(
-    //     ctx.value.fillStyle as string,
-    //     +ctx.value.lineWidth,
+    //     optionsStore.fillStyle,
+    //   optionsStore.lineWidth,
     //     [
     //       (cursorXStart - offsetXCustom.value) / currentZoom,
     //       (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -271,8 +279,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     //   fullReDraw();
 
     //   const rect = new RectangleObject(
-    //     ctx.value.fillStyle as string,
-    //     +ctx.value.lineWidth,
+    //     optionsStore.fillStyle,
+    //   optionsStore.lineWidth,
     //     [
     //       (cursorXStart - offsetXCustom.value) / currentZoom,
     //       (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -304,8 +312,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     //   fullReDraw();
 
     //   const ellipse = new EllipseObject(
-    //     ctx.value.fillStyle as string,
-    //     +ctx.value.lineWidth,
+    //     optionsStore.fillStyle,
+    //   optionsStore.lineWidth,
     //     [
     //       (cursorXStart - offsetXCustom.value) / currentZoom,
     //       (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -453,13 +461,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
         fullReDraw();
 
-        const curve = new CurveObject(
-          currentLine.value,
-          optionsStore.colors.fillColor,
-          optionsStore.lineWidth,
-          ctx.value,
-          myId,
-        );
+        const curve = getNewCurve();
         curve.zoom = currentZoom;
         curve.draw(offsetXCustom.value, offsetYCustom.value);
       }
@@ -476,8 +478,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //   }
 
     //   const rect = new RectangleObject(
-    //     ctx.value.fillStyle as string,
-    //     +ctx.value.lineWidth,
+    //     optionsStore.fillStyle,
+    //   optionsStore.lineWidth,
     //     [
     //       (cursorXStart - offsetXCustom.value) / currentZoom,
     //       (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -598,8 +600,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //     if (Math.abs(slope) <= 1) {
     //       // Horizontal or 45-degree line
     //       line = new LineObject(
-    //         ctx.value.fillStyle as string,
-    //         +ctx.value.lineWidth,
+    //         optionsStore.fillStyle,
+    //       optionsStore.lineWidth,
     //         [
     //           (cursorXStart - offsetXCustom.value) / currentZoom,
     //           (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -614,8 +616,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //     } else {
     //       // Vertical line
     //       line = new LineObject(
-    //         ctx.value.fillStyle as string,
-    //         +ctx.value.lineWidth,
+    //         optionsStore.fillStyle,
+    //       optionsStore.lineWidth,
     //         [
     //           (cursorXStart - offsetXCustom.value) / currentZoom,
     //           (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -631,8 +633,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //   } else {
     //     // Normal line (not drawn in a straight line)
     //     line = new LineObject(
-    //       ctx.value.fillStyle as string,
-    //       +ctx.value.lineWidth,
+    //       optionsStore.fillStyle,
+    //     optionsStore.lineWidth,
     //       [
     //         (cursorXStart - offsetXCustom.value) / currentZoom,
     //         (cursorYStart - offsetYCustom.value) / currentZoom,
@@ -656,8 +658,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //   fullReDraw();
 
     //   const ellipse = new EllipseObject(
-    //     ctx.value.fillStyle as string,
-    //     +ctx.value.lineWidth,
+    //     optionsStore.fillStyle,
+    //   optionsStore.lineWidth,
     //     [
     //       (cursorXStart - offsetXCustom.value) / currentZoom,
     //       (cursorYStart - offsetYCustom.value) / currentZoom,
