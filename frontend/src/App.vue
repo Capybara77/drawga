@@ -10,7 +10,7 @@ import rough from 'roughjs';
 import { useColorsStore } from './stores/colors';
 import { useCursorStore } from './stores/cursor';
 import { BaseObject, CurveObject, EllipseObject, LineObject, RectangleObject } from './types';
-import { WebSocketService } from '@/services/WebSocketService';
+import { WebSocketService } from './services/webSocketService';
 
 const socket = ref(new WebSocketService());
 const cursorStore = useCursorStore();
