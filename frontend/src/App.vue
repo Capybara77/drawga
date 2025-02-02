@@ -10,7 +10,7 @@ import ZoomContainer from './components/ZoomContainer.vue';
 import { WebSocketService } from './services/webSocketService';
 import { useCursorStore } from './stores/cursor';
 import { useOptionsStore } from './stores/options';
-import { BaseObject, CurveObject, LineObject, RectangleObject } from './types';
+import { BaseObject, CurveObject, EllipseObject, LineObject, RectangleObject } from './types';
 
 const socket = ref(new WebSocketService());
 const cursorStore = useCursorStore();
@@ -21,6 +21,7 @@ const ctx = ref<CanvasRenderingContext2D>();
 const roughCanvas = ref();
 
 const allObjects = ref<BaseObject[]>([]);
+const bufferObj = ref<BaseObject[]>([]);
 
 const offsetXCustom = ref(0);
 const offsetYCustom = ref(0);
@@ -66,6 +67,18 @@ const getNewCurve = () => {
   );
 
   return curve;
+};
+
+const deleteObj = (obj: BaseObject) => {
+  bufferObj.value = [...bufferObj.value, obj];
+
+  const a = JSON.stringify(obj);
+
+  const messageToServer: string = 'delete:::' + a;
+  const utf8Encode = new TextEncoder();
+  const array = utf8Encode.encode(messageToServer);
+  // socket.send(array.length as unknown as string);
+  // socket.send(array);
 };
 
 const resizeCanvas = () => {
@@ -382,64 +395,64 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
     }
 
-    // case 'eraser': {
-    //   const prevCount = allObjects.length;
-    //   allObjects = allObjects.filter((item) => {
-    //     if (item.typeName === 'curve') {
-    //       if (
-    //         (item as CurveObject).isCloseToPoints(
-    //           event.clientX / currentZoom - offsetXCustom / currentZoom,
-    //           event.clientY / currentZoom - offsetYCustom / currentZoom,
-    //           10,
-    //         )
-    //       ) {
-    //         deleteObj(item);
+    case 'eraser': {
+      const prevCount = allObjects.value.length;
+      allObjects.value = allObjects.value.filter((item) => {
+        if (item.typeName === 'curve') {
+          if (
+            (item as CurveObject).isCloseToPoints(
+              event.clientX / currentZoom - offsetXCustom.value / currentZoom,
+              event.clientY / currentZoom - offsetYCustom.value / currentZoom,
+              10,
+            )
+          ) {
+            deleteObj(item);
 
-    //         return false;
-    //       }
-    //     } else if (item.typeName === 'rectangle') {
-    //       if (
-    //         (item as RectangleObject).isOverlay(
-    //           -event.clientX + offsetXCustom,
-    //           -event.clientY + offsetYCustom,
-    //           1,
-    //           1,
-    //         )
-    //       ) {
-    //         deleteObj(item);
-    //         return false;
-    //       }
-    //     } else if (item.typeName === 'line') {
-    //       if (
-    //         (item as LineObject).isCloseToPoints(
-    //           event.clientX / currentZoom - offsetXCustom / currentZoom,
-    //           event.clientY / currentZoom - offsetYCustom / currentZoom,
-    //           25,
-    //         )
-    //       ) {
-    //         deleteObj(item);
-    //         return false;
-    //       }
-    //     } else if (item.typeName === 'ellipse') {
-    //       if (
-    //         (item as EllipseObject).closeToCentre(
-    //           event.clientX / currentZoom - offsetXCustom / currentZoom,
-    //           event.clientY / currentZoom - offsetYCustom / currentZoom,
-    //         )
-    //       ) {
-    //         deleteObj(item);
-    //         return false;
-    //       }
-    //     }
+            return false;
+          }
+        } else if (item.typeName === 'rectangle') {
+          if (
+            (item as RectangleObject).isOverlay(
+              -event.clientX + offsetXCustom.value,
+              -event.clientY + offsetYCustom.value,
+              1,
+              1,
+            )
+          ) {
+            deleteObj(item);
+            return false;
+          }
+        } else if (item.typeName === 'line') {
+          if (
+            (item as LineObject).isCloseToPoints(
+              event.clientX / currentZoom - offsetXCustom.value / currentZoom,
+              event.clientY / currentZoom - offsetYCustom.value / currentZoom,
+              25,
+            )
+          ) {
+            deleteObj(item);
+            return false;
+          }
+        } else if (item.typeName === 'ellipse') {
+          if (
+            (item as EllipseObject).closeToCentre(
+              event.clientX / currentZoom - offsetXCustom.value / currentZoom,
+              event.clientY / currentZoom - offsetYCustom.value / currentZoom,
+            )
+          ) {
+            deleteObj(item);
+            return false;
+          }
+        }
 
-    //     return true;
-    //   });
+        return true;
+      });
 
-    //   if (prevCount !== allObjects.length) {
-    //     fullReDraw();
-    //   }
-    //   break;
-    // }
+      if (prevCount !== allObjects.value.length) {
+        fullReDraw();
+      }
+      break;
+    }
 
     case 'pen': {
       if (prevX.value == null || prevY.value == null || !isDraw.value) {
