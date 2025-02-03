@@ -41,13 +41,16 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.UseSpa(spaBuilder =>
+if (app.Environment.IsDevelopment())
 {
-    if (app.Environment.IsDevelopment())
+    app.UseSpa(spaBuilder =>
     {
-        spaBuilder.UseProxyToSpaDevelopmentServer("http://localhost:5173/");
-    }
-});
+        if (app.Environment.IsDevelopment())
+        {
+            spaBuilder.UseProxyToSpaDevelopmentServer("http://localhost:5173/");
+        }
+    });
+}
 
 app.Use(GetVueMain);
 
