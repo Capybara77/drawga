@@ -37,4 +37,4 @@ jobs:
           docker build -t drawga .
           
           # Запускаем новый контейнер
-          docker run --network drawga --name drawga -d drawga
+          docker run --network drawga --name drawga -v /home/drawga-saves:/app/saves -d drawga

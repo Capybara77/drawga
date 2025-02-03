@@ -32,12 +32,15 @@ export function getTypedDrawObject(
     case 'rectangle':
       const r = new RectangleObject(json);
 
+      r.roughCanvas = roughCanvas;
       r.objId = json.objId;
       r.zoom = json.zoom;
 
       return r;
     case 'ellipse': {
       const e = new EllipseObject(json);
+      e.roughCanvas = roughCanvas;
+
       e.objId = json.objId;
       e.zoom = json.zoom;
 
@@ -52,6 +55,7 @@ export function getTypedDrawObject(
     }
     case 'curve': {
       const c = new CurveObject(json);
+      
       c.objId = json.objId;
       c.zoom = json.zoom;
 
