@@ -11,9 +11,10 @@ import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
+import { debounce } from '@/utils';
 import rough from 'roughjs';
 
-import { onMounted, ref, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 
 const socket = ref(new WebSocketService());
 
@@ -81,23 +82,6 @@ function createSocketConnection() {
   socket.value.send({ command: 'test', message: 'Hello, server' });
 }
 
-onMounted(() => {
-  resizeCanvas();
-  roughCanvas.value = rough.canvas(canvasElement.value as HTMLCanvasElement);
-  ctx.value = canvasElement.value?.getContext('2d') as CanvasRenderingContext2D;
-
-  createSocketConnection();
-});
-
-const resizeCanvas = () => {
-  if (canvasElement.value) {
-    canvasElement.value.width = window.innerWidth;
-    canvasElement.value.height = window.innerHeight;
-    ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
-    roughCanvas.value = rough.canvas(canvasElement.value);
-  }
-};
-
 const reDraw = () => {
   // console.log(offsetXCustom + '  ' + offsetYCustom + '  ' + screenWidth + '   ' + screenHeight);
 
@@ -127,10 +111,40 @@ const cleanCanvas = () => {
 };
 
 const fullReDraw = () => {
-  // console.log(allObjects.value);
   cleanCanvas();
   reDraw();
 };
+
+const updateCanvasSize = () => {
+  if (!canvasElement.value) return;
+
+  canvasElement.value.width = window.innerWidth;
+  canvasElement.value.height = window.innerHeight;
+  fullReDraw();
+};
+
+onMounted(() => {
+  if (canvasElement.value) {
+    if (!ctx.value) {
+      ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+    }
+
+    if (!roughCanvas.value) {
+      roughCanvas.value = rough.canvas(canvasElement.value);
+    }
+
+    canvasElement.value.width = window.innerWidth;
+    canvasElement.value.height = window.innerHeight;
+  }
+
+  createSocketConnection();
+
+  window.addEventListener('resize', updateCanvasSize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateCanvasSize);
+});
 
 const getNewCurve = () => {
   const curveProps: CurveProps = {
@@ -149,11 +163,11 @@ const getNewCurve = () => {
 const deleteObj = (obj: BaseObject) => {
   bufferObj.value = [...bufferObj.value, obj];
 
-  const a = JSON.stringify(obj);
+  // const a = JSON.stringify(obj);
 
-  const messageToServer: string = 'delete:::' + a;
-  const utf8Encode = new TextEncoder();
-  const array = utf8Encode.encode(messageToServer);
+  // const messageToServer: string = 'delete:::' + a;
+  // const utf8Encode = new TextEncoder();
+  // const array = utf8Encode.encode(messageToServer);
   // socket.send(array.length as unknown as string);
   // socket.send(array);
 };

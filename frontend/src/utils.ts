@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-nocheck
 
 import { RoughCanvas } from 'roughjs/bin/canvas';
@@ -10,45 +11,54 @@ import {
   TextObject,
 } from './constructors';
 
+// Функция debounce
+export const debounce = (fn, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
+};
+
 export function getTypedDrawObject(
   str: string,
   roughCanvas: RoughCanvas,
   ctx: CanvasRenderingContext2D,
 ): BaseObject | null {
-  let json: BaseObject = JSON.parse(str);
-  let type: string = json.typeName;
+  const json: BaseObject = JSON.parse(str);
+  const type: string = json.typeName;
 
   switch (type) {
     case 'rectangle':
-      let r = new RectangleObject(json);
+      const r = new RectangleObject(json);
 
       r.objId = json.objId;
       r.zoom = json.zoom;
 
       return r;
     case 'ellipse': {
-      let e = new EllipseObject(json);
+      const e = new EllipseObject(json);
       e.objId = json.objId;
       e.zoom = json.zoom;
 
       return e;
     }
     case 'line': {
-      let l = new LineObject(json);
+      const l = new LineObject(json);
 
       l.zoom = json.zoom;
       l.objId = json.objId;
       return l;
     }
     case 'curve': {
-      let c = new CurveObject(json);
+      const c = new CurveObject(json);
       c.objId = json.objId;
       c.zoom = json.zoom;
 
       return c;
     }
     case 'text': {
-      let {
+      const {
         color,
         width,
         userId,
@@ -64,7 +74,7 @@ export function getTypedDrawObject(
         height,
       } = json as TextObject;
 
-      let t = new TextObject(
+      const t = new TextObject(
         fontFamily,
         color,
         userId,
@@ -157,7 +167,7 @@ export function hexToRgbA(hex: string, alpha = '1') {
 }
 
 export function rgbToRgba(color: string, alpha: number) {
-  let colorArr = color.slice(color.indexOf('(') + 1, color.indexOf(')')).split(', ');
+  const colorArr = color.slice(color.indexOf('(') + 1, color.indexOf(')')).split(', ');
 
   // (25, 25, 25) / 25, 25, 25/ [25, 25, 25]
 
