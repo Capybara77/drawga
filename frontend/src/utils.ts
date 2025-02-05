@@ -56,6 +56,7 @@ export function getTypedDrawObject(
     case 'curve': {
       const c = new CurveObject(json);
       
+      c.ctx = ctx;
       c.objId = json.objId;
       c.zoom = json.zoom;
 
