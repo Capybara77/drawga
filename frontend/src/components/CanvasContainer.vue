@@ -605,18 +605,20 @@ const onKeyUp = (event: KeyboardEvent) => {
 };
 
 onMounted(() => {
-  if (canvasElement.value) {
-    if (!ctx.value) {
-      ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
-    }
-
-    if (!roughCanvas.value) {
-      roughCanvas.value = rough.canvas(canvasElement.value);
-    }
-
-    canvasElement.value.width = window.innerWidth;
-    canvasElement.value.height = window.innerHeight;
+  if (!canvasElement.value) {
+    return;
   }
+
+  if (!ctx.value) {
+    ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+  }
+
+  if (!roughCanvas.value) {
+    roughCanvas.value = rough.canvas(canvasElement.value);
+  }
+
+  canvasElement.value.width = window.innerWidth;
+  canvasElement.value.height = window.innerHeight;
 
   createSocketConnection();
 
