@@ -55,11 +55,12 @@ const prevY = ref(0);
 const isDraw = ref(false);
 const isOnCanvas = ref(false);
 const isSpacePressed = ref(false);
+const isResize = ref(false);
+const cursorY = ref(0);
+const cursorX = ref(0);
 
 const currentZoom = 1;
-const cursorY = 0;
-const cursorX = 0;
-let isResize = false;
+
 const isTyping = false;
 
 let cursorXStart = 0;
@@ -167,7 +168,12 @@ const deleteObj = (obj: BaseObject) => {
 };
 
 const onCanvasPointerDown = (event: PointerEvent) => {
-  if (event.button !== 0) {
+  if (event.button === 1 || (isSpacePressed.value && event.button === 0)) {
+    isResize.value = true;
+    cursorX.value = event.clientX - offsetXCustom.value;
+    cursorY.value = event.clientY - offsetYCustom.value;
+
+    // canvasElement.style.cursor = 'grabbing';
     return;
   }
 
@@ -194,8 +200,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
 
   if (event.button === 2 || element.id !== 'canvas' || isOnCanvas.value === false) return;
 
-  if (isResize) {
-    isResize = false;
+  if (isResize.value) {
+    isResize.value = false;
     return;
   }
 
@@ -355,11 +361,11 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     // socket.send(memessageToServer);
   }
 
-  if (isResize) {
-    // offsetXCustom = event.clientX - cursorX;
-    // offsetYCustom = event.clientY - cursorY;
-    // fullReDraw();
-    // return;
+  if (isResize.value) {
+    offsetXCustom.value = event.clientX - cursorX.value;
+    offsetYCustom.value = event.clientY - cursorY.value;
+    fullReDraw();
+    return;
   }
 
   if (!isDraw.value) return;
