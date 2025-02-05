@@ -28,7 +28,7 @@ const handleDraw = (event: CustomEvent) => {
   ) as BaseObject;
 
   allObjects.value = [...allObjects.value, obj];
-  reDraw();
+  obj.draw(offsetXCustom.value, offsetYCustom.value);
 };
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
