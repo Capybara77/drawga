@@ -124,9 +124,6 @@ export class CurveObject extends BaseObject {
 
     const tempColor = this.ctx.fillStyle;
 
-    console.log('ctx', this.ctx);
-    console.log('myPath', myPath);
-
     this.ctx.fillStyle = this.color.startsWith('#') ? hexToRgbA(this.color) : this.color;
     this.ctx.fill(myPath);
     this.ctx.fillStyle = tempColor;

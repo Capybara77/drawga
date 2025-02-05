@@ -142,13 +142,11 @@ const getNewCurve = () => {
 
   const curveProps: CurveProps = {
     userId: myId,
-    ctx: ctx.value as CanvasRenderingContext2D,
+    ctx: ctx.value,
     color: optionsStore.getterColorsWithOpacity.fillColor,
     pointsList: currentLine.value,
     width: optionsStore.lineWidth,
   };
-
-  console.log({ curveProps });
 
   const curve = new CurveObject(curveProps);
   curve.zoom = currentZoom;
