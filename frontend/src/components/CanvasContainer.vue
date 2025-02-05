@@ -27,7 +27,11 @@ const handleMessage = (event: CustomEvent) => {
 };
 
 const handleDraw = (event: CustomEvent) => {
-  const obj = getTypedDrawObject(event.detail[1], roughCanvas.value, ctx.value as CanvasRenderingContext2D) as BaseObject;
+  const obj = getTypedDrawObject(
+    event.detail[1],
+    roughCanvas.value,
+    ctx.value as CanvasRenderingContext2D,
+  ) as BaseObject;
 
   allObjects.value = [...allObjects.value, obj];
   reDraw();
@@ -67,12 +71,12 @@ const prevY = ref(0);
 
 const isDraw = ref(false);
 const isOnCanvas = ref(false);
+const isSpacePressed = ref(false);
 
 const currentZoom = 1;
 const cursorY = 0;
 const cursorX = 0;
 let isResize = false;
-const isSpacePressed = false;
 const isTyping = false;
 
 let cursorXStart = 0;
@@ -80,7 +84,26 @@ let cursorYStart = 0;
 
 const myId = '123';
 
-function createSocketConnection() {
+const handleClose = (event: CustomEvent) => {
+  console.log('Соединение закрыто', event.detail);
+};
+
+const handleMessage = (event: CustomEvent) => {
+  testToast(event.detail[1]);
+};
+
+const handleMove = (event: CustomEvent) => {
+  const data = event.detail as string[];
+  // реализовать
+  console.log('Получена команда move:', data);
+};
+
+const handleClear = (event: CustomEvent) => {
+  console.log('Получена команда clear', event.detail);
+  // Здесь можно выполнить очистку canvas, обновить состояние и т.п.
+};
+
+const createSocketConnection = () => {
   socket.value.addEventListener('move', handleMove as EventListener);
   socket.value.addEventListener('clear', handleClear as EventListener);
   socket.value.addEventListener('close', handleClose as EventListener);
@@ -88,7 +111,7 @@ function createSocketConnection() {
   socket.value.addEventListener('drawObj', handleDraw as EventListener);
 
   socket.value.send({ command: 'test', message: 'Hello, server' });
-}
+};
 
 const reDraw = () => {
   // console.log(offsetXCustom + '  ' + offsetYCustom + '  ' + screenWidth + '   ' + screenHeight);
@@ -130,29 +153,6 @@ const updateCanvasSize = () => {
   canvasElement.value.height = window.innerHeight;
   fullReDraw();
 };
-
-onMounted(() => {
-  if (canvasElement.value) {
-    if (!ctx.value) {
-      ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
-    }
-
-    if (!roughCanvas.value) {
-      roughCanvas.value = rough.canvas(canvasElement.value);
-    }
-
-    canvasElement.value.width = window.innerWidth;
-    canvasElement.value.height = window.innerHeight;
-  }
-
-  createSocketConnection();
-
-  window.addEventListener('resize', updateCanvasSize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', updateCanvasSize);
-});
 
 const getNewCurve = () => {
   const curveProps: CurveProps = {
@@ -608,6 +608,43 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
   }
 };
+
+const onKeyDown = (event: KeyboardEvent) => {
+  if (event.code === 'Space') {
+    isSpacePressed.value = true;
+  }
+};
+
+const onKeyUp = (event: KeyboardEvent) => {
+  if (event.code === 'Space') {
+    isSpacePressed.value = false;
+  }
+};
+
+onMounted(() => {
+  if (canvasElement.value) {
+    if (!ctx.value) {
+      ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+    }
+
+    if (!roughCanvas.value) {
+      roughCanvas.value = rough.canvas(canvasElement.value);
+    }
+
+    canvasElement.value.width = window.innerWidth;
+    canvasElement.value.height = window.innerHeight;
+  }
+
+  createSocketConnection();
+
+  window.addEventListener('resize', updateCanvasSize, { signal: abortController.signal });
+  window.addEventListener('keydown', onKeyDown, { signal: abortController.signal });
+  window.addEventListener('keyup', onKeyUp, { signal: abortController.signal });
+});
+
+onUnmounted(() => {
+  abortController.abort();
+});
 </script>
 
 <template>
