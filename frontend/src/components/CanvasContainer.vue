@@ -138,6 +138,8 @@ const updateCanvasSize = () => {
 };
 
 const getNewCurve = () => {
+  if (!ctx.value) return;
+
   const curveProps: CurveProps = {
     userId: myId,
     ctx: ctx.value as CanvasRenderingContext2D,
@@ -146,7 +148,10 @@ const getNewCurve = () => {
     width: optionsStore.lineWidth,
   };
 
+  console.log({ curveProps });
+
   const curve = new CurveObject(curveProps);
+  curve.zoom = currentZoom;
 
   return curve;
 };
@@ -220,8 +225,11 @@ const onCanvasPointerUp = (event: PointerEvent) => {
 
       const curve = getNewCurve();
 
+      if (!curve) {
+        break;
+      }
+
       // console.log('curve !!!!', curve);
-      curve.zoom = currentZoom;
       allObjects.value = [...allObjects.value, curve];
       fullReDraw();
       break;
@@ -445,8 +453,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         fullReDraw();
 
         const curve = getNewCurve();
-        curve.zoom = currentZoom;
-        curve.draw(offsetXCustom.value, offsetYCustom.value);
+        curve?.draw(offsetXCustom.value, offsetYCustom.value);
       }
 
       prevX.value = currentX;
