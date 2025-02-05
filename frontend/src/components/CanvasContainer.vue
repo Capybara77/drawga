@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script setup lang="ts">
 import {
   BaseObject,
@@ -11,20 +12,13 @@ import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { debounce, getTypedDrawObject } from '@/utils';
+import { getTypedDrawObject } from '@/utils';
 import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 
 const socket = ref(new WebSocketService());
-
-const handleClose = (event: CustomEvent) => {
-  console.log('Соединение закрыто', event.detail);
-};
-
-const handleMessage = (event: CustomEvent) => {
-  testToast(event.detail[1]);
-};
+const abortController = new AbortController();
 
 const handleDraw = (event: CustomEvent) => {
   const obj = getTypedDrawObject(
@@ -35,17 +29,6 @@ const handleDraw = (event: CustomEvent) => {
 
   allObjects.value = [...allObjects.value, obj];
   reDraw();
-};
-
-const handleMove = (event: CustomEvent) => {
-  const data = event.detail as string[];
-  // реализовать
-  console.log('Получена команда move:', data);
-};
-
-const handleClear = (event: CustomEvent) => {
-  console.log('Получена команда clear', event.detail);
-  // Здесь можно выполнить очистку canvas, обновить состояние и т.п.
 };
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
