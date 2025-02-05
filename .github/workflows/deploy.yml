@@ -10,31 +10,69 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2  # Репозиторий проверен
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Login to server via SSH with password and deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        script: |
-          # Удаляем старый контейнер
-          docker rm drawga -f || true
-          
-          # Удаляем старый образ
-          docker rmi drawga || true
-          
-          rm -r /home/drawga
-          mkdir /home/drawga
-          cd /home/drawga
-          
-          git clone https://github.com/Capybara77/drawga.git .
-          git checkout to-vue
-          
-          docker builder prune -f
-          docker build -t drawga .
-          
-          # Запускаем новый контейнер
-          docker run --network drawga --name drawga -v /home/drawga-saves:/app/saves -d drawga
+      - name: Remove old Docker container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: docker rm drawga -f || true
+
+      - name: Remove old Docker image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: docker rmi drawga || true
+
+      - name: Clean up and create directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            rm -r /home/drawga || true
+            mkdir -p /home/drawga
+
+      - name: Clone repository and checkout branch
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /home/drawga
+            git clone https://github.com/Capybara77/drawga.git .
+            git checkout to-vue
+
+      - name: Prune Docker builder cache
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: docker builder prune -f
+
+      - name: Build Docker image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /home/drawga
+            docker build -t drawga .
+
+      - name: Run Docker container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            docker run --network drawga --name drawga -v /home/drawga-saves:/app/saves -d drawga
