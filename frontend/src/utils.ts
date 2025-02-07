@@ -11,6 +11,45 @@ import {
   TextObject,
 } from './constructors';
 
+export const commonIsOverlay = (
+  x: number,
+  y: number,
+  offsetX: number,
+  offsetY: number,
+  Xmin: number,
+  Xmax: number,
+  Ymin: number,
+  Ymax: number,
+): boolean => {
+  const screenX = x;
+  const screenY = y;
+  const screenX1 = x + offsetX;
+  const screenY1 = y + offsetY;
+
+  const a1 = Xmin >= screenX && Xmin <= screenX1;
+  const a2 = Xmax >= screenX && Xmax <= screenX1;
+
+  const b1 = Ymin >= screenY && Ymin <= screenY1;
+  const b2 = Ymax >= screenY && Ymax <= screenY1;
+
+  const c1 = screenX >= Xmin && screenX <= Xmax;
+  const c2 = screenX1 >= Xmin && screenX1 <= Xmax;
+
+  const e1 = screenY >= Ymin && screenY <= Ymax;
+  const e2 = screenY1 >= Ymin && screenY1 <= Ymax;
+
+  if (
+    ((a1 || a2) && (b1 || b2)) ||
+    ((c1 || c2) && (e1 || e2)) ||
+    ((a1 || a2) && (e1 || e2)) ||
+    ((c1 || c2) && (b1 || b2))
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 export const handleClose = (event: CustomEvent) => {
   console.log('Соединение закрыто', event.detail);
 };
@@ -209,7 +248,7 @@ export function rgbToRgba(color: string, alpha: number) {
   return 'rgba(' + colorArr[0] + ', ' + colorArr[1] + ', ' + colorArr[2] + ', ' + alpha + ')';
 }
 
-export function makeid(length: number) {
+export function generateId(length: number) {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   const charactersLength = characters.length;
@@ -230,14 +269,14 @@ export function reDraw(
   screenWidth: number,
   screenHeight: number,
 ) {
-  let counter: number = 0;
+  // let counter: number = 0;
 
   for (let index = 0; index < objects.length; index++) {
     const element = objects[index];
 
     if (element.isOverlay(offsetXCustom, offsetYCustom, screenWidth, screenHeight)) {
       element.draw(offsetXCustom, offsetYCustom);
-      counter++;
+      // counter++;
     } else {
     }
   }

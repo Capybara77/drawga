@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import getStroke from 'perfect-freehand';
 import type { Drawable } from 'roughjs/bin/core';
 import type {
@@ -8,7 +9,7 @@ import type {
   MyCursor,
   RectangleProps,
 } from './types';
-import { getSvgPathFromStroke, hexToRgbA, makeid } from './utils';
+import { getSvgPathFromStroke, hexToRgbA, generateId, commonIsOverlay } from './utils';
 
 export abstract class BaseObject {
   color;
@@ -17,7 +18,7 @@ export abstract class BaseObject {
   drawType: MyCursor = 'pointer';
   tempObj: boolean = false;
   zoom: number = 1;
-  objId: string = makeid(6);
+  objId: string = generateId(6);
 
   constructor({ color, width, userId }: BaseProps) {
     this.color = color;
@@ -30,6 +31,10 @@ export abstract class BaseObject {
   }
 
   isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+    return true;
+  }
+
+  isCloseToPoints(x: number, y: number, delta: number): boolean {
     return true;
   }
 }
@@ -138,6 +143,7 @@ export class CurveObject extends BaseObject {
 
     for (let index = 0; index < this.pointsList.length; index++) {
       const element = this.pointsList[index];
+
       if (Math.sqrt(Math.pow(x - element[0], 2) + Math.pow(y - element[1], 2)) < delta) {
         return true;
       }
@@ -170,28 +176,7 @@ export class CurveObject extends BaseObject {
     Xmax *= this.zoom;
     Ymax *= this.zoom;
 
-    const screenX = x;
-    const screenY = y;
-    const screenX1 = x + offsetX;
-    const screenY1 = y + offsetY;
-
-    //console.log("xObj = " + Xmin + " yObj = " + Ymin + " x1Obj = " + Xmax + " y1Obj = " + Ymax);
-    //console.log("xS = " + screenX + " yS = " + screenY + " x1S = " + screenX1 + " y1S = " + screenY1);
-
-    if (
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1)))
-    ) {
-      return true;
-    }
-
-    return false;
+    return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 }
 
@@ -237,25 +222,7 @@ export class LineObject extends BaseObject {
     Xmax *= this.zoom;
     Ymax *= this.zoom;
 
-    const screenX = x;
-    const screenY = y;
-    const screenX1 = x + offsetX;
-    const screenY1 = y + offsetY;
-
-    if (
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1)))
-    ) {
-      return true;
-    }
-
-    return false;
+    return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 
   isCloseToPoints(x: number, y: number, delta: number): boolean {
@@ -337,25 +304,7 @@ export class RectangleObject extends BaseObject {
     Xmax *= this.zoom;
     Ymax *= this.zoom;
 
-    const screenX = x;
-    const screenY = y;
-    const screenX1 = x + offsetX;
-    const screenY1 = y + offsetY;
-
-    if (
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1)))
-    ) {
-      return true;
-    }
-
-    return false;
+    return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 }
 
@@ -394,8 +343,8 @@ export class EllipseObject extends BaseObject {
   }
 
   draw(offsetX: number, offsetY: number): void {
-    const width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
-    const height: number = (this.endPoint[1] - this.startPoint[1]) * this.zoom;
+    const width = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
+    const height = (this.endPoint[1] - this.startPoint[1]) * this.zoom;
 
     this.roughCanvas.ellipse(
       this.startPoint[0] * this.zoom + offsetX,
@@ -437,25 +386,7 @@ export class EllipseObject extends BaseObject {
       Ymax -= Ymin - Ymax;
     }
 
-    const screenX = x;
-    const screenY = y;
-    const screenX1 = x + offsetX;
-    const screenY1 = y + offsetY;
-
-    if (
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((Xmin >= screenX && Xmin <= screenX1) || (Xmax >= screenX && Xmax <= screenX1)) &&
-        ((screenY >= Ymin && screenY <= Ymax) || (screenY1 >= Ymin && screenY1 <= Ymax))) ||
-      (((screenX >= Xmin && screenX <= Xmax) || (screenX1 >= Xmin && screenX1 <= Xmax)) &&
-        ((Ymin >= screenY && Ymin <= screenY1) || (Ymax >= screenY && Ymax <= screenY1)))
-    ) {
-      return true;
-    }
-
-    return false;
+    return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 
   closeToCentre(x: number, y: number): boolean {

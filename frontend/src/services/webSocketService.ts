@@ -44,7 +44,7 @@ export class WebSocketService extends EventTarget {
    * Отправка данных на сервер.
    * @param data - объект с данными для отправки.
    */
-  public send(data: any): void {
+  public send(data): void {
     if (this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(data));
     } else {
