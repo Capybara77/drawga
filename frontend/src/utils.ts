@@ -21,8 +21,8 @@ export const commonIsOverlay = (
   Ymin: number,
   Ymax: number,
 ): boolean => {
-  const screenX1 = x + offsetX;
-  const screenY1 = y + offsetY;
+  const screenX1 = screenX + offsetX;
+  const screenY1 = screenY + offsetY;
 
   const a1 = Xmin >= screenX && Xmin <= screenX1;
   const a2 = Xmax >= screenX && Xmax <= screenX1;
@@ -61,7 +61,7 @@ export function getTypedDrawObject(
   str: string,
   roughCanvas: RoughCanvas,
   ctx: CanvasRenderingContext2D,
-): BaseObject | null {
+): BaseObject {
   const json: BaseObject = JSON.parse(str);
   const type: string = json.drawType;
 

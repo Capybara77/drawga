@@ -78,7 +78,7 @@ const handleDraw = (event: CustomEvent) => {
     event.detail[1],
     roughCanvas.value,
     canvasContext.value as CanvasRenderingContext2D,
-  ) as BaseObject;
+  );
 
   allObjects.value = [...allObjects.value, obj];
   obj.draw(offsetXCustom.value, offsetYCustom.value);
