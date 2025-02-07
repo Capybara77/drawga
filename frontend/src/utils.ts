@@ -12,8 +12,8 @@ import {
 } from './constructors';
 
 export const commonIsOverlay = (
-  x: number,
-  y: number,
+  screenX: number,
+  screenY: number,
   offsetX: number,
   offsetY: number,
   Xmin: number,
@@ -21,8 +21,6 @@ export const commonIsOverlay = (
   Ymin: number,
   Ymax: number,
 ): boolean => {
-  const screenX = x;
-  const screenY = y;
   const screenX1 = x + offsetX;
   const screenY1 = y + offsetY;
 
@@ -48,36 +46,6 @@ export const commonIsOverlay = (
   }
 
   return false;
-};
-
-export const handleClose = (event: CustomEvent) => {
-  console.log('Соединение закрыто', event.detail);
-};
-
-export const handleMessage = (event: CustomEvent) => {
-  testToast(event.detail[1]);
-};
-
-export const handleMove = (event: CustomEvent) => {
-  const data = event.detail as string[];
-  // реализовать
-  console.log('Получена команда move:', data);
-};
-
-export const handleClear = (event: CustomEvent) => {
-  console.log('Получена команда clear', event.detail);
-  // Здесь можно выполнить очистку canvas, обновить состояние и т.п.
-};
-
-export const handleDraw = (event: CustomEvent) => {
-  const obj = getTypedDrawObject(
-    event.detail[1],
-    roughCanvas.value,
-    ctx.value as CanvasRenderingContext2D,
-  ) as BaseObject;
-
-  allObjects.value = [...allObjects.value, obj];
-  obj.draw(offsetXCustom.value, offsetYCustom.value);
 };
 
 // Функция debounce

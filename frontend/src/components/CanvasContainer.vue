@@ -12,7 +12,7 @@ import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { handleClear, handleClose, handleDraw, handleMessage, handleMove } from '@/utils';
+import { getTypedDrawObject } from '@/utils';
 import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
@@ -55,6 +55,34 @@ const cursorXStart = ref(0);
 const cursorYStart = ref(0);
 
 const userId = '123';
+
+const handleClose = (event: CustomEvent) => {
+  console.log('Соединение закрыто', event.detail);
+};
+
+const handleMessage = (event: CustomEvent) => {
+  testToast(event.detail[1]);
+};
+
+const handleMove = (event: CustomEvent) => {
+  const data = event.detail as string[];
+  console.log('Получена команда move:', data);
+};
+
+const handleClear = (event: CustomEvent) => {
+  console.log('Получена команда clear', event.detail);
+};
+
+const handleDraw = (event: CustomEvent) => {
+  const obj = getTypedDrawObject(
+    event.detail[1],
+    roughCanvas.value,
+    canvasContext.value as CanvasRenderingContext2D,
+  ) as BaseObject;
+
+  allObjects.value = [...allObjects.value, obj];
+  obj.draw(offsetXCustom.value, offsetYCustom.value);
+};
 
 const createSocketConnection = () => {
   socket.value.addEventListener('move', handleMove as EventListener);
