@@ -74,14 +74,14 @@ const handleClear = (event: CustomEvent) => {
 };
 
 const handleDraw = (event: CustomEvent) => {
-  const obj = getTypedDrawObject(
-    event.detail[1],
-    roughCanvas.value,
-    canvasContext.value as CanvasRenderingContext2D,
-  );
-
-  allObjects.value = [...allObjects.value, obj];
-  obj.draw(offsetXCustom.value, offsetYCustom.value);
+  // хз что это но оно не работает
+  // const obj = getTypedDrawObject(
+  //   event.detail[1],
+  //   roughCanvas.value,
+  //   canvasContext.value as CanvasRenderingContext2D,
+  // );
+  // allObjects.value = [...allObjects.value, obj];
+  // obj.draw(offsetXCustom.value, offsetYCustom.value);
 };
 
 const createSocketConnection = () => {
@@ -95,6 +95,7 @@ const createSocketConnection = () => {
 };
 
 const redrawWithOffset = () => {
+  console.log({ allObjects });
   for (let index = 0; index < allObjects.value.length; index++) {
     const element = allObjects.value[index];
 
