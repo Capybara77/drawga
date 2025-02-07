@@ -95,7 +95,6 @@ const createSocketConnection = () => {
 };
 
 const redrawWithOffset = () => {
-  console.log({ allObjects });
   for (let index = 0; index < allObjects.value.length; index++) {
     const element = allObjects.value[index];
 
