@@ -12,7 +12,7 @@ import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { getTypedDrawObject } from '@/utils';
+import { handleClear, handleClose, handleDraw, handleMessage, handleMove } from '@/utils';
 import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
@@ -20,22 +20,12 @@ import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 const socket = ref(new WebSocketService());
 const abortController = new AbortController();
 
-const handleDraw = (event: CustomEvent) => {
-  const obj = getTypedDrawObject(
-    event.detail[1],
-    roughCanvas.value,
-    ctx.value as CanvasRenderingContext2D,
-  ) as BaseObject;
-
-  allObjects.value = [...allObjects.value, obj];
-  obj.draw(offsetXCustom.value, offsetYCustom.value);
-};
-
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
-const ctx = ref<CanvasRenderingContext2D>();
+const canvasContext = ref<CanvasRenderingContext2D>();
 const roughCanvas = ref();
 
 const allObjects = ref<BaseObject[]>([]);
+const bufferObj = ref<BaseObject[]>([]);
 
 const offsetXCustom = ref(0);
 const offsetYCustom = ref(0);
@@ -43,19 +33,17 @@ const offsetYCustom = ref(0);
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
-const bufferObj = ref<BaseObject[]>([]);
-
 const step = ref(1);
 const counter = ref(0);
-const currentLine = ref<number[][]>([]);
+const currentCoordinates = ref<number[][]>([]);
 
 const prevX = ref(0);
 const prevY = ref(0);
 
-const isDraw = ref(false);
+const isDrawing = ref(false);
 const isOnCanvas = ref(false);
 const isSpacePressed = ref(false);
-const isResize = ref(false);
+const isMoving = ref(false);
 const cursorY = ref(0);
 const cursorX = ref(0);
 
@@ -63,29 +51,10 @@ const currentZoom = 1;
 
 const isTyping = false;
 
-let cursorXStart = 0;
-let cursorYStart = 0;
+const cursorXStart = ref(0);
+const cursorYStart = ref(0);
 
-const myId = '123';
-
-const handleClose = (event: CustomEvent) => {
-  console.log('Соединение закрыто', event.detail);
-};
-
-const handleMessage = (event: CustomEvent) => {
-  testToast(event.detail[1]);
-};
-
-const handleMove = (event: CustomEvent) => {
-  const data = event.detail as string[];
-  // реализовать
-  console.log('Получена команда move:', data);
-};
-
-const handleClear = (event: CustomEvent) => {
-  console.log('Получена команда clear', event.detail);
-  // Здесь можно выполнить очистку canvas, обновить состояние и т.п.
-};
+const userId = '123';
 
 const createSocketConnection = () => {
   socket.value.addEventListener('move', handleMove as EventListener);
@@ -97,9 +66,7 @@ const createSocketConnection = () => {
   socket.value.send({ command: 'test', message: 'Hello, server' });
 };
 
-const reDraw = () => {
-  // console.log(offsetXCustom + '  ' + offsetYCustom + '  ' + screenWidth + '   ' + screenHeight);
-
+const redrawWithOffset = () => {
   for (let index = 0; index < allObjects.value.length; index++) {
     const element = allObjects.value[index];
 
@@ -116,8 +83,8 @@ const reDraw = () => {
   }
 };
 
-const cleanCanvas = () => {
-  ctx.value?.clearRect(
+const clearCanvas = () => {
+  canvasContext.value?.clearRect(
     0,
     0,
     document.documentElement.clientWidth,
@@ -125,9 +92,9 @@ const cleanCanvas = () => {
   );
 };
 
-const fullReDraw = () => {
-  cleanCanvas();
-  reDraw();
+const redrawWithClearing = () => {
+  clearCanvas();
+  redrawWithOffset();
 };
 
 const updateCanvasSize = () => {
@@ -135,17 +102,17 @@ const updateCanvasSize = () => {
 
   canvasElement.value.width = window.innerWidth;
   canvasElement.value.height = window.innerHeight;
-  fullReDraw();
+  redrawWithClearing();
 };
 
-const getNewCurve = () => {
-  if (!ctx.value) return;
+const getNewCurveObject = () => {
+  if (!canvasContext.value) return;
 
   const curveProps: CurveProps = {
-    userId: myId,
-    ctx: ctx.value,
+    userId: userId,
+    ctx: canvasContext.value,
     color: optionsStore.getterColorsWithOpacity.fillColor,
-    pointsList: currentLine.value,
+    pointsList: currentCoordinates.value,
     width: optionsStore.lineWidth,
   };
 
@@ -155,7 +122,35 @@ const getNewCurve = () => {
   return curve;
 };
 
-const deleteObj = (obj: BaseObject) => {
+const getNewRectObject = (event: PointerEvent) => {
+  const rectangleProps: RectangleProps = {
+    color: optionsStore.getterColorsWithOpacity.fillColor,
+    width: optionsStore.lineWidth,
+    fillStyle: optionsStore.fillStyle,
+    roughCanvas: roughCanvas.value,
+    stroke: optionsStore.getterColorsWithOpacity.borderColor,
+    strokeWidth: optionsStore.lineWidth,
+    userId: userId,
+    startPoint: [
+      (cursorXStart.value - offsetXCustom.value) / currentZoom,
+      (cursorYStart.value - offsetYCustom.value) / currentZoom,
+    ],
+    endPoint: [
+      event.shiftKey
+        ? (event.clientX - offsetXCustom.value) / currentZoom
+        : (event.clientX - offsetXCustom.value) / currentZoom,
+      event.shiftKey
+        ? (cursorYStart.value - offsetYCustom.value) / currentZoom +
+          ((event.clientX - offsetXCustom.value) / currentZoom -
+            (cursorXStart.value - offsetXCustom.value) / currentZoom)
+        : (event.clientY - offsetYCustom.value) / currentZoom,
+    ],
+  };
+
+  return new RectangleObject(rectangleProps);
+};
+
+const eraseObject = (obj: BaseObject) => {
   bufferObj.value = [...bufferObj.value, obj];
 
   // const a = JSON.stringify(obj);
@@ -169,7 +164,7 @@ const deleteObj = (obj: BaseObject) => {
 
 const onCanvasPointerDown = (event: PointerEvent) => {
   if (event.button === 1 || (isSpacePressed.value && event.button === 0)) {
-    isResize.value = true;
+    isMoving.value = true;
     cursorX.value = event.clientX - offsetXCustom.value;
     cursorY.value = event.clientY - offsetYCustom.value;
 
@@ -177,22 +172,22 @@ const onCanvasPointerDown = (event: PointerEvent) => {
     return;
   }
 
-  const element = event.target as HTMLElement;
+  const targetElement = event.target as HTMLElement;
 
-  if (element === null || element.id !== 'canvas') {
+  if (targetElement === null || targetElement.id !== 'canvas') {
     isOnCanvas.value = false;
 
     return;
   }
 
-  isDraw.value = true;
+  isDrawing.value = true;
   isOnCanvas.value = true;
 
   counter.value = 0;
-  currentLine.value = [];
+  currentCoordinates.value = [];
 
-  cursorXStart = event.clientX;
-  cursorYStart = event.clientY;
+  cursorXStart.value = event.clientX;
+  cursorYStart.value = event.clientY;
 };
 
 const onCanvasPointerUp = (event: PointerEvent) => {
@@ -200,56 +195,31 @@ const onCanvasPointerUp = (event: PointerEvent) => {
 
   if (event.button === 2 || element.id !== 'canvas' || isOnCanvas.value === false) return;
 
-  if (isResize.value) {
-    isResize.value = false;
+  if (isMoving.value) {
+    isMoving.value = false;
     return;
   }
 
-  isDraw.value = false;
+  isDrawing.value = false;
+
+  let currentDrawing: BaseObject | undefined;
 
   switch (cursorStore.cursor) {
-    case 'image': {
-      return;
-    }
-
-    case 'text': {
-      return;
-    }
-
-    case 'pointer': {
-      return;
-    }
-
     case 'pen': {
-      const pointsToDraw: number[][] = [];
-      for (let index = 0; index < currentLine.value.length; index++) {
-        const element = currentLine.value[index];
-        pointsToDraw.push([element[0] * currentZoom, element[1] * currentZoom]);
-      }
+      currentDrawing = getNewCurveObject();
 
-      const curve = getNewCurve();
-
-      if (!curve) {
-        break;
-      }
-
-      // console.log('curve !!!!', curve);
-      allObjects.value = [...allObjects.value, curve];
-      fullReDraw();
       break;
     }
 
     case 'line': {
-      fullReDraw();
-
       const lineObjectProps: LineProps = {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         roughCanvas: roughCanvas.value,
-        userId: myId,
+        userId: userId,
         startPoint: [
-          (cursorXStart - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / currentZoom,
+          (cursorYStart.value - offsetYCustom.value) / currentZoom,
         ],
         endPoint: [
           (event.clientX - offsetXCustom.value) / currentZoom,
@@ -257,67 +227,33 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         ],
       };
 
-      const line = new LineObject(lineObjectProps);
+      currentDrawing = new LineObject(lineObjectProps);
 
-      line.zoom = currentZoom;
-      allObjects.value = [...allObjects.value, line];
-      fullReDraw();
       break;
     }
 
     case 'rectangle': {
-      fullReDraw();
+      currentDrawing = getNewRectObject(event);
 
-      const rectangleProps: RectangleProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        fillStyle: optionsStore.fillStyle,
-        roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColorsWithOpacity.borderColor,
-        strokeWidth: optionsStore.lineWidth,
-        userId: myId,
-        startPoint: [
-          (cursorXStart - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
-        ],
-        endPoint: [
-          event.shiftKey
-            ? (event.clientX - offsetXCustom.value) / currentZoom
-            : (event.clientX - offsetXCustom.value) / currentZoom,
-          event.shiftKey
-            ? (cursorYStart - offsetYCustom.value) / currentZoom +
-              ((event.clientX - offsetXCustom.value) / currentZoom -
-                (cursorXStart - offsetXCustom.value) / currentZoom)
-            : (event.clientY - offsetYCustom.value) / currentZoom,
-        ],
-      };
-
-      const rect = new RectangleObject(rectangleProps);
-
-      rect.zoom = currentZoom;
-      rect.draw(offsetXCustom.value, offsetYCustom.value);
-      allObjects.value.push(rect);
       break;
     }
 
     case 'ellipse': {
-      fullReDraw();
-
       const ellipseProps: EllipseProps = {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         startPoint: [
-          (cursorXStart - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / currentZoom,
+          (cursorYStart.value - offsetYCustom.value) / currentZoom,
         ],
         endPoint: [
           event.shiftKey
             ? (event.clientX - offsetXCustom.value) / currentZoom
             : (event.clientX - offsetXCustom.value) / currentZoom,
           event.shiftKey
-            ? (cursorYStart - offsetYCustom.value) / currentZoom +
+            ? (cursorYStart.value - offsetYCustom.value) / currentZoom +
               ((event.clientX - offsetXCustom.value) / currentZoom -
-                (cursorXStart - offsetXCustom.value) / currentZoom)
+                (cursorXStart.value - offsetXCustom.value) / currentZoom)
             : (event.clientY - offsetYCustom.value) / currentZoom,
         ],
         fillStyle: optionsStore.fillStyle,
@@ -325,20 +261,24 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         stroke: optionsStore.getterColorsWithOpacity.borderColor,
         strokeWidth: optionsStore.lineWidth,
         isCircle: false,
-        userId: myId,
+        userId: userId,
       };
 
-      const ellipse = new EllipseObject(ellipseProps);
-
-      ellipse.zoom = currentZoom;
-      ellipse.draw(offsetXCustom.value, offsetYCustom.value);
-      allObjects.value.push(ellipse);
+      currentDrawing = new EllipseObject(ellipseProps);
       break;
     }
 
     default:
       break;
   }
+
+  if (!currentDrawing) {
+    return;
+  }
+
+  allObjects.value = [...allObjects.value, currentDrawing];
+
+  redrawWithClearing();
 };
 
 const onCanvasPointerMove = (event: PointerEvent) => {
@@ -361,69 +301,67 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     // socket.send(memessageToServer);
   }
 
-  if (isResize.value) {
+  if (isMoving.value) {
     offsetXCustom.value = event.clientX - cursorX.value;
     offsetYCustom.value = event.clientY - cursorY.value;
-    fullReDraw();
+    redrawWithClearing();
+
     return;
   }
 
-  if (!isDraw.value) return;
+  if (!isDrawing.value) return;
 
   const cursorXCurrent = event.clientX;
   const cursorYCurrent = event.clientY;
 
   switch (cursorStore.cursor) {
-    case 'pointer': {
-      break;
-    }
-
     case 'eraser': {
-      const prevCount = allObjects.value.length;
-      allObjects.value = allObjects.value.filter((item) => {
-        if (item.typeName === 'curve') {
+      const allObjectsCount = allObjects.value.length;
+
+      allObjects.value = allObjects.value.filter((drawObject) => {
+        if (drawObject.drawType === 'pen') {
           if (
-            (item as CurveObject).isCloseToPoints(
-              event.clientX / currentZoom - offsetXCustom.value / currentZoom,
-              event.clientY / currentZoom - offsetYCustom.value / currentZoom,
+            (drawObject as CurveObject).isCloseToPoints(
+              cursorXCurrent / currentZoom - offsetXCustom.value / currentZoom,
+              cursorYCurrent / currentZoom - offsetYCustom.value / currentZoom,
               10,
             )
           ) {
-            deleteObj(item);
+            eraseObject(drawObject);
 
             return false;
           }
-        } else if (item.typeName === 'rectangle') {
+        } else if (drawObject.drawType === 'rectangle') {
           if (
-            (item as RectangleObject).isOverlay(
-              -event.clientX + offsetXCustom.value,
+            (drawObject as RectangleObject).isOverlay(
+              -cursorYCurrent + offsetXCustom.value,
               -event.clientY + offsetYCustom.value,
               1,
               1,
             )
           ) {
-            deleteObj(item);
+            eraseObject(drawObject);
             return false;
           }
-        } else if (item.typeName === 'line') {
+        } else if (drawObject.drawType === 'line') {
           if (
-            (item as LineObject).isCloseToPoints(
-              event.clientX / currentZoom - offsetXCustom.value / currentZoom,
-              event.clientY / currentZoom - offsetYCustom.value / currentZoom,
+            (drawObject as LineObject).isCloseToPoints(
+              cursorYCurrent / currentZoom - offsetXCustom.value / currentZoom,
+              cursorYCurrent / currentZoom - offsetYCustom.value / currentZoom,
               25,
             )
           ) {
-            deleteObj(item);
+            eraseObject(drawObject);
             return false;
           }
-        } else if (item.typeName === 'ellipse') {
+        } else if (drawObject.drawType === 'ellipse') {
           if (
-            (item as EllipseObject).closeToCentre(
-              event.clientX / currentZoom - offsetXCustom.value / currentZoom,
-              event.clientY / currentZoom - offsetYCustom.value / currentZoom,
+            (drawObject as EllipseObject).closeToCentre(
+              cursorYCurrent / currentZoom - offsetXCustom.value / currentZoom,
+              cursorYCurrent / currentZoom - offsetYCustom.value / currentZoom,
             )
           ) {
-            deleteObj(item);
+            eraseObject(drawObject);
             return false;
           }
         }
@@ -431,32 +369,35 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         return true;
       });
 
-      if (prevCount !== allObjects.value.length) {
-        fullReDraw();
+      if (allObjectsCount !== allObjects.value.length) {
+        redrawWithClearing();
       }
       break;
     }
 
     case 'pen': {
-      if (prevX.value == null || prevY.value == null || !isDraw.value) {
-        prevX.value = event.clientX;
-        prevY.value = event.clientY;
+      if (prevX.value == null || prevY.value == null || !isDrawing.value) {
+        prevX.value = cursorXCurrent;
+        prevY.value = cursorYCurrent;
         return;
       }
 
-      const currentX = event.clientX;
-      const currentY = event.clientY;
+      const currentX = cursorXCurrent;
+      const currentY = cursorYCurrent;
 
       counter.value++;
+
       if (counter.value % step.value === 0) {
-        currentLine.value.push([
+        currentCoordinates.value.push([
           (currentX - offsetXCustom.value) / currentZoom,
           (currentY - offsetYCustom.value) / currentZoom,
         ]);
 
-        fullReDraw();
+        // без этого сначала рисуется не оч красиво, а когда отпускаешь становится норм, но думаю на производительность давит
+        // redrawWithClearing();
 
-        const curve = getNewCurve();
+        const curve = getNewCurveObject();
+
         curve?.draw(offsetXCustom.value, offsetYCustom.value);
       }
 
@@ -466,133 +407,72 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     }
 
     case 'rectangle': {
-      fullReDraw();
-
       if (event.shiftKey) {
       }
 
-      const rectangleProps: RectangleProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        fillStyle: optionsStore.fillStyle,
-        roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColorsWithOpacity.borderColor,
-        strokeWidth: optionsStore.lineWidth,
-        userId: myId,
-        startPoint: [
-          (cursorXStart - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
-        ],
-        endPoint: [
-          event.shiftKey
-            ? (cursorXCurrent - offsetXCustom.value) / currentZoom
-            : (cursorXCurrent - offsetXCustom.value) / currentZoom,
-          event.shiftKey
-            ? (cursorYStart - offsetYCustom.value) / currentZoom +
-              ((cursorXCurrent - offsetXCustom.value) / currentZoom -
-                (cursorXStart - offsetXCustom.value) / currentZoom)
-            : (cursorYCurrent - offsetYCustom.value) / currentZoom,
-        ],
-      };
+      const rect = getNewRectObject(event);
 
-      const rect = new RectangleObject(rectangleProps);
+      redrawWithClearing();
 
-      rect.zoom = currentZoom;
       rect.draw(offsetXCustom.value, offsetYCustom.value);
       break;
     }
 
     case 'line': {
-      fullReDraw();
-
-      let lineObjectProps: LineProps = {
+      const lineObjectProps: LineProps = {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         roughCanvas: roughCanvas.value,
-        userId: myId,
+        userId: userId,
         startPoint: [
-          (cursorXStart - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / currentZoom,
+          (cursorYStart.value - offsetYCustom.value) / currentZoom,
         ],
         endPoint: [
           (cursorXCurrent - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
+          (cursorYCurrent - offsetYCustom.value) / currentZoom,
         ],
       };
 
-      let line;
-      if (event.shiftKey) {
-        const slope = (cursorYCurrent - cursorYStart) / (cursorXCurrent - cursorXStart);
+      const line = new LineObject(lineObjectProps);
 
-        if (Math.abs(slope) <= 1) {
-          line = new LineObject(lineObjectProps);
-        } else {
-          lineObjectProps = {
-            ...lineObjectProps,
-            startPoint: [
-              (cursorXStart - offsetXCustom.value) / currentZoom,
-              (cursorYStart - offsetYCustom.value) / currentZoom,
-            ],
-            endPoint: [
-              (cursorXStart - offsetXCustom.value) / currentZoom,
-              (cursorYCurrent - offsetYCustom.value) / currentZoom,
-            ],
-          };
-          line = new LineObject(lineObjectProps);
-        }
-      } else {
-        lineObjectProps = {
-          ...lineObjectProps,
-          startPoint: [
-            (cursorXStart - offsetXCustom.value) / currentZoom,
-            (cursorYStart - offsetYCustom.value) / currentZoom,
-          ],
-          endPoint: [
-            (cursorXCurrent - offsetXCustom.value) / currentZoom,
-            (cursorYCurrent - offsetYCustom.value) / currentZoom,
-          ],
-        };
+      redrawWithClearing();
 
-        line = new LineObject(lineObjectProps);
-      }
-
-      line.zoom = currentZoom;
       line.draw(offsetXCustom.value, offsetYCustom.value);
 
       break;
     }
 
     case 'ellipse': {
-      fullReDraw();
-
       const ellipseProps: EllipseProps = {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         startPoint: [
-          (cursorXStart - offsetXCustom.value) / currentZoom,
-          (cursorYStart - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / currentZoom,
+          (cursorYStart.value - offsetYCustom.value) / currentZoom,
         ],
         endPoint: [
           event.shiftKey
-            ? (event.clientX - offsetXCustom.value) / currentZoom
-            : (event.clientX - offsetXCustom.value) / currentZoom,
+            ? (cursorXCurrent - offsetXCustom.value) / currentZoom
+            : (cursorXCurrent - offsetXCustom.value) / currentZoom,
           event.shiftKey
-            ? (cursorYStart - offsetYCustom.value) / currentZoom +
-              ((event.clientX - offsetXCustom.value) / currentZoom -
-                (cursorXStart - offsetXCustom.value) / currentZoom)
-            : (event.clientY - offsetYCustom.value) / currentZoom,
+            ? (cursorYStart.value - offsetYCustom.value) / currentZoom +
+              ((cursorXCurrent - offsetXCustom.value) / currentZoom -
+                (cursorXStart.value - offsetXCustom.value) / currentZoom)
+            : (cursorYCurrent - offsetYCustom.value) / currentZoom,
         ],
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
         stroke: optionsStore.getterColorsWithOpacity.borderColor,
         strokeWidth: optionsStore.lineWidth,
         isCircle: false,
-        userId: myId,
+        userId: userId,
       };
 
       const ellipse = new EllipseObject(ellipseProps);
 
-      ellipse.zoom = currentZoom;
+      redrawWithClearing();
+
       ellipse.draw(offsetXCustom.value, offsetYCustom.value);
 
       break;
@@ -620,8 +500,8 @@ onMounted(() => {
     return;
   }
 
-  if (!ctx.value) {
-    ctx.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+  if (!canvasContext.value) {
+    canvasContext.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
   }
 
   if (!roughCanvas.value) {

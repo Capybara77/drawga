@@ -11,6 +11,36 @@ import {
   TextObject,
 } from './constructors';
 
+export const handleClose = (event: CustomEvent) => {
+  console.log('Соединение закрыто', event.detail);
+};
+
+export const handleMessage = (event: CustomEvent) => {
+  testToast(event.detail[1]);
+};
+
+export const handleMove = (event: CustomEvent) => {
+  const data = event.detail as string[];
+  // реализовать
+  console.log('Получена команда move:', data);
+};
+
+export const handleClear = (event: CustomEvent) => {
+  console.log('Получена команда clear', event.detail);
+  // Здесь можно выполнить очистку canvas, обновить состояние и т.п.
+};
+
+export const handleDraw = (event: CustomEvent) => {
+  const obj = getTypedDrawObject(
+    event.detail[1],
+    roughCanvas.value,
+    ctx.value as CanvasRenderingContext2D,
+  ) as BaseObject;
+
+  allObjects.value = [...allObjects.value, obj];
+  obj.draw(offsetXCustom.value, offsetYCustom.value);
+};
+
 // Функция debounce
 export const debounce = (fn, delay) => {
   let timeoutId;
@@ -26,7 +56,7 @@ export function getTypedDrawObject(
   ctx: CanvasRenderingContext2D,
 ): BaseObject | null {
   const json: BaseObject = JSON.parse(str);
-  const type: string = json.typeName;
+  const type: string = json.drawType;
 
   switch (type) {
     case 'rectangle':
@@ -55,7 +85,7 @@ export function getTypedDrawObject(
     }
     case 'curve': {
       const c = new CurveObject(json);
-      
+
       c.ctx = ctx;
       c.objId = json.objId;
       c.zoom = json.zoom;

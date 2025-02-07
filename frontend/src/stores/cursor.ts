@@ -3,8 +3,7 @@ import { defineStore } from 'pinia';
 
 export const useCursorStore = defineStore('cursor', {
   state: () => ({
-    /** @type {MyCursor} */
-    cursor: 'pointer',
+    cursor: 'pointer' as MyCursor,
   }),
   actions: {
     setCursor(cursor: MyCursor) {

@@ -1,21 +1,25 @@
 import getStroke from 'perfect-freehand';
 import type { Drawable } from 'roughjs/bin/core';
-import type { BaseProps, CurveProps, EllipseProps, LineProps, RectangleProps } from './types';
+import type {
+  BaseProps,
+  CurveProps,
+  EllipseProps,
+  LineProps,
+  MyCursor,
+  RectangleProps,
+} from './types';
 import { getSvgPathFromStroke, hexToRgbA, makeid } from './utils';
 
 export abstract class BaseObject {
   color;
   width;
   userId;
-  typeName: string = '';
+  drawType: MyCursor = 'pointer';
   tempObj: boolean = false;
   zoom: number = 1;
   objId: string = makeid(6);
 
-  constructor(
-    // color: string, width: number, userId: string
-    { color, width, userId }: BaseProps,
-  ) {
+  constructor({ color, width, userId }: BaseProps) {
     this.color = color;
     this.width = width;
     this.userId = userId;
@@ -31,7 +35,7 @@ export abstract class BaseObject {
 }
 
 export class TextObject extends BaseObject {
-  typeName: string = 'text';
+  drawType: MyCursor = 'text';
   inputElement: HTMLTextAreaElement | null;
   top: number;
   left: number;
@@ -94,7 +98,7 @@ export class TextObject extends BaseObject {
 export class CurveObject extends BaseObject {
   pointsList;
   ctx;
-  typeName: string = 'curve';
+  drawType: MyCursor = 'pen';
   constructor({ color, ctx, pointsList, userId, width }: CurveProps) {
     super({ color, width, userId });
     this.pointsList = pointsList;
@@ -195,7 +199,7 @@ export class LineObject extends BaseObject {
   startPoint;
   endPoint;
   roughCanvas;
-  typeName: string = 'line';
+  drawType: MyCursor = 'line';
 
   constructor({ color, endPoint, roughCanvas, startPoint, userId, width }: LineProps) {
     super({ color, width, userId });
@@ -274,7 +278,7 @@ export class RectangleObject extends BaseObject {
   endPoint;
   roughCanvas;
   fillStyle;
-  typeName: string = 'rectangle';
+  drawType: MyCursor = 'rectangle';
   stroke;
   strokeWidth;
   drawableObj: Drawable | null = null;
@@ -360,7 +364,7 @@ export class EllipseObject extends BaseObject {
   endPoint;
   roughCanvas;
   fillStyle;
-  typeName: string = 'ellipse';
+  drawType: MyCursor = 'ellipse';
   stroke;
   strokeWidth;
   drawableObj: Drawable | null = null;
