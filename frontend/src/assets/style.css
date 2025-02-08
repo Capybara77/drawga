@@ -45,7 +45,7 @@
 
 body {
   overflow: hidden;
-  cursor: var(--cursor-custom), auto;
+  /* cursor: var(--cursor-custom), auto; */
 }
 
 button {
