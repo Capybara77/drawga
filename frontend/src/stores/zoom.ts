@@ -16,6 +16,10 @@ export const useZoomStore = defineStore('zoom', {
       this.zoom += 0.1;
     },
     decreaseZoom() {
+      if (this.zoom === 0.1) {
+        return;
+      }
+
       this.zoom -= 0.1;
     },
   },
