@@ -9,7 +9,7 @@ import {
 } from '@/constructors';
 import { testToast } from '@/services/toastify';
 import { WebSocketService } from '@/services/webSocketService';
-import { useCursorStore } from '@/stores/cursor';
+import { constantsForKeyboard, useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import { useZoomStore } from '@/stores/zoom';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
@@ -104,7 +104,6 @@ const redrawWithOffset = () => {
         zoomStore.zoom,
       )
     ) {
-      console.log('overlay');
       element.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom ?? 1);
     }
   }
@@ -512,9 +511,36 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 };
 
 const onKeyDown = (event: KeyboardEvent) => {
-  if (event.code === 'Space') {
+  const code = event.code;
+
+  if (code === 'Space') {
     isSpacePressed.value = true;
+
+    return;
   }
+
+  if (code === 'Minus') {
+    zoomStore.decreaseZoom();
+
+    return;
+  }
+
+  if (code === 'Equal') {
+    zoomStore.increaseZoom();
+
+    return;
+  }
+
+  if (!code.startsWith('Digit')) {
+    return;
+  }
+
+  const keyCodeArr = code.split('Digit');
+  const keyboardNumber = keyCodeArr[1];
+
+  const newCursor = constantsForKeyboard[keyboardNumber];
+
+  cursorStore.setCursor(newCursor);
 };
 
 const onKeyUp = (event: KeyboardEvent) => {

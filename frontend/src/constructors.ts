@@ -27,7 +27,7 @@ export abstract class BaseObject {
   }
 
   draw(offsetX: number, offsetY: number, zoom: number) {
-    console.log('offset:', offsetX, offsetY);
+    // console.log('offset:', offsetX, offsetY);
   }
 
   isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
