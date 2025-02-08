@@ -9,7 +9,7 @@ import type {
   MyCursor,
   RectangleProps,
 } from './types';
-import { getSvgPathFromStroke, hexToRgbA, generateId, commonIsOverlay } from './utils';
+import { getSvgPathFromStroke, generateId, commonIsOverlay } from './utils';
 
 export abstract class BaseObject {
   color;
@@ -133,7 +133,7 @@ export class CurveObject extends BaseObject {
 
     const tempColor = this.ctx.fillStyle;
 
-    this.ctx.fillStyle = this.color.startsWith('#') ? hexToRgbA(this.color) : this.color;
+    this.ctx.fillStyle = this.color;
     this.ctx.fill(myPath);
     this.ctx.fillStyle = tempColor;
   }

@@ -1,16 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-nocheck
-
-import { RoughCanvas } from 'roughjs/bin/canvas';
-import {
-  BaseObject,
-  RectangleObject,
-  EllipseObject,
-  LineObject,
-  CurveObject,
-  TextObject,
-} from './constructors';
-
 export const commonIsOverlay = (
   screenX: number,
   screenY: number,
@@ -48,97 +35,88 @@ export const commonIsOverlay = (
   return false;
 };
 
-// Функция debounce
-export const debounce = (fn, delay) => {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn(...args), delay);
-  };
-};
+// export function getTypedDrawObject(
+//   str: string,
+//   roughCanvas: RoughCanvas,
+//   ctx: CanvasRenderingContext2D,
+// ): BaseObject {
+//   const parsedString = JSON.parse(str);
+//   const type: string = parsedString.drawType;
 
-export function getTypedDrawObject(
-  str: string,
-  roughCanvas: RoughCanvas,
-  ctx: CanvasRenderingContext2D,
-): BaseObject {
-  const json: BaseObject = JSON.parse(str);
-  const type: string = json.drawType;
+//   switch (type) {
+//     case 'rectangle':
+//       const r = new RectangleObject(parsedString);
 
-  switch (type) {
-    case 'rectangle':
-      const r = new RectangleObject(json);
+//       r.roughCanvas = roughCanvas;
+//       r.objId = parsedString.objId;
+//       r.zoom = parsedString.zoom;
 
-      r.roughCanvas = roughCanvas;
-      r.objId = json.objId;
-      r.zoom = json.zoom;
+//       return r;
+//     case 'ellipse': {
+//       const e = new EllipseObject(parsedString);
+//       e.roughCanvas = roughCanvas;
 
-      return r;
-    case 'ellipse': {
-      const e = new EllipseObject(json);
-      e.roughCanvas = roughCanvas;
+//       e.objId = parsedString.objId;
+//       e.zoom = parsedString.zoom;
 
-      e.objId = json.objId;
-      e.zoom = json.zoom;
+//       return e;
+//     }
+//     case 'line': {
+//       const l = new LineObject(parsedString);
 
-      return e;
-    }
-    case 'line': {
-      const l = new LineObject(json);
+//       l.zoom = parsedString.zoom;
+//       l.objId = parsedString.objId;
+//       return l;
+//     }
+//     case 'curve': {
+//       const c = new CurveObject(parsedString);
 
-      l.zoom = json.zoom;
-      l.objId = json.objId;
-      return l;
-    }
-    case 'curve': {
-      const c = new CurveObject(json);
+//       c.ctx = ctx;
+//       c.objId = parsedString.objId;
+//       c.zoom = parsedString.zoom;
 
-      c.ctx = ctx;
-      c.objId = json.objId;
-      c.zoom = json.zoom;
+//       return c;
+//     }
+//     case 'text': {
+//       const {
+//         color,
+//         width,
+//         userId,
+//         zoom,
+//         objId,
+//         left,
+//         top,
+//         fontFamily,
+//         text,
+//         inputId,
+//         fontSize,
+//         textColor,
+//         height,
+//       } = parsedString as TextObject;
 
-      return c;
-    }
-    case 'text': {
-      const {
-        color,
-        width,
-        userId,
-        zoom,
-        objId,
-        left,
-        top,
-        fontFamily,
-        text,
-        inputId,
-        fontSize,
-        textColor,
-        height,
-      } = json as TextObject;
+//       const t = new TextObject(
+//         fontFamily,
+//         color,
+//         userId,
+//         null,
+//         top,
+//         left,
+//         text,
+//         inputId,
+//         fontSize,
+//         textColor,
+//         width,
+//         height,
+//       );
+//       t.objId = objId;
+//       t.zoom = zoom;
 
-      const t = new TextObject(
-        fontFamily,
-        color,
-        userId,
-        null,
-        top,
-        left,
-        text,
-        inputId,
-        fontSize,
-        textColor,
-        width,
-        height,
-      );
-      t.objId = objId;
-      t.zoom = zoom;
-
-      return t;
-    }
-    default:
-      return null;
-  }
-}
+//       return t;
+//     }
+//     default:
+//       return null;
+//   }
+// }
 
 export function animateCursor(trailerX: number, trailerY: number, trailer: HTMLDivElement) {
   const keyFrames = {
@@ -148,17 +126,6 @@ export function animateCursor(trailerX: number, trailerY: number, trailer: HTMLD
   trailer.animate(keyFrames, {
     fill: 'forwards',
   });
-}
-
-export function changeColor(
-  color: string,
-  ctx: CanvasRenderingContext2D,
-  trailer: HTMLDivElement,
-  alpha: number,
-) {
-  ctx.fillStyle = rgbToRgba(color, alpha);
-  // ctx.strokeStyle = color;
-  trailer.style.backgroundColor = color;
 }
 
 export function average(a: number, b: number) {
@@ -194,28 +161,6 @@ export function getSvgPathFromStroke(points: number[][], closed = true) {
   return result;
 }
 
-export function hexToRgbA(hex: string, alpha = '1') {
-  let c: string[];
-  let cc: number;
-  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-    c = hex.substring(1).split('');
-    if (c.length == 3) {
-      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-    }
-    cc = +('0x' + c.join(''));
-    return 'rgba(' + [(cc >> 16) & 255, (cc >> 8) & 255, cc & 255].join(',') + ',' + alpha + ')';
-  }
-  throw new Error('Bad Hex');
-}
-
-export function rgbToRgba(color: string, alpha: number) {
-  const colorArr = color.slice(color.indexOf('(') + 1, color.indexOf(')')).split(', ');
-
-  // (25, 25, 25) / 25, 25, 25/ [25, 25, 25]
-
-  return 'rgba(' + colorArr[0] + ', ' + colorArr[1] + ', ' + colorArr[2] + ', ' + alpha + ')';
-}
-
 export function generateId(length: number) {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -228,62 +173,4 @@ export function generateId(length: number) {
 
 export function cleanCanvas(ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
-}
-
-export function reDraw(
-  objects: BaseObject[],
-  offsetXCustom: number,
-  offsetYCustom: number,
-  screenWidth: number,
-  screenHeight: number,
-) {
-  // let counter: number = 0;
-
-  for (let index = 0; index < objects.length; index++) {
-    const element = objects[index];
-
-    if (element.isOverlay(offsetXCustom, offsetYCustom, screenWidth, screenHeight)) {
-      element.draw(offsetXCustom, offsetYCustom);
-      // counter++;
-    } else {
-    }
-  }
-  // console.log(objects.length + "  " + counter);
-}
-
-export function createOptions(): HTMLDivElement[] {
-  const optionsWrapper = document.querySelector('.options-wrapper') as HTMLDivElement;
-
-  const optionsColorStroke = document.getElementById('options-color-fill') as HTMLDivElement;
-
-  const optionsColorBorder = document.getElementById('options-color-border') as HTMLDivElement;
-
-  const optionsFillStyleContainer = document.getElementById(
-    'fill-style-options-container',
-  ) as HTMLDivElement;
-
-  const optionsFontSizeContainer = document.getElementById(
-    'font-size-options-container',
-  ) as HTMLDivElement;
-
-  const optionsColorText = document.getElementById('options-color-text') as HTMLDivElement;
-
-  const optionsWidthContainer = document.getElementById(
-    'width-options-container',
-  ) as HTMLDivElement;
-
-  const optionsOpacityContainer = document.getElementById(
-    'opacity-options-container',
-  ) as HTMLDivElement;
-
-  return [
-    optionsWrapper,
-    optionsColorStroke,
-    optionsColorBorder,
-    optionsFillStyleContainer,
-    optionsFontSizeContainer,
-    optionsColorText,
-    optionsWidthContainer,
-    optionsOpacityContainer,
-  ];
 }

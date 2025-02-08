@@ -12,7 +12,6 @@ import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { getTypedDrawObject } from '@/utils';
 import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
