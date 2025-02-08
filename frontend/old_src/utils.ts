@@ -14,12 +14,12 @@ export function getTypedDrawObject(
   roughCanvas: RoughCanvas,
   ctx: CanvasRenderingContext2D,
 ): BaseObject | null {
-  let json: BaseObject = JSON.parse(str);
-  let type: string = json.typeName;
+  const json: BaseObject = JSON.parse(str);
+  const type: string = json.typeName;
 
   switch (type) {
     case 'rectangle':
-      let {
+      const {
         color,
         width,
         startPoint,
@@ -32,7 +32,7 @@ export function getTypedDrawObject(
         objId,
       } = json as RectangleObject;
 
-      let r = new RectangleObject(
+      const r = new RectangleObject(
         color,
         width,
         startPoint,
@@ -49,7 +49,7 @@ export function getTypedDrawObject(
 
       return r;
     case 'ellipse': {
-      let {
+      const {
         color,
         width,
         startPoint,
@@ -63,7 +63,7 @@ export function getTypedDrawObject(
         objId,
       } = json as EllipseObject;
 
-      let e = new EllipseObject(
+      const e = new EllipseObject(
         color,
         width,
         startPoint,
@@ -81,25 +81,25 @@ export function getTypedDrawObject(
       return e;
     }
     case 'line': {
-      let { color, width, startPoint, endPoint, userId, zoom, objId } = json as LineObject;
+      const { color, width, startPoint, endPoint, userId, zoom, objId } = json as LineObject;
 
-      let l = new LineObject(color, width, startPoint, endPoint, roughCanvas, userId);
+      const l = new LineObject(color, width, startPoint, endPoint, roughCanvas, userId);
 
       l.zoom = zoom;
       l.objId = objId;
       return l;
     }
     case 'curve': {
-      let { pointsList, color, width, userId, zoom, objId } = json as CurveObject;
+      const { pointsList, color, width, userId, zoom, objId } = json as CurveObject;
 
-      let c = new CurveObject(pointsList, color, width, ctx, userId);
+      const c = new CurveObject(pointsList, color, width, ctx, userId);
       c.objId = objId;
       c.zoom = zoom;
 
       return c;
     }
     case 'text': {
-      let {
+      const {
         color,
         width,
         userId,
@@ -115,7 +115,7 @@ export function getTypedDrawObject(
         height,
       } = json as TextObject;
 
-      let t = new TextObject(
+      const t = new TextObject(
         fontFamily,
         color,
         userId,
@@ -208,7 +208,7 @@ export function hexToRgbA(hex: string, alpha = '1') {
 }
 
 export function rgbToRgba(color: string, alpha: number) {
-  let colorArr = color.slice(color.indexOf('(') + 1, color.indexOf(')')).split(', ');
+  const colorArr = color.slice(color.indexOf('(') + 1, color.indexOf(')')).split(', ');
 
   // (25, 25, 25) / 25, 25, 25/ [25, 25, 25]
 

@@ -1,88 +1,143 @@
-﻿* {
-    margin: 0;
-    padding: 0;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+:root {
+  --clr-primary: rgb(95, 61, 196);
+  --clr-primary-dark: rgb(52, 6, 190);
+  --clr-primary-light: rgb(126, 85, 250);
+  --clr-primary-active: rgba(95, 61, 196, 0.4);
+  --clr-white: rgb(255, 255, 255);
+  --clr-black: rgb(0, 0, 0);
+  --clr-gray-light: rgb(211, 211, 211);
+  --clr-gray-dark: rgb(138, 138, 138);
+
+  --clr-border: rgb(230, 225, 225);
+  --clr-background-transparent: rgba(255, 255, 255, 0.8);
+  --clr-hover: rgb(238, 238, 238);
+
+  --clr-text: rgb(51, 51, 51);
+
+  --clr-trailer: rgb(0, 0, 0);
+  --clr-canvas: rgb(255, 255, 255);
+
+  --clr-icon: rgb(51, 51, 51);
+  --clr-fill: rgb(51, 51, 51);
+
+  --clr-shortcut: rgb(165, 165, 165);
+
+  --clr-default: rgb(54, 79, 199);
+
+  --cursor-custom: url('/icons/custom-cursor.svg');
+  /* --cursor-custom: url('/icons/cursor-black.png'); */
+
+  --z-index-1: 10000000;
+  --z-index-2: 10000000000;
+  --z-index-3: 100000000000000;
+  --z-index-4: 100000000000000000;
+  --z-index-max: 10000000000000000000000000;
+}
+
+* {
+  font-family: 'Roboto', sans-serif;
+
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    position: relative;
-    height: 100vh;
-}
-
-.nav {
-    width: 310px;
-    height: 50px;
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    opacity: .3;
-    transition: opacity .5s;
-
-}
-
-.nav:hover {
-    opacity: 1;
-}
-
-.clr {
-    height: 30px;
-    width: 30px;
-    background-color: blue;
-    border-radius: 50%;
-    border: 3px solid rgb(214, 214, 214);
-    transition: transform .5s;
-}
-
-.clr:hover {
-    transform: scale(1.2);
-}
-
-.clr:nth-child(1) {
-    background-color: #000;
-}
-
-.clr:nth-child(2) {
-    background-color: #EF626C;
-}
-
-.clr:nth-child(3) {
-    background-color: #fdec03;
-}
-
-.clr:nth-child(4) {
-    background-color: #24d102;
-}
-
-.clr:nth-child(5) {
-    background-color: #fff;
+  overflow: hidden;
+  cursor: var(--cursor-custom), auto;
 }
 
 button {
-    border: none;
-    outline: none;
-    padding: .6em 1em;
-    border-radius: 3px;
-    background-color: #03bb56;
-    color: #fff;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-.save {
-    background-color: #0f65d4;
+hr {
+  background-color: var(--clr-shortcut);
+  height: 2px;
+  border: none;
 }
 
-.trailer {
-    width: 15px;
-    height: 15px;
-    border-radius: 100%;
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
 
-    background-color: black;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100000;
+.main-container,
+.main-container button,
+.main-container input {
+  position: relative;
+  overflow: hidden;
 
-    pointer-events: none;
+  color: var(--clr-text);
+  width: 100%;
+  height: 100%;
+}
+
+.main-container img {
+  background-color: var(--clr-background-icons);
+}
+
+/* ======================== ТЕМНАЯ ТЕМА ======================== */
+
+.darkTheme {
+  --clr-primary: rgb(95, 61, 196);
+  --clr-primary-dark: rgb(61, 8, 219);
+  --clr-primary-active: rgba(95, 61, 196, 0.4);
+  --clr-gray-light: rgb(211, 211, 211);
+  --clr-gray-dark: rgb(138, 138, 138);
+
+  --clr-border: rgb(65, 65, 65);
+  --clr-background-transparent: rgba(49, 49, 49, 0.8);
+  --clr-hover: rgb(94, 94, 94);
+
+  --clr-text: rgb(233, 233, 233);
+  --clr-trailer: #ccc;
+
+  --clr-canvas: #333;
+
+  --clr-icon: #ccc;
+  --clr-fill: #ccc;
+
+  /* --cursor-custom: url('/icons/custom-cursor-white.svg'); */
+  /* --cursor-custom: url('/icons/cursor-white.png'); */
+}
+
+:root:has(#dark-theme:checked) {
+  --clr-primary: rgb(95, 61, 196);
+  --clr-primary-dark: rgb(61, 8, 219);
+  --clr-primary-active: rgba(95, 61, 196, 0.4);
+  --clr-gray-light: rgb(211, 211, 211);
+  --clr-gray-dark: rgb(138, 138, 138);
+
+  --clr-border: rgb(65, 65, 65);
+  --clr-background-transparent: rgba(49, 49, 49, 0.8);
+  --clr-hover: rgb(94, 94, 94);
+
+  --clr-text: rgb(233, 233, 233);
+  --clr-trailer: #ccc;
+
+  --clr-canvas: #333;
+
+  --clr-icon: #ccc;
+  --clr-fill: #ccc;
+
+  --cursor-custom: url('/icons/custom-cursor-white.svg');
+  /* --cursor-custom: url('/icons/cursor-white.png'); */
+}
+
+/* ======================== ТЕКСТ ======================== */
+
+.text-element {
+  position: absolute !important;
+  background: transparent;
+  font-size: 2rem;
+  border: 1px solid black;
+  outline: none;
+  color: var(--clr-text);
 }

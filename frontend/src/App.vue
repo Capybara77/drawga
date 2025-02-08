@@ -17,5 +17,3 @@ import TrailerComponent from './components/TrailerComponent.vue';
   <SettingsContainer />
   <CanvasContainer />
 </template>
-
-<style scoped></style>

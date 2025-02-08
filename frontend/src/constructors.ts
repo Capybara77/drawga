@@ -26,11 +26,11 @@ export abstract class BaseObject {
     this.userId = userId;
   }
 
-  draw(offsetX: number, offsetY: number) {
+  draw(offsetX: number, offsetY: number, zoom: number) {
     console.log('offset:', offsetX, offsetY);
   }
 
-  isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
     return true;
   }
 
@@ -83,16 +83,16 @@ export class TextObject extends BaseObject {
     }
   }
 
-  draw(offsetX: number, offsetY: number): void {
+  draw(offsetX: number, offsetY: number, zoom: number): void {
     if (this.inputElement === null) {
       return;
     }
 
-    this.inputElement.style.left = this.left * this.zoom + offsetX + 'px';
-    this.inputElement.style.top = this.top * this.zoom + offsetY + 'px';
+    this.inputElement.style.left = this.left * zoom + offsetX + 'px';
+    this.inputElement.style.top = this.top * zoom + offsetY + 'px';
     this.inputElement.style.fontSize = `${this.zoom * 32}px`;
-    this.inputElement.style.width = `${this.width * this.zoom}px`;
-    this.inputElement.style.height = `${this.height * this.zoom}px`;
+    this.inputElement.style.width = `${this.width * zoom}px`;
+    this.inputElement.style.height = `${this.height * zoom}px`;
   }
 
   isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
@@ -104,23 +104,24 @@ export class CurveObject extends BaseObject {
   pointsList;
   ctx;
   drawType: MyCursor = 'pen';
-  constructor({ color, ctx, pointsList, userId, width }: CurveProps) {
+  constructor({ color, ctx, pointsList, userId, width, zoom }: CurveProps) {
     super({ color, width, userId });
     this.pointsList = pointsList;
     this.ctx = ctx;
     this.userId = userId;
   }
 
-  draw(offsetX: number, offsetY: number): void {
+  draw(offsetX: number, offsetY: number, zoom: number): void {
     const newLines: number[][] = [];
 
     for (let index = 0; index < this.pointsList.length; index++) {
       const element = this.pointsList[index];
-      newLines.push([element[0] * this.zoom + offsetX, element[1] * this.zoom + offsetY]);
+
+      newLines.push([element[0] * zoom + offsetX, element[1] * zoom + offsetY]);
     }
 
     const outlinePoints = getStroke(newLines, {
-      size: this.width * this.zoom,
+      size: this.width * zoom,
       thinning: 0.5,
       smoothing: 0.2,
       easing: (a) => a * 0.8,
@@ -152,7 +153,7 @@ export class CurveObject extends BaseObject {
     return false;
   }
 
-  isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
     x *= -1;
     y *= -1;
 
@@ -171,10 +172,10 @@ export class CurveObject extends BaseObject {
       Ymax = Ymax < element[1] ? element[1] : Ymax;
     }
 
-    Xmin *= this.zoom;
-    Ymin *= this.zoom;
-    Xmax *= this.zoom;
-    Ymax *= this.zoom;
+    Xmin *= zoom;
+    Ymin *= zoom;
+    Xmax *= zoom;
+    Ymax *= zoom;
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
@@ -194,21 +195,21 @@ export class LineObject extends BaseObject {
     this.userId = userId;
   }
 
-  draw(offsetX: number, offsetY: number): void {
+  draw(offsetX: number, offsetY: number, zoom: number): void {
     this.roughCanvas.line(
-      this.startPoint[0] * this.zoom + offsetX,
-      this.startPoint[1] * this.zoom + offsetY,
-      this.endPoint[0] * this.zoom + offsetX,
-      this.endPoint[1] * this.zoom + offsetY,
+      this.startPoint[0] * zoom + offsetX,
+      this.startPoint[1] * zoom + offsetY,
+      this.endPoint[0] * zoom + offsetX,
+      this.endPoint[1] * zoom + offsetY,
       {
-        strokeWidth: this.width * this.zoom,
+        strokeWidth: this.width * zoom,
         stroke: this.color,
         seed: 1,
       },
     );
   }
 
-  isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
     x *= -1;
     y *= -1;
 
@@ -217,10 +218,10 @@ export class LineObject extends BaseObject {
     let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
     let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
 
-    Xmin *= this.zoom;
-    Ymin *= this.zoom;
-    Xmax *= this.zoom;
-    Ymax *= this.zoom;
+    Xmin *= zoom;
+    Ymin *= zoom;
+    Xmax *= zoom;
+    Ymax *= zoom;
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
@@ -271,17 +272,17 @@ export class RectangleObject extends BaseObject {
     this.userId = userId;
   }
 
-  draw(offsetX: number, offsetY: number): void {
-    const width: number = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
-    const height: number = (this.endPoint[1] - this.startPoint[1]) * this.zoom;
+  draw(offsetX: number, offsetY: number, zoom: number): void {
+    const width: number = (this.endPoint[0] - this.startPoint[0]) * zoom;
+    const height: number = (this.endPoint[1] - this.startPoint[1]) * zoom;
 
     this.roughCanvas.rectangle(
-      this.startPoint[0] * this.zoom + offsetX,
-      this.startPoint[1] * this.zoom + offsetY,
+      this.startPoint[0] * zoom + offsetX,
+      this.startPoint[1] * zoom + offsetY,
       width,
       height,
       {
-        strokeWidth: this.width * this.zoom,
+        strokeWidth: this.width * zoom,
         fill: this.color,
         fillStyle: this.fillStyle,
         seed: 1,
@@ -290,7 +291,7 @@ export class RectangleObject extends BaseObject {
     );
   }
 
-  isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
     x *= -1;
     y *= -1;
 
@@ -299,10 +300,10 @@ export class RectangleObject extends BaseObject {
     let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
     let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
 
-    Xmin *= this.zoom;
-    Ymin *= this.zoom;
-    Xmax *= this.zoom;
-    Ymax *= this.zoom;
+    Xmin *= zoom;
+    Ymin *= zoom;
+    Xmax *= zoom;
+    Ymax *= zoom;
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
@@ -342,17 +343,17 @@ export class EllipseObject extends BaseObject {
     this.userId = this.userId;
   }
 
-  draw(offsetX: number, offsetY: number): void {
-    const width = (this.endPoint[0] - this.startPoint[0]) * this.zoom;
-    const height = (this.endPoint[1] - this.startPoint[1]) * this.zoom;
+  draw(offsetX: number, offsetY: number, zoom: number): void {
+    const width = (this.endPoint[0] - this.startPoint[0]) * zoom;
+    const height = (this.endPoint[1] - this.startPoint[1]) * zoom;
 
     this.roughCanvas.ellipse(
-      this.startPoint[0] * this.zoom + offsetX,
-      this.startPoint[1] * this.zoom + offsetY,
+      this.startPoint[0] * zoom + offsetX,
+      this.startPoint[1] * zoom + offsetY,
       width * 2,
       height * 2,
       {
-        strokeWidth: this.width * this.zoom,
+        strokeWidth: this.width * zoom,
         fill: this.color,
         fillStyle: this.fillStyle,
         seed: 1,
@@ -361,7 +362,7 @@ export class EllipseObject extends BaseObject {
     );
   }
 
-  isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
     x *= -1;
     y *= -1;
 
@@ -370,10 +371,10 @@ export class EllipseObject extends BaseObject {
     let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
     let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
 
-    Xmin *= this.zoom;
-    Ymin *= this.zoom;
-    Xmax *= this.zoom;
-    Ymax *= this.zoom;
+    Xmin *= zoom;
+    Ymin *= zoom;
+    Xmax *= zoom;
+    Ymax *= zoom;
 
     if (this.startPoint[0] < this.endPoint[0]) {
       Xmin += Xmin - Xmax;

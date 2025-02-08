@@ -11,10 +11,11 @@ import { testToast } from '@/services/toastify';
 import { WebSocketService } from '@/services/webSocketService';
 import { useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
+import { useZoomStore } from '@/stores/zoom';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
 import rough from 'roughjs';
 
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 
 const socket = ref(new WebSocketService());
 const abortController = new AbortController();
@@ -31,6 +32,7 @@ const offsetYCustom = ref(0);
 
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
+const zoomStore = useZoomStore();
 
 const step = ref(1);
 const counter = ref(0);
@@ -45,10 +47,6 @@ const isSpacePressed = ref(false);
 const isMoving = ref(false);
 const cursorY = ref(0);
 const cursorX = ref(0);
-
-const currentZoom = 1;
-
-const isTyping = false;
 
 const cursorXStart = ref(0);
 const cursorYStart = ref(0);
@@ -103,9 +101,11 @@ const redrawWithOffset = () => {
         offsetYCustom.value,
         canvasElement.value?.clientWidth ?? 0,
         canvasElement.value?.clientHeight ?? 0,
+        zoomStore.zoom,
       )
     ) {
-      element.draw(offsetXCustom.value, offsetYCustom.value);
+      console.log('overlay');
+      element.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom ?? 1);
     }
   }
 };
@@ -141,10 +141,10 @@ const getNewCurveObject = () => {
     color: optionsStore.getterColorsWithOpacity.fillColor,
     pointsList: currentCoordinates.value,
     width: optionsStore.lineWidth,
+    zoom: zoomStore.zoom,
   };
 
   const curve = new CurveObject(curveProps);
-  curve.zoom = currentZoom;
 
   return curve;
 };
@@ -159,18 +159,18 @@ const getNewRectObject = (event: PointerEvent) => {
     strokeWidth: optionsStore.lineWidth,
     userId: userId,
     startPoint: [
-      (cursorXStart.value - offsetXCustom.value) / currentZoom,
-      (cursorYStart.value - offsetYCustom.value) / currentZoom,
+      (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+      (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
     ],
     endPoint: [
       event.shiftKey
-        ? (event.clientX - offsetXCustom.value) / currentZoom
-        : (event.clientX - offsetXCustom.value) / currentZoom,
+        ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
+        : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
       event.shiftKey
-        ? (cursorYStart.value - offsetYCustom.value) / currentZoom +
-          ((event.clientX - offsetXCustom.value) / currentZoom -
-            (cursorXStart.value - offsetXCustom.value) / currentZoom)
-        : (event.clientY - offsetYCustom.value) / currentZoom,
+        ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
+          ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
+            (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
+        : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
     ],
   };
 
@@ -245,12 +245,12 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         roughCanvas: roughCanvas.value,
         userId: userId,
         startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / currentZoom,
-          (cursorYStart.value - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
         ],
         endPoint: [
-          (event.clientX - offsetXCustom.value) / currentZoom,
-          (event.clientY - offsetYCustom.value) / currentZoom,
+          (event.clientX - offsetXCustom.value) / zoomStore.zoom,
+          (event.clientY - offsetYCustom.value) / zoomStore.zoom,
         ],
       };
 
@@ -270,18 +270,18 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / currentZoom,
-          (cursorYStart.value - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
         ],
         endPoint: [
           event.shiftKey
-            ? (event.clientX - offsetXCustom.value) / currentZoom
-            : (event.clientX - offsetXCustom.value) / currentZoom,
+            ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
+            : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
           event.shiftKey
-            ? (cursorYStart.value - offsetYCustom.value) / currentZoom +
-              ((event.clientX - offsetXCustom.value) / currentZoom -
-                (cursorXStart.value - offsetXCustom.value) / currentZoom)
-            : (event.clientY - offsetYCustom.value) / currentZoom,
+            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
+              ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
+                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
+            : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
         ],
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
@@ -320,9 +320,9 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     //   'cur:::' +
     //   myId +
     //   ':::' +
-    //   +(event.clientX / currentZoom - offsetXCustom / currentZoom) +
+    //   +(event.clientX / zoomStore.zoom - offsetXCustom / zoomStore.zoom) +
     //   ':::' +
-    //   +(event.clientY / currentZoom - offsetYCustom / currentZoom) +
+    //   +(event.clientY / zoomStore.zoom - offsetYCustom / zoomStore.zoom) +
     //   ':::';
     // socket.send(memessageToServer.length as unknown as string);
     // socket.send(memessageToServer);
@@ -349,8 +349,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         if (drawObject.drawType === 'pen') {
           if (
             (drawObject as CurveObject).isCloseToPoints(
-              cursorXCurrent / currentZoom - offsetXCustom.value / currentZoom,
-              cursorYCurrent / currentZoom - offsetYCustom.value / currentZoom,
+              cursorXCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
+              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
               10,
             )
           ) {
@@ -365,6 +365,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
               -event.clientY + offsetYCustom.value,
               1,
               1,
+              zoomStore.zoom,
             )
           ) {
             eraseObject(drawObject);
@@ -373,8 +374,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         } else if (drawObject.drawType === 'line') {
           if (
             (drawObject as LineObject).isCloseToPoints(
-              cursorYCurrent / currentZoom - offsetXCustom.value / currentZoom,
-              cursorYCurrent / currentZoom - offsetYCustom.value / currentZoom,
+              cursorYCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
+              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
               25,
             )
           ) {
@@ -384,8 +385,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         } else if (drawObject.drawType === 'ellipse') {
           if (
             (drawObject as EllipseObject).closeToCentre(
-              cursorYCurrent / currentZoom - offsetXCustom.value / currentZoom,
-              cursorYCurrent / currentZoom - offsetYCustom.value / currentZoom,
+              cursorYCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
+              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
             )
           ) {
             eraseObject(drawObject);
@@ -416,16 +417,16 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       if (counter.value % step.value === 0) {
         currentCoordinates.value.push([
-          (currentX - offsetXCustom.value) / currentZoom,
-          (currentY - offsetYCustom.value) / currentZoom,
+          (currentX - offsetXCustom.value) / zoomStore.zoom,
+          (currentY - offsetYCustom.value) / zoomStore.zoom,
         ]);
 
         // без этого сначала рисуется не оч красиво, а когда отпускаешь становится норм, но думаю на производительность давит
-        // redrawWithClearing();
+        redrawWithClearing();
 
         const curve = getNewCurveObject();
 
-        curve?.draw(offsetXCustom.value, offsetYCustom.value);
+        curve?.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
       }
 
       prevX.value = currentX;
@@ -441,7 +442,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       redrawWithClearing();
 
-      rect.draw(offsetXCustom.value, offsetYCustom.value);
+      rect.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
       break;
     }
 
@@ -452,12 +453,12 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         roughCanvas: roughCanvas.value,
         userId: userId,
         startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / currentZoom,
-          (cursorYStart.value - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
         ],
         endPoint: [
-          (cursorXCurrent - offsetXCustom.value) / currentZoom,
-          (cursorYCurrent - offsetYCustom.value) / currentZoom,
+          (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
         ],
       };
 
@@ -465,7 +466,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       redrawWithClearing();
 
-      line.draw(offsetXCustom.value, offsetYCustom.value);
+      line.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
 
       break;
     }
@@ -475,18 +476,18 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
         startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / currentZoom,
-          (cursorYStart.value - offsetYCustom.value) / currentZoom,
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
         ],
         endPoint: [
           event.shiftKey
-            ? (cursorXCurrent - offsetXCustom.value) / currentZoom
-            : (cursorXCurrent - offsetXCustom.value) / currentZoom,
+            ? (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom
+            : (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
           event.shiftKey
-            ? (cursorYStart.value - offsetYCustom.value) / currentZoom +
-              ((cursorXCurrent - offsetXCustom.value) / currentZoom -
-                (cursorXStart.value - offsetXCustom.value) / currentZoom)
-            : (cursorYCurrent - offsetYCustom.value) / currentZoom,
+            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
+              ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom -
+                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
+            : (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
         ],
         fillStyle: optionsStore.fillStyle,
         roughCanvas: roughCanvas.value,
@@ -500,7 +501,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       redrawWithClearing();
 
-      ellipse.draw(offsetXCustom.value, offsetYCustom.value);
+      ellipse.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
 
       break;
     }
@@ -547,6 +548,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   abortController.abort();
+});
+
+watch(zoomStore, () => {
+  redrawWithClearing();
 });
 </script>
 

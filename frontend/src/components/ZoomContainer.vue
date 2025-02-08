@@ -1,8 +1,20 @@
+<script setup lang="ts">
+import { useZoomStore } from '@/stores/zoom';
+
+const zoomStore = useZoomStore();
+</script>
+
 <template>
   <div class="zoom-container">
-    <button class="zoom-btn" id="zoom-decrease"><span>-</span></button>
-    <div class="zoom-current-container"><span id="zoom-current">100%</span></div>
-    <button class="zoom-btn" id="zoom-increase"><span>+</span></button>
+    <button class="zoom-btn" id="zoom-decrease" @click="zoomStore.decreaseZoom">
+      <span>-</span>
+    </button>
+    <div class="zoom-current-container">
+      <span id="zoom-current">{{ zoomStore.percentage }}</span>
+    </div>
+    <button class="zoom-btn" id="zoom-increase" @click="zoomStore.increaseZoom">
+      <span>+</span>
+    </button>
   </div>
 </template>
 
@@ -11,16 +23,13 @@
   position: absolute;
   bottom: 10px;
   left: 10px;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   border: 1px solid var(--clr-border);
   border-radius: 5px;
   background-color: var(--clr-background-transparent);
-
-  padding: 0px 10px;
+  padding: 0 10px;
 }
 
 .zoom-container > * {
@@ -31,11 +40,9 @@
   font-size: 1rem;
   padding: 8px;
   aspect-ratio: 1 / 1;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   min-height: 41px;
   color: var(--clr-text);
 }
@@ -47,13 +54,10 @@
   background: transparent;
   border: none;
   color: var(--clr-text);
-
   font-size: 1.2rem;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   transition: background-color 150ms ease-in-out;
 }
 

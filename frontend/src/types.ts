@@ -22,6 +22,7 @@ export type CurveProps = {
   width: number;
   ctx: CanvasRenderingContext2D;
   userId: string;
+  zoom: number;
 };
 
 export type LineProps = {
