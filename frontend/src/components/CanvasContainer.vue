@@ -17,7 +17,11 @@ import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 
-const socket = ref(new WebSocketService());
+const cursorStore = useCursorStore();
+const optionsStore = useOptionsStore();
+const zoomStore = useZoomStore();
+
+const socket = new WebSocketService();
 const abortController = new AbortController();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
@@ -25,31 +29,22 @@ const canvasContext = ref<CanvasRenderingContext2D>();
 const roughCanvas = ref();
 
 const allObjects = ref<BaseObject[]>([]);
-const bufferObj = ref<BaseObject[]>([]);
+
+const cursorY = ref(0);
+const cursorX = ref(0);
 
 const offsetXCustom = ref(0);
 const offsetYCustom = ref(0);
 
-const cursorStore = useCursorStore();
-const optionsStore = useOptionsStore();
-const zoomStore = useZoomStore();
+const cursorXStart = ref(0);
+const cursorYStart = ref(0);
 
-const step = ref(1);
-const counter = ref(0);
 const currentCoordinates = ref<number[][]>([]);
-
-const prevX = ref(0);
-const prevY = ref(0);
 
 const isDrawing = ref(false);
 const isOnCanvas = ref(false);
 const isSpacePressed = ref(false);
 const isMoving = ref(false);
-const cursorY = ref(0);
-const cursorX = ref(0);
-
-const cursorXStart = ref(0);
-const cursorYStart = ref(0);
 
 const userId = '123';
 
@@ -82,13 +77,13 @@ const handleDraw = (event: CustomEvent) => {
 };
 
 const createSocketConnection = () => {
-  socket.value.addEventListener('move', handleMove as EventListener);
-  socket.value.addEventListener('clear', handleClear as EventListener);
-  socket.value.addEventListener('close', handleClose as EventListener);
-  socket.value.addEventListener('message', handleMessage as EventListener);
-  socket.value.addEventListener('drawObj', handleDraw as EventListener);
+  socket.addEventListener('move', handleMove as EventListener);
+  socket.addEventListener('clear', handleClear as EventListener);
+  socket.addEventListener('close', handleClose as EventListener);
+  socket.addEventListener('message', handleMessage as EventListener);
+  socket.addEventListener('drawObj', handleDraw as EventListener);
 
-  socket.value.send({ command: 'test', message: 'Hello, server' });
+  socket.send({ command: 'test', message: 'Hello, server' });
 };
 
 const redrawWithOffset = () => {
@@ -177,10 +172,8 @@ const getNewRectObject = (event: PointerEvent) => {
 };
 
 const eraseObject = (obj: BaseObject) => {
-  bufferObj.value = [...bufferObj.value, obj];
-
+  // bufferObj.value = [...bufferObj.value, obj];
   // const a = JSON.stringify(obj);
-
   // const messageToServer: string = 'delete:::' + a;
   // const utf8Encode = new TextEncoder();
   // const array = utf8Encode.encode(messageToServer);
@@ -209,7 +202,6 @@ const onCanvasPointerDown = (event: PointerEvent) => {
   isDrawing.value = true;
   isOnCanvas.value = true;
 
-  counter.value = 0;
   currentCoordinates.value = [];
 
   cursorXStart.value = event.clientX;
@@ -403,33 +395,25 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     }
 
     case 'pen': {
-      if (prevX.value == null || prevY.value == null || !isDrawing.value) {
-        prevX.value = cursorXCurrent;
-        prevY.value = cursorYCurrent;
-        return;
-      }
-
       const currentX = cursorXCurrent;
       const currentY = cursorYCurrent;
 
-      counter.value++;
+      // counter.value++;
 
-      if (counter.value % step.value === 0) {
-        currentCoordinates.value.push([
-          (currentX - offsetXCustom.value) / zoomStore.zoom,
-          (currentY - offsetYCustom.value) / zoomStore.zoom,
-        ]);
+      // if (counter.value) {
+      currentCoordinates.value.push([
+        (currentX - offsetXCustom.value) / zoomStore.zoom,
+        (currentY - offsetYCustom.value) / zoomStore.zoom,
+      ]);
 
-        // без этого сначала рисуется не оч красиво, а когда отпускаешь становится норм, но думаю на производительность давит
-        redrawWithClearing();
+      // без этого сначала рисуется не оч красиво, а когда отпускаешь становится норм, но думаю на производительность давит
+      redrawWithClearing();
 
-        const curve = getNewCurveObject();
+      const curve = getNewCurveObject();
 
-        curve?.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
-      }
+      curve?.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      // }
 
-      prevX.value = currentX;
-      prevY.value = currentY;
       break;
     }
 
