@@ -4,213 +4,215 @@ using Drawga.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Drawga.Controllers
+namespace Drawga.Controllers;
+
+public class DrawController : Controller
 {
-    public class DrawController : Controller
+    public static int[] PrivateBoards { get; set; } = { 7, 9 };
+    public static Dictionary<int, List<WebSocket>> Sockets { get; set; } = new();
+    public static Dictionary<int, List<byte[]>> History { get; set; } = new();
+    private const int MaxArrayLength = 10000 * 50;
+    public static BoardManager BoardManager { get; } = new(History);
+    public event Action<WebSocket, int> ClientDisconnect;
+    public event Action<WebSocket, int> ClientConnected;
+
+    public DrawController()
     {
-        public static int[] PrivateBoards { get; set; } = { 7, 9 };
-        public static Dictionary<int, List<WebSocket>> Sockets { get; set; } = new();
-        public static Dictionary<int, List<byte[]>> History { get; set; } = new();
-        private const int MaxArrayLength = 10000 * 50;
-        public static BoardManager BoardManager { get; } = new(History);
-        public event Action<WebSocket, int> ClientDisconnect;
-        public event Action<WebSocket, int> ClientConnected;
+        ClientDisconnect += SaveBoard;
+        ClientDisconnect += EventForClientDisconnect;
+        ClientConnected += OnClientConnected;
+    }
 
-        public DrawController()
+    private async void OnClientConnected(WebSocket socket, int id)
+    {
+        await SendData(socket, Encoding.UTF8.GetBytes("message:::Пользователь подключился"), id);
+    }
+
+    private async void EventForClientDisconnect(WebSocket socket, int id)
+    {
+        await SendData(socket, Encoding.UTF8.GetBytes("disconnect:::"), id);
+    }
+
+    private void SaveBoard(WebSocket client, int boardId)
+    {
+        if (Sockets[boardId].Count == 0)
         {
-            ClientDisconnect += SaveBoard;
-            ClientDisconnect += EventForClientDisconnect;
-            ClientConnected += OnClientConnected;
+            BoardManager.SaveBoard(boardId, $"{boardId}.board");
+            History[boardId] = new();
+        }
+    }
+
+    //public IActionResult Index()
+    //{
+    //    List<string> colorList = new List<string>
+    //    {
+    //        "rgb(0, 0, 0)", "rgb(52, 58, 64)", "rgb(73, 80, 87)", "rgb(201, 42, 42)", "rgb(166, 30, 77)",
+    //        "rgb(134, 46, 156)", "rgb(95, 61, 196)", "rgb(54, 79, 199)", "rgb(24, 100, 171)", "rgb(11, 114, 133)",
+    //        "rgb(8, 127, 91)", "rgb(43, 138, 62)", "rgb(92, 148, 13)", "rgb(230, 119, 0)", "rgb(217, 72, 15)"
+    //    };
+
+    //    return View("newIndex", colorList);
+    //}
+
+    [Route("/draw/ws")]
+    public async Task StartSocketDraw(int id)
+    {
+        if (!HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            return;
         }
 
-        private async void OnClientConnected(WebSocket socket, int id)
+        var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+
+        if (!Sockets.ContainsKey(id))
         {
-            await SendData(socket, Encoding.UTF8.GetBytes("message:::Пользователь подключился"), id);
+            Sockets.Add(id, new());
         }
 
-        private async void EventForClientDisconnect(WebSocket socket, int id)
+        if (Sockets[id].Count == 0)
         {
-            await SendData(socket, Encoding.UTF8.GetBytes("disconnect:::"), id);
+            BoardManager.LoadBoard(id, $"{id}.board");
         }
 
-        private void SaveBoard(WebSocket client, int boardId)
-        {
-            if (Sockets[boardId].Count == 0)
-            {
-                BoardManager.SaveBoard(boardId, $"{boardId}.board");
-                History[boardId] = new();
-            }
-        }
+        Sockets[id].Add(socket);
 
-        //public IActionResult Index()
-        //{
-        //    List<string> colorList = new List<string>
-        //    {
-        //        "rgb(0, 0, 0)", "rgb(52, 58, 64)", "rgb(73, 80, 87)", "rgb(201, 42, 42)", "rgb(166, 30, 77)",
-        //        "rgb(134, 46, 156)", "rgb(95, 61, 196)", "rgb(54, 79, 199)", "rgb(24, 100, 171)", "rgb(11, 114, 133)",
-        //        "rgb(8, 127, 91)", "rgb(43, 138, 62)", "rgb(92, 148, 13)", "rgb(230, 119, 0)", "rgb(217, 72, 15)"
-        //    };
+        ClientConnected(socket, id);
+        await socket.SendAsync(Encoding.UTF8.GetBytes($"message:::Элементов на доске: {History[id].Count}"), WebSocketMessageType.Text, true,
+            CancellationToken.None);
 
-        //    return View("newIndex", colorList);
-        //}
-
-        [Route("/draw/ws")]
-        public async Task StartSocketDraw(int id)
-        {
-            if (!HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                return;
-            }
-
-            var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-
-            if (!Sockets.ContainsKey(id))
-            {
-                Sockets.Add(id, new());
-            }
-
-            if (Sockets[id].Count == 0)
-            {
-                BoardManager.LoadBoard(id, $"{id}.board");
-            }
-
-            Sockets[id].Add(socket);
-
-            ClientConnected(socket, id);
-            await socket.SendAsync(Encoding.UTF8.GetBytes($"message:::Элементов на доске: {History[id].Count}"), WebSocketMessageType.Text, true,
-                CancellationToken.None);
-
-            if (!History.ContainsKey(id))
-                History.Add(id, new());
+        if (!History.ContainsKey(id))
+            History.Add(id, new());
             
 
-            // удалить потом
-            // if (History[id].Count > MaxArrayLength)
-            // {
-            //     History[id].RemoveRange(0, History[id].Count - MaxArrayLength);
-            // }
+        // удалить потом
+        // if (History[id].Count > MaxArrayLength)
+        // {
+        //     History[id].RemoveRange(0, History[id].Count - MaxArrayLength);
+        // }
 
+        try
+        {
+            foreach (var t in History[id])
+            {
+                await socket.SendAsync(t, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+
+        }
+        catch
+        {
+            // ignored
+        }
+
+        if (PrivateBoards.Contains(id))
+        {
+            await socket.SendAsync(Encoding.UTF8.GetBytes("message:::Это закрытая доска. Изменения не сохраняются"),
+                WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+
+        while (socket.State == WebSocketState.Open)
+        {
             try
             {
-                foreach (var t in History[id])
+                var bufferSize = new byte[32];
+                await socket.ReceiveAsync(bufferSize, CancellationToken.None);
+
+                var successParse = int.TryParse(Encoding.UTF8.GetString(bufferSize), out int size);
+
+                if (!successParse || PrivateBoards.Contains(id))
+                    continue;
+
+                var buffer = new byte[size];
+
+                await socket.ReceiveAsync(buffer, CancellationToken.None);
+                var message = Encoding.UTF8.GetString(buffer);
+
+                AddToHistory(buffer, id);
+                await DeleteHistory(buffer, id, socket);
+
+                if (message == "save")
                 {
-                    await socket.SendAsync(t, WebSocketMessageType.Text, true, CancellationToken.None);
+                    BoardManager.SaveBoard(id, $"{id}.board");
                 }
 
+                await SendData(socket, buffer, id);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Console.WriteLine(e);
+                break;
             }
-
-            if (PrivateBoards.Contains(id))
-            {
-                await socket.SendAsync(Encoding.UTF8.GetBytes("message:::Это закрытая доска. Изменения не сохраняются"),
-                    WebSocketMessageType.Text, true, CancellationToken.None);
-            }
-
-            while (socket.State == WebSocketState.Open)
-            {
-                try
-                {
-                    byte[] bufferSize = new byte[32];
-                    await socket.ReceiveAsync(bufferSize, CancellationToken.None);
-
-                    bool successParse = int.TryParse(Encoding.UTF8.GetString(bufferSize), out int size);
-
-                    if (!successParse || PrivateBoards.Contains(id))
-                        continue;
-
-                    byte[] buffer = new byte[size];
-
-                    await socket.ReceiveAsync(buffer, CancellationToken.None);
-                    string message = Encoding.UTF8.GetString(buffer);
-
-                    AddToHistory(buffer, id);
-                    await DeleteHistory(buffer, id, socket);
-
-                    if (message == "save")
-                    {
-                        BoardManager.SaveBoard(id, $"{id}.board");
-                    }
-
-                    await SendData(socket, buffer, id);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    break;
-                }
-            }
-
-            Sockets[id].Remove(socket);
-            ClientDisconnect(socket, id);
         }
+
+        Sockets[id].Remove(socket);
+        ClientDisconnect(socket, id);
+    }
         
-        private async Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
+    private Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
+    {
+        var message = Encoding.UTF8.GetString(buffer);
+        var parts = message.Split(":::");
+
+        if (parts.Length < 2)
+            return Task.CompletedTask;
+
+        if (parts[0] != "delete") return Task.CompletedTask;
+
+        var delId = (JsonConvert.DeserializeObject(parts[1]) as dynamic)?.objId.ToString();
+
+        var historyToDelete = History[id]
+            .Where(bytes => delId != null && Encoding.UTF8.GetString(bytes).Contains(delId))
+            .ToArray();
+
+        foreach (var bytes in historyToDelete)
         {
-            string message = Encoding.UTF8.GetString(buffer);
-            string[] parts = message.Split(":::");
-
-            if (parts.Length < 2)
-                return;
-
-            if (parts[0] == "delete")
-            {
-                string delId = (JsonConvert.DeserializeObject(parts[1]) as dynamic)?.objId.ToString();
-
-                var historyToDelete = History[id].Where(bytes => delId != null && Encoding.UTF8.GetString(bytes).Contains(delId)).ToArray();
-
-                foreach (byte[] bytes in historyToDelete)
-                {
-                    History[id].Remove(bytes);
-                }
-            }
+            History[id].Remove(bytes);
         }
 
-        private static void AddToHistory(byte[] buffer, int id)
+        return Task.CompletedTask;
+    }
+
+    private static void AddToHistory(byte[] buffer, int id)
+    {
+        if (History[id].Count > MaxArrayLength)
         {
-            if (History[id].Count > MaxArrayLength)
-            {
-                History[id].Remove(History[id][0]);
-            }
-
-            var message = Encoding.UTF8.GetString(buffer);
-
-            if (message.StartsWith("clear"))
-            {
-                History[id].Clear();
-            }
-
-            if (message.StartsWith("cur"))
-                return;
-
-            //if (message.StartsWith("line"))
-            History[id].Add(buffer);
+            History[id].Remove(History[id][0]);
         }
 
-        private async Task SendData(WebSocket socketSender, byte[] buffer, int id)
+        var message = Encoding.UTF8.GetString(buffer);
+
+        if (message.StartsWith("clear"))
         {
-            for (var i = 0; i < Sockets[id].Count; i++)
+            History[id].Clear();
+        }
+
+        if (message.StartsWith("cur"))
+            return;
+
+        //if (message.StartsWith("line"))
+        History[id].Add(buffer);
+    }
+
+    private async Task SendData(WebSocket socketSender, byte[] buffer, int id)
+    {
+        for (var i = 0; i < Sockets[id].Count; i++)
+        {
+            var client = Sockets[id][i];
+            if (client.State != WebSocketState.Open)
             {
-                var client = Sockets[id][i];
-                if (client.State != WebSocketState.Open)
-                {
-                    continue;
-                }
-
-                if (socketSender == client)
-                    continue;
-
-                await client.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+                continue;
             }
-        }
 
-        ~DrawController()
-        {
-            ClientDisconnect -= SaveBoard;
-            ClientDisconnect -= EventForClientDisconnect;
-            ClientConnected -= OnClientConnected;
+            if (socketSender == client)
+                continue;
+
+            await client.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
         }
+    }
+
+    ~DrawController()
+    {
+        ClientDisconnect -= SaveBoard;
+        ClientDisconnect -= EventForClientDisconnect;
+        ClientConnected -= OnClientConnected;
     }
 }
