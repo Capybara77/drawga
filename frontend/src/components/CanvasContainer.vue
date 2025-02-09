@@ -72,6 +72,11 @@ const handleDraw = (event: CustomEvent) => {
     roughCanvas.value,
     canvasContext.value as CanvasRenderingContext2D,
   );
+
+  if (!obj) {
+    return;
+  }
+
   allObjects.value = [...allObjects.value, obj];
   obj.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
 };
