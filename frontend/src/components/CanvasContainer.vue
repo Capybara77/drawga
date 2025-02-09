@@ -13,6 +13,7 @@ import { constantsForKeyboard, useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import { useZoomStore } from '@/stores/zoom';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
+import { getTypedDrawObject } from '@/utils';
 import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
@@ -66,14 +67,13 @@ const handleClear = (event: CustomEvent) => {
 };
 
 const handleDraw = (event: CustomEvent) => {
-  // хз что это но оно не работает
-  // const obj = getTypedDrawObject(
-  //   event.detail[1],
-  //   roughCanvas.value,
-  //   canvasContext.value as CanvasRenderingContext2D,
-  // );
-  // allObjects.value = [...allObjects.value, obj];
-  // obj.draw(offsetXCustom.value, offsetYCustom.value);
+  const obj = getTypedDrawObject(
+    event.detail[1],
+    roughCanvas.value,
+    canvasContext.value as CanvasRenderingContext2D,
+  );
+  allObjects.value = [...allObjects.value, obj];
+  obj.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
 };
 
 const createSocketConnection = () => {
