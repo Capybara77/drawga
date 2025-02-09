@@ -7,6 +7,7 @@ export class WebSocketService extends EventTarget {
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Формирование URI: например, wss://example.com/путь/ws?query=...
     const newUri = `${protocol}//${location.host}${location.pathname}/ws${location.search}`;
+    console.log(newUri);
     this.socket = new WebSocket(newUri);
     this.setSocketEvents();
   }

@@ -51,7 +51,7 @@ export function getTypedDrawObject(
   ctx: CanvasRenderingContext2D,
 ): BaseObject | null {
   const parsedString = JSON.parse(str);
-  const type: string = parsedString.drawType;
+  const type: string = parsedString.typeName;
 
   switch (type) {
     case 'rectangle':
