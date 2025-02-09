@@ -47,7 +47,7 @@ export class WebSocketService extends EventTarget {
    */
   public send(data): void {
     if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(data));
+      this.socket.send(data);
     } else {
       console.warn(
         'Невозможно отправить данные. WebSocket не открыт. Текущее состояние:',

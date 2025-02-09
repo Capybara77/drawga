@@ -311,17 +311,19 @@ const onCanvasPointerMove = (event: PointerEvent) => {
   // const trailerY = event.clientY - trailer.offsetHeight / 2;
 
   if (element.id === 'canvas') {
-    // animateCursor(trailerX, trailerY, trailer);
-    // const memessageToServer: string =
-    //   'cur:::' +
-    //   myId +
-    //   ':::' +
-    //   +(event.clientX / zoomStore.zoom - offsetXCustom / zoomStore.zoom) +
-    //   ':::' +
-    //   +(event.clientY / zoomStore.zoom - offsetYCustom / zoomStore.zoom) +
-    //   ':::';
-    // socket.send(memessageToServer.length as unknown as string);
-    // socket.send(memessageToServer);
+    //animateCursor(trailerX, trailerY, trailer);
+
+    const memessageToServer: string =
+      'cur:::' +
+      userId +
+      ':::' +
+      +(event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom) +
+      ':::' +
+      +(event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom) +
+      ':::';
+
+    socket.send(memessageToServer.length as unknown as string);
+    socket.send(memessageToServer);
   }
 
   if (isMoving.value) {
