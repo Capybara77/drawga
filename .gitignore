@@ -38,3 +38,7 @@ draw-type/
 staticwebassets.pack.sentinel
 
 */Migrations
+
+
+*.db-shm
+*.db-wal
