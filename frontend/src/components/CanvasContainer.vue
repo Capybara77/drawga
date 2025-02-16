@@ -16,7 +16,7 @@ import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/type
 import { getTypedDrawObject } from '@/utils';
 import rough from 'roughjs';
 
-import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
@@ -48,14 +48,6 @@ const isSpacePressed = ref(false);
 const isMoving = ref(false);
 
 const userId = '123';
-
-const newX = computed(() => {
-  return (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom;
-});
-
-const newY = computed(() => {
-  return (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom;
-});
 
 const handleClose = (event: CustomEvent) => {
   console.log('Соединение закрыто', event.detail);
@@ -163,13 +155,18 @@ const getNewRectObject = (event: PointerEvent) => {
     stroke: optionsStore.getterColorsWithOpacity.borderColor,
     strokeWidth: optionsStore.lineWidth,
     userId: userId,
-    startPoint: [newX.value, newY.value],
+    startPoint: [
+      (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+      (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
+    ],
     endPoint: [
       event.shiftKey
         ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
         : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
       event.shiftKey
-        ? newY.value + ((event.clientX - offsetXCustom.value) / zoomStore.zoom - newX.value)
+        ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
+          ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
+            (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
         : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
     ],
   };
@@ -241,7 +238,10 @@ const onCanvasPointerUp = (event: PointerEvent) => {
         width: optionsStore.lineWidth,
         roughCanvas: roughCanvas.value,
         userId: userId,
-        startPoint: [newX.value, newY.value],
+        startPoint: [
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
+        ],
         endPoint: [
           (event.clientX - offsetXCustom.value) / zoomStore.zoom,
           (event.clientY - offsetYCustom.value) / zoomStore.zoom,
@@ -263,13 +263,18 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       const ellipseProps: EllipseProps = {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
-        startPoint: [newX.value, newY.value],
+        startPoint: [
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
+        ],
         endPoint: [
           event.shiftKey
             ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
             : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
           event.shiftKey
-            ? newY.value + ((event.clientX - offsetXCustom.value) / zoomStore.zoom - newX.value)
+            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
+              ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
+                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
             : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
         ],
         fillStyle: optionsStore.fillStyle,
@@ -327,8 +332,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
   if (!isDrawing.value) return;
 
-  const cursorXCurrent = event.clientX / zoomStore.zoom;
-  const cursorYCurrent = event.clientY / zoomStore.zoom;
+  const cursorXCurrent = event.clientX;
+  const cursorYCurrent = event.clientY;
 
   switch (cursorStore.cursor) {
     case 'eraser': {
@@ -338,8 +343,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         if (drawObject.drawType === 'pen') {
           if (
             (drawObject as CurveObject).isCloseToPoints(
-              cursorXCurrent - offsetXCustom.value / zoomStore.zoom,
-              cursorYCurrent - offsetYCustom.value / zoomStore.zoom,
+              cursorXCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
+              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
               10,
             )
           ) {
@@ -433,7 +438,10 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         width: optionsStore.lineWidth,
         roughCanvas: roughCanvas.value,
         userId: userId,
-        startPoint: [newX.value, newY.value],
+        startPoint: [
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
+        ],
         endPoint: [
           (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
           (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
@@ -453,13 +461,18 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       const ellipseProps: EllipseProps = {
         color: optionsStore.getterColorsWithOpacity.fillColor,
         width: optionsStore.lineWidth,
-        startPoint: [newX.value, newY.value],
+        startPoint: [
+          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
+          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
+        ],
         endPoint: [
           event.shiftKey
             ? (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom
             : (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
           event.shiftKey
-            ? newY.value + ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom - newX.value)
+            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
+              ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom -
+                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
             : (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
         ],
         fillStyle: optionsStore.fillStyle,
