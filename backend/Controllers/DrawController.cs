@@ -54,18 +54,6 @@ public class DrawController : Controller
         }
     }
 
-    //public IActionResult Index()
-    //{
-    //    List<string> colorList = new List<string>
-    //    {
-    //        "rgb(0, 0, 0)", "rgb(52, 58, 64)", "rgb(73, 80, 87)", "rgb(201, 42, 42)", "rgb(166, 30, 77)",
-    //        "rgb(134, 46, 156)", "rgb(95, 61, 196)", "rgb(54, 79, 199)", "rgb(24, 100, 171)", "rgb(11, 114, 133)",
-    //        "rgb(8, 127, 91)", "rgb(43, 138, 62)", "rgb(92, 148, 13)", "rgb(230, 119, 0)", "rgb(217, 72, 15)"
-    //    };
-
-    //    return View("newIndex", colorList);
-    //}
-
     [Route("/draw/ws")]
     public async Task StartSocketDraw(int id)
     {
@@ -90,20 +78,13 @@ public class DrawController : Controller
 
         ClientConnected(socket, id);
 
-        string msg = FormatMessage("message", $"Элементов на доске: {History[id].Count}");
+        var msg = FormatMessage("message", $"Элементов на доске: {History[id].Count}");
 
         await socket.SendAsync(Encoding.UTF8.GetBytes(msg), WebSocketMessageType.Text, true,
             CancellationToken.None);
 
         if (!History.ContainsKey(id))
             History.Add(id, new());
-            
-
-        // удалить потом
-        // if (History[id].Count > MaxArrayLength)
-        // {
-        //     History[id].RemoveRange(0, History[id].Count - MaxArrayLength);
-        // }
 
         try
         {
