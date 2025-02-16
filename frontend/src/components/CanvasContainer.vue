@@ -13,7 +13,7 @@ import { constantsForKeyboard, useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import { useZoomStore } from '@/stores/zoom';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { getTypedDrawObject } from '@/utils';
+import { animateCursor, getTypedDrawObject } from '@/utils';
 import rough from 'roughjs';
 
 import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
@@ -66,6 +66,31 @@ const handleClear = (event: CustomEvent) => {
   console.log('Получена команда clear', event.detail);
 };
 
+const handleCur = (event: CustomEvent) => {
+  const userId = event.detail[1];
+  let t;
+
+  t = document.getElementById(userId);
+
+  if (t === null) {
+    t = document.createElement('div');
+    t.id = userId;
+    t.className = 'trailer';
+    document.body.appendChild(t);
+    return;
+  }
+
+  const keyFrames = {
+    transform: `translate(${
+      +event.detail[2] * zoomStore.zoom + offsetXCustom.value
+    }px, ${+event.detail[3] * zoomStore.zoom, + offsetYCustom.value}px)`,
+  };
+
+  t.animate(keyFrames, {
+    fill: 'forwards',
+  });
+};
+
 const handleDraw = (event: CustomEvent) => {
   const obj = getTypedDrawObject(
     event.detail[1],
@@ -87,6 +112,7 @@ const createSocketConnection = () => {
   socket.addEventListener('close', handleClose as EventListener);
   socket.addEventListener('message', handleMessage as EventListener);
   socket.addEventListener('drawObj', handleDraw as EventListener);
+  socket.addEventListener('cur', handleCur as EventListener);
 };
 
 const redrawWithOffset = () => {
