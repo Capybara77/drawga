@@ -107,7 +107,7 @@ public class DrawController : Controller
                 WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        while (socket.State == WebSocketState.Open)
+        while (socket.State == WebSocketState.CloseSent)
         {
             try
             {

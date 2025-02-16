@@ -62,6 +62,13 @@ async Task GetVueMain(HttpContext context, RequestDelegate arg2)
         return;
     }
 
+    // При ссылке /draw2 редирект на главную
+    if (context.Request.Path != "/draw22")
+    {
+        context.Response.StatusCode = StatusCodes.Status302Found;
+        return;
+    }
+
     context.Response.ContentType = "text/html";
     await context.Response.SendFileAsync(Path.Combine("dist", "index.html"));
 }
