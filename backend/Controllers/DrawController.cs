@@ -8,50 +8,20 @@ namespace Drawga.Controllers;
 
 public class DrawController : Controller
 {
-    public static int[] PrivateBoards { get; set; } = { 7, 9 };
-    public static Dictionary<int, List<WebSocket>> Sockets { get; set; } = new();
-    public static Dictionary<int, List<byte[]>> History { get; set; } = new();
     private const int MaxArrayLength = 10000 * 50;
     private const string Separator = ":::";
-    public static BoardManager BoardManager { get; } = new(History);
-    public event Action<WebSocket, int> ClientDisconnect;
-    public event Action<WebSocket, int> ClientConnected;
+    private static int[] PrivateBoards { get; set; } = { 7, 9 };
+    public static Dictionary<int, List<WebSocket>> Sockets { get; } = new();
+    public static Dictionary<int, List<byte[]>> History { get; } = new();
+    private static BoardManager BoardManager { get; } = new(History);
+    public event Func<WebSocket, int, Task> ClientDisconnectAsync;
+    public event Func<WebSocket, int, Task> ClientConnectedAsync;
 
     public DrawController()
     {
-        ClientDisconnect += SaveBoard;
-        ClientDisconnect += EventForClientDisconnect;
-        ClientConnected += OnClientConnected;
-    }
-
-    private static string FormatMessage(string msgType, string msgContent)
-    {
-        var result = msgType + Separator + msgContent;
-
-        return result;
-    }
-
-    private async void OnClientConnected(WebSocket socket, int id)
-    {
-        string msg = FormatMessage("message", "Пользователь подключился");
-
-        await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
-    }
-
-    private async void EventForClientDisconnect(WebSocket socket, int id)
-    {
-        string msg = FormatMessage("disconnect", "");
-
-        await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
-    }
-
-    private void SaveBoard(WebSocket client, int boardId)
-    {
-        if (Sockets[boardId].Count == 0)
-        {
-            BoardManager.SaveBoard(boardId, $"{boardId}.board");
-            History[boardId] = new();
-        }
+        ClientDisconnectAsync += SaveBoard;
+        ClientDisconnectAsync += EventForClientDisconnectAsync;
+        ClientConnectedAsync += OnClientConnectedAsync;
     }
 
     [Route("/draw/ws")]
@@ -76,7 +46,7 @@ public class DrawController : Controller
 
         Sockets[id].Add(socket);
 
-        ClientConnected(socket, id);
+        await ClientConnectedAsync(socket, id);
 
         var msg = FormatMessage("message", $"Элементов на доске: {History[id].Count}");
 
@@ -92,7 +62,6 @@ public class DrawController : Controller
             {
                 await socket.SendAsync(t, WebSocketMessageType.Text, true, CancellationToken.None);
             }
-
         }
         catch
         {
@@ -101,7 +70,7 @@ public class DrawController : Controller
 
         if (PrivateBoards.Contains(id))
         {
-            string saveMsg = FormatMessage("message", "Это закрытая доска. Изменения не сохраняются");
+            var saveMsg = FormatMessage("message", "Это закрытая доска. Изменения не сохраняются");
 
             await socket.SendAsync(Encoding.UTF8.GetBytes(saveMsg),
                 WebSocketMessageType.Text, true, CancellationToken.None);
@@ -142,9 +111,39 @@ public class DrawController : Controller
         }
 
         Sockets[id].Remove(socket);
-        ClientDisconnect(socket, id);
+        await ClientDisconnectAsync(socket, id);
     }
-        
+
+    private static string FormatMessage(string msgType, string msgContent)
+    {
+        var result = msgType + Separator + msgContent;
+
+        return result;
+    }
+
+    private async Task OnClientConnectedAsync(WebSocket socket, int id)
+    {
+        var msg = FormatMessage("message", "Пользователь подключился");
+
+        await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
+    }
+
+    private async Task EventForClientDisconnectAsync(WebSocket socket, int id)
+    {
+        var msg = FormatMessage("disconnect", "");
+
+        await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
+    }
+
+    private Task SaveBoard(WebSocket client, int boardId)
+    {
+        if (Sockets[boardId].Count != 0) return Task.CompletedTask;
+
+        BoardManager.SaveBoard(boardId, $"{boardId}.board");
+        History[boardId] = new();
+        return Task.CompletedTask;
+    }
+
     private static Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
     {
         var message = Encoding.UTF8.GetString(buffer);
@@ -186,7 +185,6 @@ public class DrawController : Controller
         if (message.StartsWith("cur"))
             return;
 
-        //if (message.StartsWith("line"))
         History[id].Add(buffer);
     }
 
@@ -209,8 +207,8 @@ public class DrawController : Controller
 
     ~DrawController()
     {
-        ClientDisconnect -= SaveBoard;
-        ClientDisconnect -= EventForClientDisconnect;
-        ClientConnected -= OnClientConnected;
+        ClientDisconnectAsync -= SaveBoard;
+        ClientDisconnectAsync -= EventForClientDisconnectAsync;
+        ClientConnectedAsync -= OnClientConnectedAsync;
     }
 }
