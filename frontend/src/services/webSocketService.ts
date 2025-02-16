@@ -70,7 +70,5 @@ export class WebSocketService extends EventTarget {
     const formattedData = formatDataToWS(data);
 
     this.socket.send(formattedData);
-
-    console.log('!!!NEW!!!', formattedData);
   }
 }
