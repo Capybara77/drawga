@@ -28,6 +28,9 @@ backend/saves
 backend/obj/
 backend/dist/
 
+Drawga.Tests/bin
+Drawga.Tests/obj
+
 *.user
 
 websocket chat/
@@ -42,3 +45,5 @@ staticwebassets.pack.sentinel
 
 *.db-shm
 *.db-wal
+
+*/.idea
