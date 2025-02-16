@@ -56,6 +56,12 @@ app.Use(GetVueMain);
 
 async Task GetVueMain(HttpContext context, RequestDelegate arg2)
 {
+    if (context.Request.Path != "/draw")
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+
     context.Response.ContentType = "text/html";
     await context.Response.SendFileAsync(Path.Combine("dist", "index.html"));
 }
