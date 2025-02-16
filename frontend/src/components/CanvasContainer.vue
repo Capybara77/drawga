@@ -83,7 +83,7 @@ const handleCur = (event: CustomEvent) => {
   const keyFrames = {
     transform: `translate(${
       +event.detail[2] * zoomStore.zoom + offsetXCustom.value
-    }px, ${+event.detail[3] * zoomStore.zoom, + offsetYCustom.value}px)`,
+    }px, ${(+event.detail[3] * zoomStore.zoom, +offsetYCustom.value)}px)`,
   };
 
   t.animate(keyFrames, {
@@ -326,6 +326,13 @@ const onCanvasPointerUp = (event: PointerEvent) => {
   allObjects.value = [...allObjects.value, currentDrawing];
 
   redrawWithClearing();
+
+  const messageToServer = [
+    'drawObj',
+    JSON.stringify(allObjects.value[allObjects.value.length - 1]),
+  ].map(String);
+
+  socket.send(messageToServer);
 };
 
 const onCanvasPointerMove = (event: PointerEvent) => {
@@ -344,7 +351,6 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
     ].map(String);
 
-    socket.send(messageToServer.length);
     socket.send(messageToServer);
   }
 

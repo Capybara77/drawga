@@ -50,8 +50,8 @@ export function getTypedDrawObject(
   roughCanvas: RoughCanvas,
   ctx: CanvasRenderingContext2D,
 ): BaseObject | null {
-  const parsedString = JSON.parse(str);
-  const type: string = parsedString.typeName;
+  const parsedString: BaseObject = JSON.parse(str);
+  const type: string = parsedString.drawType;
 
   switch (type) {
     case 'rectangle':

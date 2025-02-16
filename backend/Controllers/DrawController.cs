@@ -147,7 +147,7 @@ public class DrawController : Controller
     private static Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
     {
         var message = Encoding.UTF8.GetString(buffer);
-        var parts = message.Split(":::");
+        var parts = message.Split(Separator);
 
         if (parts.Length < 2)
             return Task.CompletedTask;

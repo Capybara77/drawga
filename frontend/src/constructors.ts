@@ -15,7 +15,7 @@ export abstract class BaseObject {
   color;
   width;
   userId;
-  drawType: MyCursor = 'pointer';
+  typeName: MyCursor = 'pointer';
   tempObj: boolean = false;
   zoom: number = 1;
   objId: string = generateId(6);
@@ -103,7 +103,7 @@ export class TextObject extends BaseObject {
 export class CurveObject extends BaseObject {
   pointsList;
   ctx;
-  drawType: MyCursor = 'pen';
+  drawType: MyCursor = 'curve';
   constructor({ color, ctx, pointsList, userId, width, zoom }: CurveProps) {
     super({ color, width, userId });
     this.pointsList = pointsList;
