@@ -1,3 +1,11 @@
+const SEPARATOR = ':::';
+
+function formatDataToWS(data: string[]): string {
+  const formattedData = data.join(SEPARATOR) + SEPARATOR;
+
+  return formattedData;
+}
+
 export class WebSocketService extends EventTarget {
   private socket: WebSocket;
 
@@ -20,7 +28,7 @@ export class WebSocketService extends EventTarget {
   }
 
   private onSocketOpen(): void {
-    this.send('Hello, server');
+    // this.send('Hello, server');
   }
 
   private onSocketMessage(msg: MessageEvent): void {
@@ -45,14 +53,24 @@ export class WebSocketService extends EventTarget {
    * Отправка данных на сервер.
    * @param data - объект с данными для отправки.
    */
-  public send(data): void {
-    if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(data);
-    } else {
-      console.warn(
+  public send(data: string[] | number): void {
+    if (this.socket.readyState !== WebSocket.OPEN) {
+      console.error(
         'Невозможно отправить данные. WebSocket не открыт. Текущее состояние:',
         this.socket.readyState,
       );
     }
+
+    if (typeof data === 'number') {
+      this.socket.send(String(data));
+
+      return;
+    }
+
+    const formattedData = formatDataToWS(data);
+
+    this.socket.send(formattedData);
+
+    console.log('!!!NEW!!!', formattedData);
   }
 }

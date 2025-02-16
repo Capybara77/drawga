@@ -12,6 +12,7 @@ public class DrawController : Controller
     public static Dictionary<int, List<WebSocket>> Sockets { get; set; } = new();
     public static Dictionary<int, List<byte[]>> History { get; set; } = new();
     private const int MaxArrayLength = 10000 * 50;
+    private const string Separator = ":::";
     public static BoardManager BoardManager { get; } = new(History);
     public event Action<WebSocket, int> ClientDisconnect;
     public event Action<WebSocket, int> ClientConnected;
@@ -23,14 +24,25 @@ public class DrawController : Controller
         ClientConnected += OnClientConnected;
     }
 
+    private static string FormatMessage(string msgType, string msgContent)
+    {
+        var result = msgType + Separator + msgContent;
+
+        return result;
+    }
+
     private async void OnClientConnected(WebSocket socket, int id)
     {
-        await SendData(socket, Encoding.UTF8.GetBytes("message:::Пользователь подключился"), id);
+        string msg = FormatMessage("message", "Пользователь подключился");
+
+        await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
     }
 
     private async void EventForClientDisconnect(WebSocket socket, int id)
     {
-        await SendData(socket, Encoding.UTF8.GetBytes("disconnect:::"), id);
+        string msg = FormatMessage("disconnect", "");
+
+        await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
     }
 
     private void SaveBoard(WebSocket client, int boardId)
@@ -77,7 +89,10 @@ public class DrawController : Controller
         Sockets[id].Add(socket);
 
         ClientConnected(socket, id);
-        await socket.SendAsync(Encoding.UTF8.GetBytes($"message:::Элементов на доске: {History[id].Count}"), WebSocketMessageType.Text, true,
+
+        string msg = FormatMessage("message", $"Элементов на доске: {History[id].Count}");
+
+        await socket.SendAsync(Encoding.UTF8.GetBytes(msg), WebSocketMessageType.Text, true,
             CancellationToken.None);
 
         if (!History.ContainsKey(id))
@@ -105,7 +120,9 @@ public class DrawController : Controller
 
         if (PrivateBoards.Contains(id))
         {
-            await socket.SendAsync(Encoding.UTF8.GetBytes("message:::Это закрытая доска. Изменения не сохраняются"),
+            string saveMsg = FormatMessage("message", "Это закрытая доска. Изменения не сохраняются");
+
+            await socket.SendAsync(Encoding.UTF8.GetBytes(saveMsg),
                 WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
@@ -147,7 +164,7 @@ public class DrawController : Controller
         ClientDisconnect(socket, id);
     }
         
-    private Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
+    private static Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
     {
         var message = Encoding.UTF8.GetString(buffer);
         var parts = message.Split(":::");
@@ -192,7 +209,7 @@ public class DrawController : Controller
         History[id].Add(buffer);
     }
 
-    private async Task SendData(WebSocket socketSender, byte[] buffer, int id)
+    private static async Task SendData(WebSocket socketSender, byte[] buffer, int id)
     {
         for (var i = 0; i < Sockets[id].Count; i++)
         {

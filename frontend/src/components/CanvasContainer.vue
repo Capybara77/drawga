@@ -95,8 +95,6 @@ const createSocketConnection = () => {
   socket.addEventListener('close', handleClose as EventListener);
   socket.addEventListener('message', handleMessage as EventListener);
   socket.addEventListener('drawObj', handleDraw as EventListener);
-
-  socket.send({ command: 'test', message: 'Hello, server' });
 };
 
 const redrawWithOffset = () => {
@@ -308,16 +306,14 @@ const onCanvasPointerMove = (event: PointerEvent) => {
   if (element.id === 'canvas') {
     //animateCursor(trailerX, trailerY, trailer);
 
-    const messageToServer: string =
-      'cur:::' +
-      userId +
-      ':::' +
-      +(event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom) +
-      ':::' +
-      +(event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom) +
-      ':::';
+    const messageToServer = [
+      'cur',
+      userId,
+      event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
+      event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
+    ].map(String);
 
-    socket.send(messageToServer.length as unknown as string);
+    socket.send(messageToServer.length);
     socket.send(messageToServer);
   }
 
