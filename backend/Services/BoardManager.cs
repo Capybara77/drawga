@@ -5,10 +5,10 @@ namespace Drawga.Services
 {
     public class BoardManager
     {
-        public string PathToSaves { get; } = "saves";
-        public Dictionary<int, List<byte[]>> Boards { get; }
+        private string PathToSaves { get; } = "saves";
+        private IDictionary<int, List<byte[]>> Boards { get; }
 
-        public BoardManager(Dictionary<int, List<byte[]>> boards)
+        public BoardManager(IDictionary<int, List<byte[]>> boards)
         {
             Boards = boards;
 
@@ -26,7 +26,7 @@ namespace Drawga.Services
                 throw new ArgumentException(nameof(id));
             }
 
-            string pathToFile = $"{PathToSaves}/{fileName}";
+            var pathToFile = $"{PathToSaves}/{fileName}";
 
             if (File.Exists(pathToFile))
                 File.Delete(pathToFile);
@@ -36,7 +36,7 @@ namespace Drawga.Services
 
         public void LoadBoard(int id, string fileName)
         {
-            string pathToFile = $"{PathToSaves}/{fileName}";
+            var pathToFile = $"{PathToSaves}/{fileName}";
 
             if (!Boards.ContainsKey(id))
                 Boards.Add(id, new());

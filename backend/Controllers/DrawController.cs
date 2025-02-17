@@ -38,7 +38,7 @@ public class DrawController : Controller, IDisposable
 
         if (!_state.Sockets.ContainsKey(id))
         {
-            _state.Sockets.Add(id, new());
+            _state.Sockets.TryAdd(id, new());
         }
 
         if (_state.Sockets[id].Count == 0)
@@ -59,7 +59,7 @@ public class DrawController : Controller, IDisposable
             CancellationToken.None);
 
         if (!_state.History.ContainsKey(id))
-            _state.History.Add(id, new());
+            _state.History.TryAdd(id, new());
 
         try
         {
