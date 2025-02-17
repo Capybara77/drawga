@@ -1,27 +1,29 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using Drawga.Draw;
 using Drawga.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Drawga.Controllers;
 
-public class DrawController : Controller
+public class DrawController : Controller, IDisposable
 {
     private const int MaxArrayLength = 10000 * 50;
     private const string Separator = ":::";
-    private static int[] PrivateBoards { get; set; } = { 7, 9 };
-    public static Dictionary<int, List<WebSocket>> Sockets { get; } = new();
-    public static Dictionary<int, List<byte[]>> History { get; } = new();
-    private static BoardManager BoardManager { get; } = new(History);
-    public event Func<WebSocket, int, Task> ClientDisconnectAsync;
-    public event Func<WebSocket, int, Task> ClientConnectedAsync;
+
+    private readonly DrawState _state = DrawState.Instance;
+
+    public event Func<WebSocket, int, Task>? ClientDisconnectAsync;
+    public event Func<WebSocket, int, Task>? ClientConnectedAsync;
+    
+    private bool _disposed;
 
     public DrawController()
     {
-        ClientDisconnectAsync += SaveBoard;
-        ClientDisconnectAsync += EventForClientDisconnectAsync;
-        ClientConnectedAsync += OnClientConnectedAsync;
+        // ClientDisconnectAsync += SaveBoard;
+        // ClientDisconnectAsync += EventForClientDisconnectAsync;
+        // ClientConnectedAsync += OnClientConnectedAsync;
     }
 
     [Route("/draw/ws")]
@@ -34,31 +36,34 @@ public class DrawController : Controller
 
         var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
-        if (!Sockets.ContainsKey(id))
+        if (!_state.Sockets.ContainsKey(id))
         {
-            Sockets.Add(id, new());
+            _state.Sockets.Add(id, new());
         }
 
-        if (Sockets[id].Count == 0)
+        if (_state.Sockets[id].Count == 0)
         {
-            BoardManager.LoadBoard(id, $"{id}.board");
+            _state.BoardManager.LoadBoard(id, $"{id}.board");
         }
 
-        Sockets[id].Add(socket);
+        _state.Sockets[id].Add(socket);
 
-        await ClientConnectedAsync(socket, id);
+        if (ClientConnectedAsync != null)
+        {
+            await ClientConnectedAsync(socket, id);
+        }
 
-        var msg = FormatMessage("message", $"Элементов на доске: {History[id].Count}");
+        var msg = FormatMessage("message", $"Элементов на доске: {_state.History[id].Count}");
 
         await socket.SendAsync(Encoding.UTF8.GetBytes(msg), WebSocketMessageType.Text, true,
             CancellationToken.None);
 
-        if (!History.ContainsKey(id))
-            History.Add(id, new());
+        if (!_state.History.ContainsKey(id))
+            _state.History.Add(id, new());
 
         try
         {
-            foreach (var t in History[id])
+            foreach (var t in _state.History[id])
             {
                 await socket.SendAsync(t, WebSocketMessageType.Text, true, CancellationToken.None);
             }
@@ -68,7 +73,7 @@ public class DrawController : Controller
             // ignored
         }
 
-        if (PrivateBoards.Contains(id))
+        if (_state.PrivateBoards.Contains(id))
         {
             var saveMsg = FormatMessage("message", "Это закрытая доска. Изменения не сохраняются");
 
@@ -85,7 +90,7 @@ public class DrawController : Controller
 
                 var successParse = int.TryParse(Encoding.UTF8.GetString(bufferSize), out int size);
 
-                if (!successParse || PrivateBoards.Contains(id))
+                if (!successParse || _state.PrivateBoards.Contains(id))
                     continue;
 
                 var buffer = new byte[size];
@@ -98,7 +103,7 @@ public class DrawController : Controller
 
                 if (message == "save")
                 {
-                    BoardManager.SaveBoard(id, $"{id}.board");
+                    _state.BoardManager.SaveBoard(id, $"{id}.board");
                 }
 
                 await SendData(socket, buffer, id);
@@ -110,8 +115,11 @@ public class DrawController : Controller
             }
         }
 
-        Sockets[id].Remove(socket);
-        await ClientDisconnectAsync(socket, id);
+        _state.Sockets[id].Remove(socket);
+        if (ClientDisconnectAsync != null)
+        {
+            await ClientDisconnectAsync(socket, id);
+        }
     }
 
     private static string FormatMessage(string msgType, string msgContent)
@@ -137,14 +145,14 @@ public class DrawController : Controller
 
     private Task SaveBoard(WebSocket client, int boardId)
     {
-        if (Sockets[boardId].Count != 0) return Task.CompletedTask;
+        if (_state.Sockets.ContainsKey(boardId) && _state.Sockets[boardId].Count != 0) return Task.CompletedTask;
 
-        BoardManager.SaveBoard(boardId, $"{boardId}.board");
-        History[boardId] = new();
+        _state.BoardManager.SaveBoard(boardId, $"{boardId}.board");
+        _state.History[boardId] = new();
         return Task.CompletedTask;
     }
 
-    private static Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
+    private Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
     {
         var message = Encoding.UTF8.GetString(buffer);
         var parts = message.Split(Separator);
@@ -156,43 +164,43 @@ public class DrawController : Controller
 
         var delId = (JsonConvert.DeserializeObject(parts[1]) as dynamic)?.objId.ToString();
 
-        var historyToDelete = History[id]
+        var historyToDelete = _state.History[id]
             .Where(bytes => delId != null && Encoding.UTF8.GetString(bytes).Contains(delId))
             .ToArray();
 
         foreach (var bytes in historyToDelete)
         {
-            History[id].Remove(bytes);
+            _state.History[id].Remove(bytes);
         }
 
         return Task.CompletedTask;
     }
 
-    private static void AddToHistory(byte[] buffer, int id)
+    private void AddToHistory(byte[] buffer, int id)
     {
-        if (History[id].Count > MaxArrayLength)
+        if (_state.History[id].Count > MaxArrayLength)
         {
-            History[id].Remove(History[id][0]);
+            _state.History[id].Remove(_state.History[id][0]);
         }
 
         var message = Encoding.UTF8.GetString(buffer);
 
         if (message.StartsWith("clear"))
         {
-            History[id].Clear();
+            _state.History[id].Clear();
         }
 
         if (message.StartsWith("cur"))
             return;
 
-        History[id].Add(buffer);
+        _state.History[id].Add(buffer);
     }
 
-    private static async Task SendData(WebSocket socketSender, byte[] buffer, int id)
+    private async Task SendData(WebSocket socketSender, byte[] buffer, int id)
     {
-        for (var i = 0; i < Sockets[id].Count; i++)
+        for (var i = 0; i < _state.Sockets[id].Count; i++)
         {
-            var client = Sockets[id][i];
+            var client = _state.Sockets[id][i];
             if (client.State != WebSocketState.Open)
             {
                 continue;
@@ -204,11 +212,24 @@ public class DrawController : Controller
             await client.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
-
-    ~DrawController()
+    
+    protected override void Dispose(bool disposing)
     {
-        ClientDisconnectAsync -= SaveBoard;
-        ClientDisconnectAsync -= EventForClientDisconnectAsync;
-        ClientConnectedAsync -= OnClientConnectedAsync;
+        if (_disposed) return;
+        
+        if (disposing)
+        {
+            ClientDisconnectAsync -= SaveBoard;
+            ClientDisconnectAsync -= EventForClientDisconnectAsync;
+            ClientConnectedAsync -= OnClientConnectedAsync;
+        }
+        
+        _disposed = true;
     }
-}
+
+    public new void Dispose()
+    {
+        base.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }}
