@@ -2,7 +2,7 @@ import { RoughCanvas } from 'roughjs/bin/canvas';
 
 export type MyCursor =
   | 'pointer'
-  | 'pen'
+  | 'curve'
   | 'ellipse'
   | 'rectangle'
   | 'line'

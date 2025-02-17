@@ -103,7 +103,7 @@ export class TextObject extends BaseObject {
 export class CurveObject extends BaseObject {
   pointsList;
   ctx;
-  drawType: MyCursor = 'pen';
+  drawType: MyCursor = 'curve';
   constructor({ color, ctx, pointsList, userId, width, zoom }: CurveProps) {
     super({ color, width, userId });
     this.pointsList = pointsList;

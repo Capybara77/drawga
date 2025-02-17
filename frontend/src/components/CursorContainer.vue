@@ -21,7 +21,7 @@ type CursorItem = {
 const items: CursorItem[] = [
   { name: 'Курсор', key: 'pointer', title: "Курсор - 'f' или 1", icon: PointerIcon },
   { name: 'Ластик', key: 'eraser', title: "Ластик - 'e' или 2", icon: EraserIcon },
-  { name: 'Карандаш', key: 'pen', title: "Карандаш - 'p' или 3", icon: PenIcon },
+  { name: 'Карандаш', key: 'curve', title: "Карандаш - 'p' или 3", icon: PenIcon },
   {
     name: 'Прямоугольник',
     key: 'rectangle',
@@ -63,7 +63,6 @@ const pickCursor = (newCursor: MyCursor) => {
   top: 8px;
   left: 50%;
   transform: translate(-50%, 0);
-
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 1rem;
@@ -78,9 +77,7 @@ const pickCursor = (newCursor: MyCursor) => {
   border: 2px solid var(--clr-border);
   padding: 6px;
   border-radius: 5px;
-
   cursor: pointer;
-
   transition: background-color 100ms ease;
 }
 
@@ -88,7 +85,6 @@ const pickCursor = (newCursor: MyCursor) => {
   pointer-events: none;
   width: 20px;
   height: 100%;
-
   color: var(--clr-icon);
 }
 
@@ -99,13 +95,11 @@ const pickCursor = (newCursor: MyCursor) => {
 .top-btn {
   padding: 6px;
   border-radius: 5px;
-
   position: relative;
   background-color: inherit;
   border: none;
   outline: none;
   cursor: pointer !important;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -133,7 +127,7 @@ const pickCursor = (newCursor: MyCursor) => {
   color: var(--clr-text);
 }
 
-#pen-btn::after {
+#curve-btn::after {
   content: '3';
   position: absolute;
   bottom: 1px;

@@ -9,7 +9,7 @@ const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
 const cursorsForHideAll: MyCursor[] = ['pointer', 'eraser', 'text', 'image'];
-const showFill: MyCursor[] = ['ellipse', 'line', 'line', 'pen', 'rectangle'];
+const showFill: MyCursor[] = ['ellipse', 'line', 'line', 'curve', 'rectangle'];
 const showStroke: MyCursor[] = ['ellipse', 'rectangle'];
 const showText: MyCursor[] = ['text'];
 const showFillType: MyCursor[] = ['rectangle', 'ellipse'];
@@ -149,7 +149,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     <div class="options-container" id="width-options-container">
       <p>Толщина линии</p>
       <div class="options-btns-container">
-        <div v-for="lineSize in optionsStore.allOptions.lineWidths">
+        <div v-for="lineSize in optionsStore.allOptions.lineWidths" :key="lineSize.label">
           <button
             :class="
               'option-btn width-btn' +
@@ -167,7 +167,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     <div class="options-container" id="font-size-options-container" v-if="isTextColor">
       <p>Размер текста</p>
       <div class="options-btns-container">
-        <div v-for="textSize in optionsStore.allOptions.textSizes">
+        <div v-for="textSize in optionsStore.allOptions.textSizes" :key="textSize.label">
           <button
             :class="
               'option-btn font-size-btn ' +
@@ -221,10 +221,8 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-
   border: 2px solid var(--clr-border);
   border-radius: 5px;
-
   padding: 10px;
   background-color: var(--clr-background-transparent);
 }
@@ -272,13 +270,11 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
 .color-picker-input {
   outline: 2px solid var(--clr-border);
   border-radius: 4px;
-
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
   padding-left: 7px;
-
   color: var(--clr-text);
 }
 
@@ -296,10 +292,8 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   border: 2px solid var(--clr-border);
   background-color: var(--clr-background-transparent);
   z-index: var(--z-index-4);
-
   padding: 5px;
   border-radius: 4px;
-
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
@@ -337,6 +331,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
 
 .active-option {
   outline: 2px solid var(--clr-primary);
+
   /* color: var(--clr-primary); */
 }
 
@@ -349,7 +344,6 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
 
 input[type='range'] {
   appearance: none;
-  -webkit-appearance: none;
   width: 100%;
   height: 8px;
   border-radius: 5px;
@@ -358,7 +352,6 @@ input[type='range'] {
 
 input[type='range']::-webkit-slider-thumb {
   appearance: none;
-  -webkit-appearance: none;
   height: 20px;
   width: 20px;
   border-radius: 50%;
@@ -368,7 +361,6 @@ input[type='range']::-webkit-slider-thumb {
 
 input[type='range']::-moz-range-thumb {
   appearance: none;
-  -webkit-appearance: none;
   height: 20px;
   width: 20px;
   border-radius: 50%;
@@ -378,7 +370,6 @@ input[type='range']::-moz-range-thumb {
 
 input[type='range']::-webkit-slider-runnable-track {
   appearance: none;
-  -webkit-appearance: none;
   box-shadow: none;
   border: none;
   background: transparent;
@@ -399,7 +390,6 @@ input[type='range']::-webkit-slider-runnable-track {
   aspect-ratio: 1 / 1;
   font-size: 0.9rem;
   color: var(--clr-text);
-
   transition: border 200ms ease;
   cursor: pointer;
   position: relative;
@@ -407,6 +397,7 @@ input[type='range']::-webkit-slider-runnable-track {
 
 .active-fill-style {
   outline: 2px solid var(--clr-primary);
+
   /* color: var(--clr-primary-dark); */
 }
 

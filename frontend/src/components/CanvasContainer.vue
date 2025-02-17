@@ -80,6 +80,9 @@ const handleCur = (event: CustomEvent) => {
     return;
   }
 
+  const x = +event.detail[2] * zoomStore.zoom + offsetXCustom.value;
+  const y = +event.detail[3] * zoomStore.zoom + offsetYCustom.value;
+
   const keyFrames = {
     transform: `translate(${
       +event.detail[2] * zoomStore.zoom + offsetXCustom.value
@@ -252,7 +255,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
   let currentDrawing: BaseObject | undefined;
 
   switch (cursorStore.cursor) {
-    case 'pen': {
+    case 'curve': {
       currentDrawing = getNewCurveObject();
 
       break;
@@ -326,6 +329,13 @@ const onCanvasPointerUp = (event: PointerEvent) => {
   allObjects.value = [...allObjects.value, currentDrawing];
 
   redrawWithClearing();
+
+  const messageToServer = [
+    'drawObj',
+    JSON.stringify(allObjects.value[allObjects.value.length - 1]),
+  ].map(String);
+
+  socket.send(messageToServer);
 };
 
 const onCanvasPointerMove = (event: PointerEvent) => {
@@ -344,7 +354,6 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
     ].map(String);
 
-    socket.send(messageToServer.length);
     socket.send(messageToServer);
   }
 
@@ -366,7 +375,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       const allObjectsCount = allObjects.value.length;
 
       allObjects.value = allObjects.value.filter((drawObject) => {
-        if (drawObject.drawType === 'pen') {
+        if (drawObject.drawType === 'curve') {
           if (
             (drawObject as CurveObject).isCloseToPoints(
               cursorXCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
@@ -423,7 +432,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
     }
 
-    case 'pen': {
+    case 'curve': {
       const currentX = cursorXCurrent;
       const currentY = cursorYCurrent;
 

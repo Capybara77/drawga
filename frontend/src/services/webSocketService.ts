@@ -53,7 +53,7 @@ export class WebSocketService extends EventTarget {
    * Отправка данных на сервер.
    * @param data - объект с данными для отправки.
    */
-  public send(data: string[] | number): void {
+  public send(data: string[]): void {
     if (this.socket.readyState !== WebSocket.OPEN) {
       console.error(
         'Невозможно отправить данные. WebSocket не открыт. Текущее состояние:',
@@ -61,14 +61,13 @@ export class WebSocketService extends EventTarget {
       );
     }
 
-    if (typeof data === 'number') {
-      this.socket.send(String(data));
-
-      return;
-    }
-
     const formattedData = formatDataToWS(data);
 
-    this.socket.send(formattedData);
+    try {
+      this.socket.send(String(formattedData.length));
+      this.socket.send(formattedData);
+    } catch (error) {
+      console.error('Пизда рисованию:', error);
+    }
   }
 }
