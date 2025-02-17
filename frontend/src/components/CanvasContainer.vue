@@ -80,10 +80,11 @@ const handleCur = (event: CustomEvent) => {
     return;
   }
 
+  const x = +event.detail[2] * zoomStore.zoom + offsetXCustom.value;
+  const y = +event.detail[3] * zoomStore.zoom + offsetYCustom.value;
+
   const keyFrames = {
-    transform: `translate(${
-      +event.detail[2] * zoomStore.zoom + offsetXCustom.value
-    }px, ${(+event.detail[3] * zoomStore.zoom, +offsetYCustom.value)}px)`,
+    transform: `translate(${x}px, ${y}px)`,
   };
 
   t.animate(keyFrames, {
