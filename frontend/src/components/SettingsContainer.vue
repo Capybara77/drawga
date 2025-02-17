@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ClearIcon from '@/icons/settings/ClearIcon.vue';
-import MoonIcon from '@/icons/settings/MoonIcon.vue';
-import SaveIcon from '@/icons/settings/SaveIcon.vue';
-import ServerIcon from '@/icons/settings/ServerIcon.vue';
-import SettingsIcon from '@/icons/settings/SettingsIcon.vue';
-import SunIcon from '@/icons/settings/SunIcon.vue';
-import UserIcon from '@/icons/settings/UserIcon.vue';
+import ClearIcon from '@/icons/settings/ClearIcon/ClearIcon.vue';
+import MoonIcon from '@/icons/settings/MoonIcon/MoonIcon.vue';
+import SaveIcon from '@/icons/settings/SaveIcon/SaveIcon.vue';
+import ServerIcon from '@/icons/settings/ServerIcon/ServerIcon.vue';
+import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
+import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
+import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
 import { THEME_KEY, useThemeStore, type Theme } from '@/stores/theme';
 import { onMounted, ref } from 'vue';
 
