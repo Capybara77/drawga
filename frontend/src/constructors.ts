@@ -15,7 +15,7 @@ export abstract class BaseObject {
   color;
   width;
   userId;
-  typeName: MyCursor = 'pointer';
+  drawType: MyCursor = 'pointer';
   tempObj: boolean = false;
   zoom: number = 1;
   objId: string = generateId(6);

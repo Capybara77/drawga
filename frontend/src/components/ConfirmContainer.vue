@@ -18,11 +18,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-
   z-index: var(--z-index-max);
-
   background-color: var(--clr-background-transparent);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,7 +29,6 @@
   background-color: var(--clr-background-transparent);
   border: 2px solid var(--clr-border);
   border-radius: 5px;
-
   padding: 20px;
 }
 
@@ -59,13 +55,12 @@
   background-color: var(--clr-background-transparent);
   border: 2px solid var(--clr-border);
   border-radius: 5px;
-
   padding: 7px 12px;
   font-size: 1.125rem;
   cursor: pointer;
 }
 
 #confirm-agree {
-  background-color: rgb(177, 97, 97);
+  background-color: rgb(177 97 97);
 }
 </style>
