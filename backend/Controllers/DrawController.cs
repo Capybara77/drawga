@@ -21,9 +21,9 @@ public class DrawController : Controller, IDisposable
 
     public DrawController()
     {
-        // ClientDisconnectAsync += SaveBoard;
-        // ClientDisconnectAsync += EventForClientDisconnectAsync;
-        // ClientConnectedAsync += OnClientConnectedAsync;
+        ClientDisconnectAsync += SaveBoard;
+        ClientDisconnectAsync += EventForClientDisconnectAsync;
+        ClientConnectedAsync += OnClientConnectedAsync;
     }
 
     [Route("/draw/ws")]
