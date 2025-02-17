@@ -13,17 +13,17 @@ import { constantsForKeyboard, useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import { useZoomStore } from '@/stores/zoom';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { animateCursor, getTypedDrawObject } from '@/utils';
+import { getTypedDrawObject } from '@/utils';
+import { useEventListener } from '@vueuse/core';
 import rough from 'roughjs';
 
-import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { onMounted, ref, useTemplateRef, watch } from 'vue';
 
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 const zoomStore = useZoomStore();
 
 const socket = new WebSocketService();
-const abortController = new AbortController();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
 const canvasContext = ref<CanvasRenderingContext2D>();
@@ -83,7 +83,7 @@ const handleCur = (event: CustomEvent) => {
   const keyFrames = {
     transform: `translate(${
       +event.detail[2] * zoomStore.zoom + offsetXCustom.value
-    }px, ${+event.detail[3] * zoomStore.zoom, + offsetYCustom.value}px)`,
+    }px, ${(+event.detail[3] * zoomStore.zoom, +offsetYCustom.value)}px)`,
   };
 
   t.animate(keyFrames, {
@@ -107,12 +107,12 @@ const handleDraw = (event: CustomEvent) => {
 };
 
 const createSocketConnection = () => {
-  socket.addEventListener('move', handleMove as EventListener);
-  socket.addEventListener('clear', handleClear as EventListener);
-  socket.addEventListener('close', handleClose as EventListener);
-  socket.addEventListener('message', handleMessage as EventListener);
-  socket.addEventListener('drawObj', handleDraw as EventListener);
-  socket.addEventListener('cur', handleCur as EventListener);
+  useEventListener(socket, 'move', handleMove);
+  useEventListener(socket, 'clear', handleClear);
+  useEventListener(socket, 'close', handleClose);
+  useEventListener(socket, 'message', handleMessage);
+  useEventListener(socket, 'drawObj', handleDraw);
+  useEventListener(socket, 'cur', handleCur);
 };
 
 const redrawWithOffset = () => {
@@ -580,13 +580,9 @@ onMounted(() => {
 
   createSocketConnection();
 
-  window.addEventListener('resize', updateCanvasSize, { signal: abortController.signal });
-  window.addEventListener('keydown', onKeyDown, { signal: abortController.signal });
-  window.addEventListener('keyup', onKeyUp, { signal: abortController.signal });
-});
-
-onUnmounted(() => {
-  abortController.abort();
+  useEventListener(window, 'resize', updateCanvasSize);
+  useEventListener(window, 'keydown', onKeyDown);
+  useEventListener(window, 'keyup', onKeyUp);
 });
 
 watch(zoomStore, () => {
