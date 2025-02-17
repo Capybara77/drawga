@@ -252,7 +252,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
   let currentDrawing: BaseObject | undefined;
 
   switch (cursorStore.cursor) {
-    case 'pointer': {
+    case 'curve': {
       currentDrawing = getNewCurveObject();
 
       break;
@@ -372,7 +372,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       const allObjectsCount = allObjects.value.length;
 
       allObjects.value = allObjects.value.filter((drawObject) => {
-        if (drawObject.drawType === 'pointer') {
+        if (drawObject.drawType === 'curve') {
           if (
             (drawObject as CurveObject).isCloseToPoints(
               cursorXCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
@@ -429,7 +429,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       break;
     }
 
-    case 'pointer': {
+    case 'curve': {
       const currentX = cursorXCurrent;
       const currentY = cursorYCurrent;
 

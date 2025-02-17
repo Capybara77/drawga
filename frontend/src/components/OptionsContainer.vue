@@ -9,7 +9,7 @@ const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
 const cursorsForHideAll: MyCursor[] = ['pointer', 'eraser', 'text', 'image'];
-const showFill: MyCursor[] = ['ellipse', 'line', 'line', 'pointer', 'rectangle'];
+const showFill: MyCursor[] = ['ellipse', 'line', 'line', 'curve', 'rectangle'];
 const showStroke: MyCursor[] = ['ellipse', 'rectangle'];
 const showText: MyCursor[] = ['text'];
 const showFillType: MyCursor[] = ['rectangle', 'ellipse'];

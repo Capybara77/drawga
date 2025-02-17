@@ -21,7 +21,7 @@ type CursorItem = {
 const items: CursorItem[] = [
   { name: 'Курсор', key: 'pointer', title: "Курсор - 'f' или 1", icon: PointerIcon },
   { name: 'Ластик', key: 'eraser', title: "Ластик - 'e' или 2", icon: EraserIcon },
-  { name: 'Карандаш', key: 'pointer', title: "Карандаш - 'p' или 3", icon: PenIcon },
+  { name: 'Карандаш', key: 'curve', title: "Карандаш - 'p' или 3", icon: PenIcon },
   {
     name: 'Прямоугольник',
     key: 'rectangle',
