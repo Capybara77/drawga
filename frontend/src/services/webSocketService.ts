@@ -63,7 +63,11 @@ export class WebSocketService extends EventTarget {
 
     const formattedData = formatDataToWS(data);
 
-    this.socket.send(formattedData.length as unknown as string);
-    this.socket.send(formattedData);
+    try {
+      this.socket.send(String(formattedData.length));
+      this.socket.send(formattedData);
+    } catch (error) {
+      console.error('Пизда рисованию:', error);
+    }
   }
 }

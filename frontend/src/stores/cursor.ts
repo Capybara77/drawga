@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 export const constantsForKeyboard: Record<string, MyCursor> = {
   1: 'pointer',
   2: 'eraser',
-  3: 'pen',
+  3: 'curve',
   4: 'rectangle',
   5: 'line',
   6: 'ellipse',
