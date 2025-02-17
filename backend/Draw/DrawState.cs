@@ -10,8 +10,8 @@ public sealed class DrawState
 
     private DrawState()
     {
-        Sockets = new Dictionary<int, List<WebSocket>>();
-        History = new Dictionary<int, List<byte[]>>();
+        Sockets = new ConcurrentDictionary<int, List<WebSocket>>();
+        History = new ConcurrentDictionary<int, List<byte[]>>();
         PrivateBoards = new[] { 7, 9 };
         BoardManager = new BoardManager(History);
     }
