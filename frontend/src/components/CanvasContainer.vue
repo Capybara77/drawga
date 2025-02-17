@@ -13,7 +13,7 @@ import { constantsForKeyboard, useCursorStore } from '@/stores/cursor';
 import { useOptionsStore } from '@/stores/options';
 import { useZoomStore } from '@/stores/zoom';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
-import { getTypedDrawObject } from '@/utils';
+import { getTypedDrawObject } from '@/utils/getTypedDrawObject/getTypedDrawObject';
 import { useEventListener } from '@vueuse/core';
 import rough from 'roughjs';
 

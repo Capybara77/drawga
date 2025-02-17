@@ -9,7 +9,7 @@ import type {
   MyCursor,
   RectangleProps,
 } from './types';
-import { getSvgPathFromStroke, generateId, commonIsOverlay } from './utils';
+import { generateId, commonIsOverlay, getSvgPathFromStroke } from './utils';
 
 export abstract class BaseObject {
   color;
