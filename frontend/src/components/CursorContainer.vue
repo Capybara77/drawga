@@ -127,7 +127,7 @@ const pickCursor = (newCursor: MyCursor) => {
   color: var(--clr-text);
 }
 
-#pen-btn::after {
+#curve-btn::after {
   content: '3';
   position: absolute;
   bottom: 1px;
