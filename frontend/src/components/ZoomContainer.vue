@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useZoomStore } from '@/stores/zoom';
+import { useZoomStore } from '@/stores/zoom/';
 
 const zoomStore = useZoomStore();
 </script>

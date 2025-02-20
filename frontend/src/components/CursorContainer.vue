@@ -7,7 +7,7 @@ import PenIcon from '@/icons/cursors/PenIcon/PenIcon.vue';
 import PointerIcon from '@/icons/cursors/PointerIcon/PointerIcon.vue';
 import RectangleIcon from '@/icons/cursors/RectangleIcon/RectangleIcon.vue';
 import TextIcon from '@/icons/cursors/TextIcon/TextIcon.vue';
-import { useCursorStore } from '@/stores/cursor';
+import { useCursorStore } from '@/stores/cursor/';
 import type { MyCursor } from '@/types';
 import type { Component } from 'vue';
 

@@ -6,7 +6,7 @@ import ServerIcon from '@/icons/settings/ServerIcon/ServerIcon.vue';
 import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
 import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
 import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
-import { THEME_KEY, useThemeStore, type Theme } from '@/stores/theme';
+import { THEME_KEY, useThemeStore, type Theme } from '@/stores/theme/';
 import { onMounted, ref } from 'vue';
 
 const isSettingsOpened = ref(false);
@@ -17,12 +17,12 @@ const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
 };
 
-onMounted(() => {
-  const newTheme = (localStorage.getItem(THEME_KEY) ?? 'darkTheme') as Theme;
+// onMounted(() => {
+//   const newTheme = (localStorage.getItem(THEME_KEY) ?? 'darkTheme') as Theme;
 
-  document.documentElement.className = newTheme;
-  themeStore.onMount(newTheme);
-});
+//   document.documentElement.className = newTheme;
+//   themeStore.onMount(newTheme);
+// });
 </script>
 
 <template>

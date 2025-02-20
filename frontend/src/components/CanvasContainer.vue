@@ -9,9 +9,9 @@ import {
 } from '@/constructors';
 import { testToast } from '@/services/toastify';
 import { WebSocketService } from '@/services/webSocketService';
-import { constantsForKeyboard, useCursorStore } from '@/stores/cursor';
-import { useOptionsStore } from '@/stores/options';
-import { useZoomStore } from '@/stores/zoom';
+import { constantsForKeyboard, useCursorStore } from '@/stores/cursor/';
+import { useOptionsStore } from '@/stores/options/';
+import { useZoomStore } from '@/stores/zoom/';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
 import { getTypedDrawObject } from '@/utils/getTypedDrawObject/getTypedDrawObject';
 import { useEventListener } from '@vueuse/core';

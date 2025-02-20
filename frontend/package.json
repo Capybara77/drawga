@@ -17,6 +17,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@pinia/testing": "^1.0.0",
     "@vueuse/core": "^12.7.0",
     "perfect-freehand": "^1.2.0",
     "pinia": "^2.3.1",

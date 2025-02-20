@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useCursorStore } from '@/stores/cursor';
-import { useOptionsStore } from '@/stores/options';
+import { useCursorStore } from '@/stores/cursor/';
+import { useOptionsStore } from '@/stores/options/';
 import type { MyCursor } from '@/types';
 import { computed, ref } from 'vue';
 import ColorPicker from './ColorPicker.vue';
