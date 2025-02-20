@@ -16,7 +16,7 @@ describe('SunIcon', () => {
     const svgElement = wrapper.find('svg');
 
     expect(svgElement.attributes('xmlns')).toBe('http://www.w3.org/2000/svg');
-    expect(svgElement.attributes('viewbox')).toBe('0 0 24 24');
+    expect(svgElement.attributes('viewBox')).toBe('0 0 24 24');
     expect(svgElement.attributes('fill')).toBe('none');
     expect(svgElement.attributes('stroke')).toBe('currentColor');
     expect(svgElement.attributes('stroke-width')).toBe('2');
