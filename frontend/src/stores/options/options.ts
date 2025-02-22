@@ -1,3 +1,4 @@
+import { getMinMax } from '@/utils';
 import { defineStore } from 'pinia';
 
 const defaultState = {
@@ -65,7 +66,7 @@ const defaultState = {
 };
 
 export const useOptionsStore = defineStore('options', {
-  state: () => defaultState,
+  state: () => ({ ...defaultState }),
   getters: {
     getterColors: (state) => ({
       fillColor: '#' + state.colors.fillColor,
@@ -88,26 +89,60 @@ export const useOptionsStore = defineStore('options', {
     },
   },
   actions: {
-    setFillColor(color: string) {
-      this.colors.fillColor = color;
+    setFillColor(hexCode: string) {
+      if (this.isValidHex(hexCode)) {
+        this.colors.fillColor = hexCode;
+      } else {
+        console.warn('Недопустимый HEX-код для fillColor. Используется значение по умолчанию.');
+        return defaultState.colors.fillColor;
+      }
     },
-    setBorderColor(color: string) {
-      this.colors.borderColor = color;
+
+    setBorderColor(hexCode: string) {
+      if (this.isValidHex(hexCode)) {
+        this.colors.borderColor = hexCode;
+      } else {
+        console.warn('Недопустимый HEX-код для borderColor. Используется значение по умолчанию.');
+        return defaultState.colors.borderColor;
+      }
     },
-    setTextColor(color: string) {
-      this.colors.textColor = color;
+
+    setTextColor(hexCode: string) {
+      if (this.isValidHex(hexCode)) {
+        this.colors.textColor = hexCode;
+      } else {
+        console.warn('Недопустимый HEX-код для textColor. Используется значение по умолчанию.');
+        return defaultState.colors.textColor;
+      }
     },
     setLineWidth(width: number) {
-      this.lineWidth = width;
+      const result = getMinMax(5, 20, width);
+      this.lineWidth = result;
     },
     setTextSize(size: string) {
-      this.textSize = size;
+      if (this.isValidSize(size)) {
+        this.textSize = size;
+      } else {
+        console.warn(
+          `Недопустимый формат размера текста "${size}". Используется значение по умолчанию.`,
+        );
+        this.textSize = defaultState.textSize;
+      }
     },
     setFillStyle(style: string) {
       this.fillStyle = style;
     },
     setOpacity(value: number) {
-      this.opacity = value;
+      const result = getMinMax(0.1, 1, value);
+      this.opacity = result;
+    },
+    isValidHex(hexCode: string): boolean {
+      const hexColorRegex = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+      return hexColorRegex.test(hexCode);
+    },
+    isValidSize(size: string): boolean {
+      const sizeRegex = /^(\d+(\.\d+)?|0)rem$/;
+      return sizeRegex.test(size);
     },
   },
 });

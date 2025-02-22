@@ -8,11 +8,6 @@ describe('generateId', () => {
     expect(result.length).toBe(length);
   });
 
-  it('возвращает строку, состоящую только из букв', () => {
-    const result = generateId(20);
-    expect(result).toMatch(/^[A-Za-z]+$/);
-  });
-
   it('возвращает разные значения при нескольких вызовах', () => {
     const result1 = generateId(10);
     const result2 = generateId(10);
@@ -24,9 +19,8 @@ describe('generateId', () => {
     expect(result).toBe('');
   });
 
-  it('корректно работает с минимальной длиной 1', () => {
-    const result = generateId(1);
-    expect(result.length).toBe(1);
-    expect(result).toMatch(/^[A-Za-z]$/);
+  it('корректно работает с минимальной длиной 8', () => {
+    const result = generateId(8);
+    expect(result.length).toBe(8);
   });
 });

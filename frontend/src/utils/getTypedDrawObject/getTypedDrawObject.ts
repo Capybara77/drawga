@@ -4,7 +4,6 @@ import {
   EllipseObject,
   LineObject,
   CurveObject,
-  TextObject,
 } from '@/constructors';
 import type { RoughCanvas } from 'roughjs/bin/canvas';
 
@@ -13,31 +12,51 @@ export function getTypedDrawObject(
   roughCanvas: RoughCanvas,
   ctx: CanvasRenderingContext2D,
 ): BaseObject | null {
-  const parsedString: BaseObject = JSON.parse(str);
-  const type: string = parsedString.drawType;
+  if (!str) {
+    return null;
+  }
+
+  let parsedString: BaseObject;
+
+  try {
+    parsedString = JSON.parse(str);
+  } catch (err) {
+    console.error('getTypedDrawObject error', err);
+    return null;
+  }
+  const { color, drawType: type, objId, tempObj, userId, width, zoom } = parsedString;
+
+  if (!color || !type || !objId || !userId || !tempObj || !width || !zoom) {
+    return null;
+  }
+
+  if (zoom <= 0) {
+    return null;
+  }
 
   switch (type) {
-    case 'rectangle':
+    case 'rectangle': {
       const r = new RectangleObject(parsedString);
 
       r.roughCanvas = roughCanvas;
       r.objId = parsedString.objId;
-      r.zoom = parsedString.zoom;
+      r.zoom = zoom;
 
       return r;
+    }
     case 'ellipse': {
       const e = new EllipseObject(parsedString);
       e.roughCanvas = roughCanvas;
 
       e.objId = parsedString.objId;
-      e.zoom = parsedString.zoom;
+      e.zoom = zoom;
 
       return e;
     }
     case 'line': {
       const l = new LineObject(parsedString);
 
-      l.zoom = parsedString.zoom;
+      l.zoom = zoom;
       l.objId = parsedString.objId;
       return l;
     }
@@ -46,7 +65,7 @@ export function getTypedDrawObject(
 
       c.ctx = ctx;
       c.objId = parsedString.objId;
-      c.zoom = parsedString.zoom;
+      c.zoom = zoom;
 
       return c;
     }

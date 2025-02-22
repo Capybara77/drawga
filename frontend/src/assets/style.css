@@ -85,7 +85,7 @@ hr {
 
 /* ======================== ТЕМНАЯ ТЕМА ======================== */
 
-.darkTheme {
+.dark {
   --clr-primary: rgb(95, 61, 196);
   --clr-primary-dark: rgb(61, 8, 219);
   --clr-primary-active: rgba(95, 61, 196, 0.4);
@@ -108,7 +108,7 @@ hr {
   /* --cursor-custom: url('/icons/cursor-white.png'); */
 }
 
-:root:has(#dark-theme:checked) {
+:root:has(#dark:checked) {
   --clr-primary: rgb(95, 61, 196);
   --clr-primary-dark: rgb(61, 8, 219);
   --clr-primary-active: rgba(95, 61, 196, 0.4);
@@ -127,7 +127,7 @@ hr {
   --clr-icon: #ccc;
   --clr-fill: #ccc;
 
-  --cursor-custom: url('/icons/custom-cursor-white.svg');
+  /* --cursor-custom: url('/icons/custom-cursor-white.svg'); */
   /* --cursor-custom: url('/icons/cursor-white.png'); */
 }
 

@@ -6,23 +6,22 @@ on:
       - to-vue
 
 jobs:
-  build-and-push:
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          node-version: '20'
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test
 
   deploy:
     runs-on: ubuntu-latest

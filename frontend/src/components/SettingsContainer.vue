@@ -6,23 +6,20 @@ import ServerIcon from '@/icons/settings/ServerIcon/ServerIcon.vue';
 import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
 import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
 import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
-import { THEME_KEY, useThemeStore, type Theme } from '@/stores/theme/';
-import { onMounted, ref } from 'vue';
+import { useColorMode, useCycleList } from '@vueuse/core';
+import { ref, watchEffect } from 'vue';
+
+const mode = useColorMode({});
+
+const { state, next } = useCycleList(['dark', 'light'] as const, { initialValue: mode });
+
+watchEffect(() => (mode.value = state.value));
 
 const isSettingsOpened = ref(false);
-
-const themeStore = useThemeStore();
 
 const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
 };
-
-// onMounted(() => {
-//   const newTheme = (localStorage.getItem(THEME_KEY) ?? 'darkTheme') as Theme;
-
-//   document.documentElement.className = newTheme;
-//   themeStore.onMount(newTheme);
-// });
 </script>
 
 <template>
@@ -35,7 +32,6 @@ const toggleSettings = () => {
     <section class="settings-container" v-if="isSettingsOpened">
       <button class="settings-item" onclick="location.replace('/login')" id="user-btn">
         <div class="settings-item-icon">
-          <!-- <?xml version="1.0" encoding="utf-8"?> -->
           <UserIcon />
         </div>
         <div class="settings-item-text">Профиль</div>
@@ -43,7 +39,6 @@ const toggleSettings = () => {
       </button>
       <button class="settings-item" id="save-btn">
         <div class="settings-item-icon">
-          <!-- <?xml version="1.0" encoding="utf-8"?> -->
           <SaveIcon />
         </div>
         <div class="settings-item-text">Сохранить файл</div>
@@ -64,17 +59,13 @@ const toggleSettings = () => {
         <div class="settings-item-shortcut">Ctrl+Shift+Del</div>
       </button>
       <hr />
-      <button class="settings-item" id="change-theme-btn" @click="themeStore.toggleTheme">
-        <div class="settings-item-icon" id="moon-icon-container" v-if="themeStore.isLightTheme">
-          <MoonIcon />
+      <button class="settings-item" id="change-theme-btn" @click="next()">
+        <div class="settings-item-icon">
+          <MoonIcon v-if="state === 'dark'" />
+          <SunIcon v-if="state === 'light'" />
         </div>
-
-        <div class="settings-item-icon" id="sun-icon-container" v-if="themeStore.isDarkTheme">
-          <SunIcon />
-        </div>
-
         <div class="settings-item-text" id="theme-inner-text">
-          {{ themeStore.isLightTheme ? 'Темная' : 'Светлая' }} тема
+          {{ state === 'dark' ? 'Темная' : 'Светлая' }} тема
         </div>
         <div class="settings-item-shortcut">Ctrl+Shift+T</div>
       </button>
