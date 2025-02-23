@@ -189,6 +189,7 @@ export class LineObject extends BaseObject {
 
   constructor({ color, endPoint, roughCanvas, startPoint, userId, width }: LineProps) {
     super({ color, width, userId });
+    console.log('roughCanvas', roughCanvas);
     this.startPoint = startPoint;
     this.endPoint = endPoint;
     this.roughCanvas = roughCanvas;
