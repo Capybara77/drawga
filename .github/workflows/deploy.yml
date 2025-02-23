@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - to-vue
+      - test-server
 
 jobs:
   build-and-push:
