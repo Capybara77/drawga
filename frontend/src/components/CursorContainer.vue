@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import EllipseIcon from '@/icons/cursors/EllipseIcon.vue';
-import EraserIcon from '@/icons/cursors/EraserIcon.vue';
-import ImageIcon from '@/icons/cursors/ImageIcon.vue';
-import LineIcon from '@/icons/cursors/LineIcon.vue';
-import PenIcon from '@/icons/cursors/PenIcon.vue';
-import PointerIcon from '@/icons/cursors/PointerIcon.vue';
-import RectangleIcon from '@/icons/cursors/RectangleIcon.vue';
-import TextIcon from '@/icons/cursors/TextIcon.vue';
-import { useCursorStore } from '@/stores/cursor';
+import EllipseIcon from '@/icons/cursors/EllipseIcon/EllipseIcon.vue';
+import EraserIcon from '@/icons/cursors/EraserIcon/EraserIcon.vue';
+import ImageIcon from '@/icons/cursors/ImageIcon/ImageIcon.vue';
+import LineIcon from '@/icons/cursors/LineIcon/LineIcon.vue';
+import PenIcon from '@/icons/cursors/PenIcon/PenIcon.vue';
+import PointerIcon from '@/icons/cursors/PointerIcon/PointerIcon.vue';
+import RectangleIcon from '@/icons/cursors/RectangleIcon/RectangleIcon.vue';
+import TextIcon from '@/icons/cursors/TextIcon/TextIcon.vue';
+import { useCursorStore } from '@/stores/cursor/';
 import type { MyCursor } from '@/types';
 import type { Component } from 'vue';
 

@@ -27,7 +27,6 @@
   --clr-default: rgb(54, 79, 199);
 
   --cursor-custom: url('/icons/custom-cursor.svg');
-  /* --cursor-custom: url('/icons/cursor-black.png'); */
 
   --z-index-1: 10000000;
   --z-index-2: 10000000000;
@@ -45,7 +44,6 @@
 
 body {
   overflow: hidden;
-  /* cursor: var(--cursor-custom), auto; */
 }
 
 button {
@@ -85,7 +83,7 @@ hr {
 
 /* ======================== ТЕМНАЯ ТЕМА ======================== */
 
-.darkTheme {
+.dark {
   --clr-primary: rgb(95, 61, 196);
   --clr-primary-dark: rgb(61, 8, 219);
   --clr-primary-active: rgba(95, 61, 196, 0.4);
@@ -103,32 +101,6 @@ hr {
 
   --clr-icon: #ccc;
   --clr-fill: #ccc;
-
-  /* --cursor-custom: url('/icons/custom-cursor-white.svg'); */
-  /* --cursor-custom: url('/icons/cursor-white.png'); */
-}
-
-:root:has(#dark-theme:checked) {
-  --clr-primary: rgb(95, 61, 196);
-  --clr-primary-dark: rgb(61, 8, 219);
-  --clr-primary-active: rgba(95, 61, 196, 0.4);
-  --clr-gray-light: rgb(211, 211, 211);
-  --clr-gray-dark: rgb(138, 138, 138);
-
-  --clr-border: rgb(65, 65, 65);
-  --clr-background-transparent: rgba(49, 49, 49, 0.8);
-  --clr-hover: rgb(94, 94, 94);
-
-  --clr-text: rgb(233, 233, 233);
-  --clr-trailer: #ccc;
-
-  --clr-canvas: #333;
-
-  --clr-icon: #ccc;
-  --clr-fill: #ccc;
-
-  --cursor-custom: url('/icons/custom-cursor-white.svg');
-  /* --cursor-custom: url('/icons/cursor-white.png'); */
 }
 
 /* ======================== ТЕКСТ ======================== */

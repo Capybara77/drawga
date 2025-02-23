@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import ClearIcon from '@/icons/settings/ClearIcon.vue';
-import MoonIcon from '@/icons/settings/MoonIcon.vue';
-import SaveIcon from '@/icons/settings/SaveIcon.vue';
-import ServerIcon from '@/icons/settings/ServerIcon.vue';
-import SettingsIcon from '@/icons/settings/SettingsIcon.vue';
-import SunIcon from '@/icons/settings/SunIcon.vue';
-import UserIcon from '@/icons/settings/UserIcon.vue';
-import { THEME_KEY, useThemeStore, type Theme } from '@/stores/theme';
-import { onMounted, ref } from 'vue';
+import ClearIcon from '@/icons/settings/ClearIcon/ClearIcon.vue';
+import MoonIcon from '@/icons/settings/MoonIcon/MoonIcon.vue';
+import SaveIcon from '@/icons/settings/SaveIcon/SaveIcon.vue';
+import ServerIcon from '@/icons/settings/ServerIcon/ServerIcon.vue';
+import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
+import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
+import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
+import { useColorMode, useCycleList } from '@vueuse/core';
+import { computed, ref, watchEffect } from 'vue';
+
+const mode = useColorMode({
+  attribute: 'class',
+  initialValue: 'dark',
+});
+
+const { state, next } = useCycleList(['dark', 'light'] as const, { initialValue: mode });
+
+watchEffect(() => (mode.value = state.value));
 
 const isSettingsOpened = ref(false);
 
-const themeStore = useThemeStore();
+const isDarkTheme = computed(() => state.value === 'dark');
 
 const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
 };
-
-onMounted(() => {
-  const newTheme = (localStorage.getItem(THEME_KEY) ?? 'darkTheme') as Theme;
-
-  document.documentElement.className = newTheme;
-  themeStore.onMount(newTheme);
-});
 </script>
 
 <template>
@@ -35,7 +37,6 @@ onMounted(() => {
     <section class="settings-container" v-if="isSettingsOpened">
       <button class="settings-item" onclick="location.replace('/login')" id="user-btn">
         <div class="settings-item-icon">
-          <!-- <?xml version="1.0" encoding="utf-8"?> -->
           <UserIcon />
         </div>
         <div class="settings-item-text">Профиль</div>
@@ -43,7 +44,6 @@ onMounted(() => {
       </button>
       <button class="settings-item" id="save-btn">
         <div class="settings-item-icon">
-          <!-- <?xml version="1.0" encoding="utf-8"?> -->
           <SaveIcon />
         </div>
         <div class="settings-item-text">Сохранить файл</div>
@@ -64,17 +64,13 @@ onMounted(() => {
         <div class="settings-item-shortcut">Ctrl+Shift+Del</div>
       </button>
       <hr />
-      <button class="settings-item" id="change-theme-btn" @click="themeStore.toggleTheme">
-        <div class="settings-item-icon" id="moon-icon-container" v-if="themeStore.isLightTheme">
-          <MoonIcon />
+      <button class="settings-item" id="change-theme-btn" @click="next()">
+        <div class="settings-item-icon">
+          <MoonIcon v-if="isDarkTheme" />
+          <SunIcon v-else />
         </div>
-
-        <div class="settings-item-icon" id="sun-icon-container" v-if="themeStore.isDarkTheme">
-          <SunIcon />
-        </div>
-
         <div class="settings-item-text" id="theme-inner-text">
-          {{ themeStore.isLightTheme ? 'Темная' : 'Светлая' }} тема
+          {{ isDarkTheme ? 'Темная' : 'Светлая' }} тема
         </div>
         <div class="settings-item-shortcut">Ctrl+Shift+T</div>
       </button>
