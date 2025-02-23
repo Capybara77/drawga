@@ -94,7 +94,7 @@ export const useOptionsStore = defineStore('options', {
         this.colors.fillColor = hexCode;
       } else {
         console.warn('Недопустимый HEX-код для fillColor. Используется значение по умолчанию.');
-        return defaultState.colors.fillColor;
+        this.colors.fillColor = defaultState.colors.fillColor;
       }
     },
 
@@ -103,7 +103,7 @@ export const useOptionsStore = defineStore('options', {
         this.colors.borderColor = hexCode;
       } else {
         console.warn('Недопустимый HEX-код для borderColor. Используется значение по умолчанию.');
-        return defaultState.colors.borderColor;
+        this.colors.borderColor = defaultState.colors.borderColor;
       }
     },
 
@@ -112,7 +112,7 @@ export const useOptionsStore = defineStore('options', {
         this.colors.textColor = hexCode;
       } else {
         console.warn('Недопустимый HEX-код для textColor. Используется значение по умолчанию.');
-        return defaultState.colors.textColor;
+        this.colors.textColor = defaultState.colors.textColor;
       }
     },
     setLineWidth(width: number) {

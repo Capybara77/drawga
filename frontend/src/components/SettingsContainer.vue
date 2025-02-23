@@ -7,15 +7,20 @@ import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
 import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
 import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
 import { useColorMode, useCycleList } from '@vueuse/core';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 
-const mode = useColorMode({});
+const mode = useColorMode({
+  attribute: 'class',
+  initialValue: 'dark',
+});
 
 const { state, next } = useCycleList(['dark', 'light'] as const, { initialValue: mode });
 
 watchEffect(() => (mode.value = state.value));
 
 const isSettingsOpened = ref(false);
+
+const isDarkTheme = computed(() => state.value === 'dark');
 
 const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
@@ -61,11 +66,11 @@ const toggleSettings = () => {
       <hr />
       <button class="settings-item" id="change-theme-btn" @click="next()">
         <div class="settings-item-icon">
-          <MoonIcon v-if="state === 'dark'" />
-          <SunIcon v-if="state === 'light'" />
+          <MoonIcon v-if="isDarkTheme" />
+          <SunIcon v-else />
         </div>
         <div class="settings-item-text" id="theme-inner-text">
-          {{ state === 'dark' ? 'Темная' : 'Светлая' }} тема
+          {{ isDarkTheme ? 'Темная' : 'Светлая' }} тема
         </div>
         <div class="settings-item-shortcut">Ctrl+Shift+T</div>
       </button>

@@ -36,4 +36,9 @@ describe('getMinMax', () => {
     const result = getMinMax(10, 10, 15);
     expect(result).toBe(10);
   });
+
+  it('должен обрабатывать случай, когда min больше max', () => {
+    const result = getMinMax(20, 10, 15);
+    expect(result).toBe(10);
+  });
 });

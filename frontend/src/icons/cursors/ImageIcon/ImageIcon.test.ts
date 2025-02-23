@@ -9,32 +9,33 @@ describe('ImageIcon.vue', () => {
     wrapper = mount(ImageIcon);
   });
 
-  it('должен рендерить SVG элемент', () => {
-    expect(wrapper.find('svg').exists()).toBe(true);
-  });
-
-  it('должен иметь правильный атрибут viewBox', () => {
+  it('должен рендерить SVG элемент с правильным viewBox', () => {
     const svg = wrapper.find('svg');
+    expect(svg.exists()).toBe(true);
     expect(svg.attributes('viewBox')).toBe('0 0 24 24');
   });
 
   it('должен содержать rect элемент с правильными атрибутами', () => {
     const rect = wrapper.find('rect');
     expect(rect.exists()).toBe(true);
-    expect(rect.attributes('x')).toBe('3');
-    expect(rect.attributes('y')).toBe('3');
-    expect(rect.attributes('width')).toBe('18');
-    expect(rect.attributes('height')).toBe('18');
-    expect(rect.attributes('rx')).toBe('2');
-    expect(rect.attributes('ry')).toBe('2');
+    expect(rect.attributes()).toMatchObject({
+      x: '3',
+      y: '3',
+      width: '18',
+      height: '18',
+      rx: '2',
+      ry: '2',
+    });
   });
 
   it('должен содержать circle элемент с правильными атрибутами', () => {
     const circle = wrapper.find('circle');
     expect(circle.exists()).toBe(true);
-    expect(circle.attributes('cx')).toBe('8.5');
-    expect(circle.attributes('cy')).toBe('8.5');
-    expect(circle.attributes('r')).toBe('1.5');
+    expect(circle.attributes()).toMatchObject({
+      cx: '8.5',
+      cy: '8.5',
+      r: '1.5',
+    });
   });
 
   it('должен содержать polyline элемент с правильными точками', () => {
@@ -45,9 +46,10 @@ describe('ImageIcon.vue', () => {
 
   it('должен иметь правильные классы', () => {
     const svg = wrapper.find('svg');
-    expect(svg.classes()).toContain('cursor-icon');
-    expect(svg.classes()).toContain('feather');
-    expect(svg.classes()).toContain('feather-image');
+
+    expect(svg.classes()).toEqual(
+      expect.arrayContaining(['cursor-icon', 'feather', 'feather-image']),
+    );
   });
 
   it('должен корректно обрабатывать отсутствующие атрибуты', () => {

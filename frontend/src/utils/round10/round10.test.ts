@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { describe, it, expect } from 'vitest';
 
 import { round10 } from './round10';
@@ -29,10 +28,8 @@ describe('round10', () => {
   });
 
   it('должен возвращать NaN для недопустимых входных данных', () => {
-    // @ts-ignore
-    expect(round10('abc', -2)).toBeNaN();
-    // @ts-ignore
-    expect(round10(123, 'xyz')).toBeNaN();
+    expect(round10('abc' as unknown as number, -2)).toBeNaN();
+    expect(round10(123, 'xyz' as unknown as number)).toBeNaN();
     expect(round10(NaN, -2)).toBeNaN();
     expect(round10(123, NaN)).toBeNaN();
   });

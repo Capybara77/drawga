@@ -7,6 +7,13 @@ import {
 } from '@/constructors';
 import type { RoughCanvas } from 'roughjs/bin/canvas';
 
+/**
+ * Создаёт типизированный объект рисования из JSON строки
+ * @param str - JSON строка с данными объекта
+ * @param roughCanvas - Инстанс RoughCanvas для рендеринга
+ * @param ctx - Контекст канваса для рисования
+ * @returns Типизированный объект рисования или null в случае ошибки
+ */
 export function getTypedDrawObject(
   str: string,
   roughCanvas: RoughCanvas,
@@ -24,9 +31,18 @@ export function getTypedDrawObject(
     console.error('getTypedDrawObject error', err);
     return null;
   }
+
   const { color, drawType: type, objId, tempObj, userId, width, zoom } = parsedString;
 
-  if (!color || !type || !objId || !userId || !tempObj || !width || !zoom) {
+  if (
+    color === undefined ||
+    type === undefined ||
+    objId === undefined ||
+    userId === undefined ||
+    tempObj === undefined ||
+    width === undefined ||
+    zoom === undefined
+  ) {
     return null;
   }
 
@@ -69,42 +85,40 @@ export function getTypedDrawObject(
 
       return c;
     }
-    // case 'text': {
-    //   const {
-    //     color,
-    //     width,
-    //     userId,
-    //     zoom,
-    //     objId,
-    //     left,
-    //     top,
-    //     fontFamily,
-    //     text,
-    //     inputId,
-    //     fontSize,
-    //     textColor,
-    //     height,
-    //   } = parsedString as TextObject;
-
-    //   const t = new TextObject(
-    //     fontFamily,
-    //     color,
-    //     userId,
-    //     null,
-    //     top,
-    //     left,
-    //     text,
-    //     inputId,
-    //     fontSize,
-    //     textColor,
-    //     width,
-    //     height,
-    //   );
-    //   t.objId = objId;
-    //   t.zoom = zoom;
-
-    //   return t;
-    // }
+    case 'text': {
+      // const {
+      //   color,
+      //   width,
+      //   userId,
+      //   zoom,
+      //   objId,
+      //   left,
+      //   top,
+      //   fontFamily,
+      //   text,
+      //   inputId,
+      //   fontSize,
+      //   textColor,
+      //   height,
+      // } = parsedString as TextObject;
+      // const t = new TextObject(
+      //   fontFamily,
+      //   color,
+      //   userId,
+      //   null,
+      //   top,
+      //   left,
+      //   text,
+      //   inputId,
+      //   fontSize,
+      //   textColor,
+      //   width,
+      //   height,
+      // );
+      // t.objId = objId;
+      // t.zoom = zoom;
+      // return t;
+    }
     default:
       return null;
   }

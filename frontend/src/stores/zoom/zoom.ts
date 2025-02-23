@@ -1,6 +1,9 @@
 import { round10 } from '@/utils';
 import { defineStore } from 'pinia';
 
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 5;
+
 const defaultState = {
   zoom: 1,
 };
@@ -14,18 +17,18 @@ export const useZoomStore = defineStore('zoom', {
   },
   actions: {
     increaseZoom() {
-      if (this.zoom === 5) {
+      if (this.zoom === MAX_ZOOM) {
         return;
       }
 
-      this.zoom = round10(this.zoom + 0.1, -1);
+      this.zoom = round10(this.zoom + MIN_ZOOM, -1);
     },
     decreaseZoom() {
-      if (this.zoom === 0.1) {
+      if (this.zoom === MIN_ZOOM) {
         return;
       }
 
-      this.zoom = round10(this.zoom - 0.1, -1);
+      this.zoom = round10(this.zoom - MIN_ZOOM, -1);
     },
   },
 });

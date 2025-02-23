@@ -57,31 +57,4 @@ describe('SunIcon', () => {
       expect(line?.attributes(attr)).toBe(value);
     });
   });
-
-  // it('должен содержать все необходимые элементы line', () => {
-  //   const wrapper = mount(SunIcon);
-  //   const lineElements = wrapper.findAll('line');
-
-  //   expect(lineElements.length).toBe(8);
-
-  //   const firstLine = lineElements[0];
-  //   expect(firstLine.attributes('x1')).toBe('12');
-  //   expect(firstLine.attributes('y1')).toBe('1');
-  //   expect(firstLine.attributes('x2')).toBe('12');
-  //   expect(firstLine.attributes('y2')).toBe('3');
-
-  //   const secondLine = lineElements[1];
-  //   expect(secondLine.attributes('x1')).toBe('12');
-  //   expect(secondLine.attributes('y1')).toBe('21');
-  //   expect(secondLine.attributes('x2')).toBe('12');
-  //   expect(secondLine.attributes('y2')).toBe('23');
-
-  //   const thirdLine = lineElements[2];
-  //   expect(thirdLine.attributes('x1')).toBe('4.22');
-  //   expect(thirdLine.attributes('y1')).toBe('4.22');
-  //   expect(thirdLine.attributes('x2')).toBe('5.64');
-  //   expect(thirdLine.attributes('y2')).toBe('5.64');
-
-  //   // Можно добавить проверки для остальных линий аналогичным образом
-  // });
 });
