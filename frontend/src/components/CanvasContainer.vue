@@ -50,8 +50,8 @@ const offset = ref({
 });
 
 const computedCurrentCoords = computed(() => ({
-  x: currentX.value - offset.value.x,
-  y: currentY.value - offset.value.y,
+  x: currentX.value ?? 0 - offset.value.x,
+  y: currentY.value ?? 0 - offset.value.y,
 }));
 
 const startPoint = computed(() => [
@@ -69,6 +69,11 @@ const isSpacePressed = ref(false);
 const isMoving = ref(false);
 
 const userId = '123';
+
+const getAdjustedCoordinates = (x: number, y: number) => ({
+  x: x / zoomStore.zoom - offset.value.x / zoomStore.zoom,
+  y: y / zoomStore.zoom - offset.value.y / zoomStore.zoom,
+});
 
 const handleClose = (event: CustomEvent) => {
   console.log('Соединение закрыто', event.detail);
@@ -334,14 +339,10 @@ const onCanvasPointerUp = (event: PointerEvent) => {
 
 const onCanvasPointerMove = (event: PointerEvent) => {
   const element = event.target as HTMLElement;
+  const { x, y } = getAdjustedCoordinates(currentX.value, currentY.value);
 
   if (element.id === 'canvas') {
-    const messageToServer = [
-      'cur',
-      userId,
-      currentX.value / zoomStore.zoom - offset.value.x / zoomStore.zoom,
-      currentY.value / zoomStore.zoom - offset.value.y / zoomStore.zoom,
-    ].map(String);
+    const messageToServer = ['cur', userId, x, y].map(String);
 
     socket.send(messageToServer);
   }
@@ -362,13 +363,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       allObjects.value = allObjects.value.filter((drawObject) => {
         if (drawObject.drawType === 'curve') {
-          if (
-            drawObject.isCloseToPoints(
-              currentX.value / zoomStore.zoom - offset.value.x / zoomStore.zoom,
-              currentY.value / zoomStore.zoom - offset.value.y / zoomStore.zoom,
-              10,
-            )
-          ) {
+          if (drawObject.isCloseToPoints(x, y, 10)) {
             eraseObject(drawObject);
 
             return false;
@@ -387,23 +382,16 @@ const onCanvasPointerMove = (event: PointerEvent) => {
             return false;
           }
         } else if (drawObject.drawType === 'line') {
-          if (
-            drawObject.isCloseToPoints(
-              currentY.value / zoomStore.zoom - offset.value.x / zoomStore.zoom,
-              currentY.value / zoomStore.zoom - offset.value.y / zoomStore.zoom,
-              25,
-            )
-          ) {
+          const { x, y } = getAdjustedCoordinates(currentY.value, currentY.value);
+
+          if (drawObject.isCloseToPoints(x, y, 25)) {
             eraseObject(drawObject);
             return false;
           }
         } else if (drawObject.drawType === 'ellipse') {
-          if (
-            (drawObject as EllipseObject).closeToCentre(
-              currentY.value / zoomStore.zoom - offset.value.x / zoomStore.zoom,
-              currentY.value / zoomStore.zoom - offset.value.y / zoomStore.zoom,
-            )
-          ) {
+          const { x, y } = getAdjustedCoordinates(currentY.value, currentY.value);
+
+          if ((drawObject as EllipseObject).closeToCentre(x, y)) {
             eraseObject(drawObject);
             return false;
           }
@@ -510,7 +498,11 @@ onMounted(() => {
   }
 
   if (!canvasContext.value) {
-    canvasContext.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+    const ctx = canvasElement.value.getContext('2d');
+    if (!ctx) {
+      throw new Error('Не удалось получить 2D контекст canvas');
+    }
+    canvasContext.value = ctx;
   }
 
   if (!roughCanvas.value) {
