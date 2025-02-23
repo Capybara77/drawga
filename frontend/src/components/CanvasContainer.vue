@@ -19,11 +19,13 @@ import rough from 'roughjs';
 
 import { onMounted, ref, useTemplateRef, watch } from 'vue';
 
+const { socket } = defineProps<{
+  socket: WebSocketService;
+}>();
+
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 const zoomStore = useZoomStore();
-
-const socket = new WebSocketService();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
 const canvasContext = ref<CanvasRenderingContext2D>();

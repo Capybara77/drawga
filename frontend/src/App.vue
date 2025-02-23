@@ -6,6 +6,9 @@ import SettingsContainer from './components/SettingsContainer.vue';
 import ZoomContainer from './components/ZoomContainer.vue';
 import CanvasContainer from './components/CanvasContainer.vue';
 import TrailerComponent from './components/TrailerComponent.vue';
+import { WebSocketService } from './services/webSocketService';
+
+const socket = new WebSocketService();
 </script>
 
 <template>
@@ -14,6 +17,6 @@ import TrailerComponent from './components/TrailerComponent.vue';
   <CursorContainer />
   <OptionsContainer />
   <ZoomContainer />
-  <SettingsContainer />
-  <CanvasContainer />
+  <SettingsContainer :socket="socket" />
+  <CanvasContainer :socket="socket" />
 </template>
