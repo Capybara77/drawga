@@ -196,6 +196,8 @@ export class LineObject extends BaseObject {
   }
 
   draw(offsetX: number, offsetY: number, zoom: number): void {
+    console.log(' this.roughCanvas', this.roughCanvas);
+    console.log(' this.roughCanvas.line', this.roughCanvas.line);
     this.roughCanvas.line(
       this.startPoint[0] * zoom + offsetX,
       this.startPoint[1] * zoom + offsetY,
