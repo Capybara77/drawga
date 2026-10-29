@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import EllipseIcon from '@/icons/cursors/EllipseIcon/EllipseIcon.vue';
-import EraserIcon from '@/icons/cursors/EraserIcon/EraserIcon.vue';
-import ImageIcon from '@/icons/cursors/ImageIcon/ImageIcon.vue';
-import LineIcon from '@/icons/cursors/LineIcon/LineIcon.vue';
-import PenIcon from '@/icons/cursors/PenIcon/PenIcon.vue';
-import PointerIcon from '@/icons/cursors/PointerIcon/PointerIcon.vue';
-import RectangleIcon from '@/icons/cursors/RectangleIcon/RectangleIcon.vue';
-import TextIcon from '@/icons/cursors/TextIcon/TextIcon.vue';
-import { useCursorStore } from '@/stores/cursor/';
-import type { MyCursor } from '@/types';
-import type { Component } from 'vue';
+import EllipseIcon from "@/icons/cursors/EllipseIcon/EllipseIcon.vue";
+import EraserIcon from "@/icons/cursors/EraserIcon/EraserIcon.vue";
+import ImageIcon from "@/icons/cursors/ImageIcon/ImageIcon.vue";
+import LineIcon from "@/icons/cursors/LineIcon/LineIcon.vue";
+import PenIcon from "@/icons/cursors/PenIcon/PenIcon.vue";
+import PointerIcon from "@/icons/cursors/PointerIcon/PointerIcon.vue";
+import RectangleIcon from "@/icons/cursors/RectangleIcon/RectangleIcon.vue";
+import TextIcon from "@/icons/cursors/TextIcon/TextIcon.vue";
+import { useCursorStore } from "@/stores/cursor/";
+import type { MyCursor } from "@/types";
+import type { Component } from "vue";
 
 type CursorItem = {
   name: string;
@@ -19,19 +19,19 @@ type CursorItem = {
 };
 
 const items: CursorItem[] = [
-  { name: 'Курсор', key: 'pointer', title: "Курсор - 'f' или 1", icon: PointerIcon },
-  { name: 'Ластик', key: 'eraser', title: "Ластик - 'e' или 2", icon: EraserIcon },
-  { name: 'Карандаш', key: 'curve', title: "Карандаш - 'p' или 3", icon: PenIcon },
+  { name: "Курсор", key: "pointer", title: "Курсор - 'f' или 1", icon: PointerIcon },
+  { name: "Ластик", key: "eraser", title: "Ластик - 'e' или 2", icon: EraserIcon },
+  { name: "Карандаш", key: "curve", title: "Карандаш - 'p' или 3", icon: PenIcon },
   {
-    name: 'Прямоугольник',
-    key: 'rectangle',
+    name: "Прямоугольник",
+    key: "rectangle",
     title: "Прямоугольник - 'r' или 4",
     icon: RectangleIcon,
   },
-  { name: 'Прямая линия', key: 'line', title: "Прямая линия - 'v' или 5", icon: LineIcon },
-  { name: 'Окружность', key: 'ellipse', title: "Окружность - 'c' или 6", icon: EllipseIcon },
-  { name: 'Текст', key: 'text', title: "Текст - 't' или 7", icon: TextIcon },
-  { name: 'Изображение', key: 'image', title: "Изображение - 'i' или 8", icon: ImageIcon },
+  { name: "Прямая линия", key: "line", title: "Прямая линия - 'v' или 5", icon: LineIcon },
+  { name: "Окружность", key: "ellipse", title: "Окружность - 'c' или 6", icon: EllipseIcon },
+  { name: "Текст", key: "text", title: "Текст - 't' или 7", icon: TextIcon },
+  { name: "Изображение", key: "image", title: "Изображение - 'i' или 8", icon: ImageIcon },
 ];
 
 const cursorStore = useCursorStore();
@@ -43,13 +43,9 @@ const pickCursor = (newCursor: MyCursor) => {
 
 <template>
   <div class="cursor-container">
-    <div
-      v-for="item in items"
-      :key="item.key"
-      :class="'cursor-item' + (cursorStore.cursor === item.key ? ' active-shape' : '')"
-      :title="item.title"
-      @click="() => pickCursor(item.key)"
-    >
+    <div v-for="item in items" :key="item.key"
+      :class="'cursor-item' + (cursorStore.cursor === item.key ? ' active-shape' : '')" :title="item.title"
+      @click="() => pickCursor(item.key)">
       <button class="top-btn" :data-shape-option="item.key" :id="item.key + '-btn'">
         <component :is="item.icon"></component>
       </button>
@@ -57,7 +53,7 @@ const pickCursor = (newCursor: MyCursor) => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .cursor-container {
   position: absolute;
   top: 8px;
@@ -108,7 +104,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #pointer-btn::after {
-  content: '1';
+  content: "1";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -118,7 +114,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #eraser-btn::after {
-  content: '2';
+  content: "2";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -128,7 +124,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #curve-btn::after {
-  content: '3';
+  content: "3";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -138,7 +134,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #rectangle-btn::after {
-  content: '4';
+  content: "4";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -148,7 +144,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #line-btn::after {
-  content: '5';
+  content: "5";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -158,7 +154,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #ellipse-btn::after {
-  content: '6';
+  content: "6";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -168,7 +164,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #text-btn::after {
-  content: '7';
+  content: "7";
   position: absolute;
   bottom: 1px;
   right: -1px;
@@ -178,7 +174,7 @@ const pickCursor = (newCursor: MyCursor) => {
 }
 
 #image-btn::after {
-  content: '8';
+  content: "8";
   position: absolute;
   bottom: 1px;
   right: -1px;

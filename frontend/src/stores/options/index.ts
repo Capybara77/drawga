@@ -1,1 +1,1 @@
-export { useOptionsStore } from './options';
+export { useOptionsStore } from "./options";

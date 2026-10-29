@@ -32,7 +32,7 @@ pnpm install
 pnpm dev             # vite, порт 5173
 pnpm build           # type-check + vite build
 pnpm build-only      # только vite build (так собирает Dockerfile)
-pnpm type-check      # vue-tsc --noEmit
+pnpm type-check      # vue-tsc --build (--noEmit на корневом tsconfig ничего не проверяет)
 pnpm vitest run      # тесты (pnpm test — watch-режим)
 pnpm coverage
 pnpm lint            # eslint --fix

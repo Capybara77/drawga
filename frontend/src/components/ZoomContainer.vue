@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useZoomStore } from '@/stores/zoom/';
+import { useZoomStore } from "@/stores/zoom/";
 
 const zoomStore = useZoomStore();
 </script>
@@ -18,7 +18,7 @@ const zoomStore = useZoomStore();
   </div>
 </template>
 
-<style>
+<style scoped>
 .zoom-container {
   position: absolute;
   bottom: 10px;
@@ -32,7 +32,7 @@ const zoomStore = useZoomStore();
   padding: 0 10px;
 }
 
-.zoom-container > * {
+.zoom-container>* {
   cursor: pointer;
 }
 

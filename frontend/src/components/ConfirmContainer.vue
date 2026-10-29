@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .confirm-wrapper {
   position: fixed;
   top: 0;

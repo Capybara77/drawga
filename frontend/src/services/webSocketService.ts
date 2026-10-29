@@ -1,4 +1,4 @@
-const SEPARATOR = ':::';
+const SEPARATOR = ":::";
 
 function formatDataToWS(data: string[]): string {
   const formattedData = data.join(SEPARATOR) + SEPARATOR;
@@ -12,7 +12,7 @@ export class WebSocketService extends EventTarget {
   constructor() {
     super();
     const location: Location = window.location;
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
     // Формирование URI: например, wss://example.com/путь/ws?query=...
     const newUri = `${protocol}//${location.host}${location.pathname}/ws${location.search}`;
     console.log(newUri);
@@ -34,19 +34,19 @@ export class WebSocketService extends EventTarget {
   private onSocketMessage(msg: MessageEvent): void {
     try {
       // Разбиваем полученное сообщение по разделителю ":::"
-      const data: string[] = msg.data.split(':::');
+      const data: string[] = msg.data.split(":::");
       const command: string = data[0];
 
       // Генерируем событие с именем команды и передаём массив data как detail.
       this.dispatchEvent(new CustomEvent(command, { detail: data }));
     } catch (e) {
-      console.error('Ошибка обработки сообщения WebSocket:', e);
+      console.error("Ошибка обработки сообщения WebSocket:", e);
     }
   }
 
   private onSocketClose(): void {
     // Генерируем событие закрытия, чтобы приложение могло отреагировать (например, показать уведомление)
-    this.dispatchEvent(new CustomEvent('close'));
+    this.dispatchEvent(new CustomEvent("close"));
   }
 
   /**
@@ -56,7 +56,7 @@ export class WebSocketService extends EventTarget {
   public send(data: string[]): void {
     if (this.socket.readyState !== WebSocket.OPEN) {
       console.error(
-        'Невозможно отправить данные. WebSocket не открыт. Текущее состояние:',
+        "Невозможно отправить данные. WebSocket не открыт. Текущее состояние:",
         this.socket.readyState,
       );
     }
@@ -67,7 +67,7 @@ export class WebSocketService extends EventTarget {
       this.socket.send(String(formattedData.length));
       this.socket.send(formattedData);
     } catch (error) {
-      console.error('Пизда рисованию:', error);
+      console.error("Пизда рисованию:", error);
     }
   }
 }

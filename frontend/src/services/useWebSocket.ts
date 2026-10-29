@@ -1,4 +1,4 @@
-import { useWebSocket, type UseWebSocketReturn } from '@vueuse/core';
+import { useWebSocket, type UseWebSocketReturn } from "@vueuse/core";
 
 // export const useDrawgaWebSocket = (): UseWebSocketReturn<any> => {
 //   const location: Location = window.location;

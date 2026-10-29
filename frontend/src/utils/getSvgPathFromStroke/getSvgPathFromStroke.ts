@@ -1,4 +1,4 @@
-import { average } from '../getAverage/getAverage';
+import { average } from "../getAverage/getAverage";
 
 export function getSvgPathFromStroke(points: number[][], closed = true) {
   const len = points.length;
@@ -23,7 +23,7 @@ export function getSvgPathFromStroke(points: number[][], closed = true) {
   }
 
   if (closed) {
-    result += 'Z';
+    result += "Z";
   }
 
   return result;

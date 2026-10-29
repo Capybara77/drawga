@@ -1,14 +1,14 @@
-import { RoughCanvas } from 'roughjs/bin/canvas';
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 export type MyCursor =
-  | 'pointer'
-  | 'curve'
-  | 'ellipse'
-  | 'rectangle'
-  | 'line'
-  | 'text'
-  | 'image'
-  | 'eraser';
+  | "pointer"
+  | "curve"
+  | "ellipse"
+  | "rectangle"
+  | "line"
+  | "text"
+  | "image"
+  | "eraser";
 
 export type BaseProps = {
   color: string;
