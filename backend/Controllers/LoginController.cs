@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Web;
-using Drawga.Data;
 using Drawga.Models;
+using Drawga.Services;
 
 namespace Drawga.Controllers
 {
     public class LoginController : Controller
     {
-        public DataContext DataContext { get; }
+        private readonly AccountService _accounts;
 
-        public LoginController(DataContext dataContext)
+        public LoginController(AccountService accounts)
         {
-            DataContext = dataContext;
+            _accounts = accounts;
         }
 
         public IActionResult Index() => View("Login");
@@ -23,7 +23,7 @@ namespace Drawga.Controllers
         [Route("/login/login")]
         public IActionResult In(string email, string password)
         {
-            User? user = DataContext.Users.FirstOrDefault(user1 => user1.Password == password && user1.Email == email);
+            User? user = _accounts.Authenticate(email, password);
             if (user == null)
             {
                 return View("~/Views/Login/Login.cshtml", "Неверный логин или пароль");
@@ -69,13 +69,7 @@ namespace Drawga.Controllers
         [HttpPost]
         public IActionResult Register(string name, string password, string email)
         {
-            DataContext.Users.Add(new User()
-            {
-                Email = email,
-                Name = name,
-                Password = password
-            });
-            DataContext.SaveChanges();
+            _accounts.Register(name, email, password);
             return LocalRedirect("/profile");
         }
     }
