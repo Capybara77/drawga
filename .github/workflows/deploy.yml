@@ -4,62 +4,91 @@ on:
   push:
     branches:
       - test-server
+  workflow_dispatch:
+
+env:
+  IMAGE: ghcr.io/capybara77/drawga
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Frontend checks
+        working-directory: frontend
+        run: |
+          npm i -g pnpm@12.16.1
+          pnpm install --frozen-lockfile
+          pnpm type-check
+          pnpm vitest run
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Backend tests
+        run: dotnet test Drawga.Tests
+
   build-and-push:
     runs-on: ubuntu-latest
-
+    needs: test
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
-
     steps:
-      - name: Remove old Docker container
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: docker rm -f drawga || true
+      - uses: actions/checkout@v4
 
-      - name: Remove old Docker image
-        uses: appleboy/ssh-action@master
+      - name: Copy compose files
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest || true
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: deploy/docker-compose.yml,deploy/Caddyfile
+          target: drawga
+          strip_components: 1
 
-      - name: Pull new Docker image
-        uses: appleboy/ssh-action@master
+      - name: Pull and restart
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USER: ${{ github.actor }}
+          DOMAIN: ${{ vars.DOMAIN }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest
-
-      - name: Run new Docker container
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GHCR_TOKEN,GHCR_USER,DOMAIN
           script: |
-            docker run --network drawga --name drawga \
-              -v /home/drawga-saves:/app/saves \
-              -d ${{ secrets.DOCKER_HUB_USERNAME }}/drawga:latest
+            set -e
+            cd ~/drawga
+            echo "DOMAIN=$DOMAIN" > .env
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

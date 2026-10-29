@@ -1,0 +1,23 @@
+# Лежит на сервере в ~/drawga, туда же CI кладёт Caddyfile и .env (DOMAIN=...)
+services:
+  app:
+    image: ghcr.io/capybara77/drawga:latest
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./saves:/app/saves
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+volumes:
+  caddy_data:

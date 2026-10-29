@@ -1,0 +1,9 @@
+**/node_modules
+**/bin
+**/obj
+**/dist
+frontend/old_src
+backend/saves
+backend/data.db
+.git
+.github

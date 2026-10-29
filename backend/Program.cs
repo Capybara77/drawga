@@ -19,6 +19,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
+// ponytail: миграций в репо нет — на пустой базе (свежий volume на сервере) просто создаём схему
+app.Services.GetRequiredService<DataContext>().Database.EnsureCreated();
+
 app.UseWebSockets();
 
 //app.UseHttpsRedirection();
