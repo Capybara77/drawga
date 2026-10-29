@@ -6,8 +6,13 @@ import ServerIcon from '@/icons/settings/ServerIcon/ServerIcon.vue';
 import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
 import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
 import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
+import type { WebSocketService } from '@/services/webSocketService';
 import { useColorMode, useCycleList } from '@vueuse/core';
 import { computed, ref, watchEffect } from 'vue';
+
+const { socket } = defineProps<{
+  socket: WebSocketService;
+}>();
 
 const mode = useColorMode({
   attribute: 'class',
@@ -24,6 +29,11 @@ const isDarkTheme = computed(() => state.value === 'dark');
 
 const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
+};
+
+const clearBoard = () => {
+  socket.send(['clear:::'.length as unknown as string]);
+  socket.send(['clear']);
 };
 </script>
 
@@ -56,7 +66,7 @@ const toggleSettings = () => {
         <div class="settings-item-text">Сохранить доску на сервере</div>
         <div class="settings-item-shortcut">Ctrl+Shift+O</div>
       </button>
-      <button class="settings-item" id="clear-btn">
+      <button class="settings-item" id="clear-btn" @click="clearBoard">
         <div class="settings-item-icon">
           <ClearIcon />
         </div>

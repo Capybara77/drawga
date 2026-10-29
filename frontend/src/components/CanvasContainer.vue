@@ -19,11 +19,13 @@ import rough from 'roughjs';
 
 import { onMounted, ref, useTemplateRef, watch } from 'vue';
 
+const { socket } = defineProps<{
+  socket: WebSocketService;
+}>();
+
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 const zoomStore = useZoomStore();
-
-const socket = new WebSocketService();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>('canvasElement');
 const canvasContext = ref<CanvasRenderingContext2D>();
@@ -84,9 +86,7 @@ const handleCur = (event: CustomEvent) => {
   const y = +event.detail[3] * zoomStore.zoom + offsetYCustom.value;
 
   const keyFrames = {
-    transform: `translate(${
-      +event.detail[2] * zoomStore.zoom + offsetXCustom.value
-    }px, ${(+event.detail[3] * zoomStore.zoom, +offsetYCustom.value)}px)`,
+    transform: `translate(${x}px, ${y}px)`,
   };
 
   t.animate(keyFrames, {
