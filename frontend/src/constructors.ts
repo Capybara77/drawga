@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import getStroke from 'perfect-freehand';
-import type { Drawable } from 'roughjs/bin/core';
+/* oxlint-disable @typescript-eslint/no-unused-vars */
+import getStroke from "perfect-freehand";
+import type { Drawable } from "roughjs/bin/core";
 import type {
   BaseProps,
   CurveProps,
@@ -8,14 +8,14 @@ import type {
   LineProps,
   MyCursor,
   RectangleProps,
-} from './types';
-import { generateId, commonIsOverlay, getSvgPathFromStroke } from './utils';
+} from "./types";
+import { generateId, commonIsOverlay, getSvgPathFromStroke } from "./utils";
 
 export abstract class BaseObject {
   color;
   width;
   userId;
-  drawType: MyCursor = 'pointer';
+  drawType: MyCursor = "pointer";
   tempObj: boolean = false;
   zoom: number = 1;
   objId: string = generateId(6);
@@ -40,7 +40,7 @@ export abstract class BaseObject {
 }
 
 export class TextObject extends BaseObject {
-  drawType: MyCursor = 'text';
+  drawType: MyCursor = "text";
   inputElement: HTMLTextAreaElement | null;
   top: number;
   left: number;
@@ -88,8 +88,8 @@ export class TextObject extends BaseObject {
       return;
     }
 
-    this.inputElement.style.left = this.left * zoom + offsetX + 'px';
-    this.inputElement.style.top = this.top * zoom + offsetY + 'px';
+    this.inputElement.style.left = this.left * zoom + offsetX + "px";
+    this.inputElement.style.top = this.top * zoom + offsetY + "px";
     this.inputElement.style.fontSize = `${this.zoom * 32}px`;
     this.inputElement.style.width = `${this.width * zoom}px`;
     this.inputElement.style.height = `${this.height * zoom}px`;
@@ -103,7 +103,7 @@ export class TextObject extends BaseObject {
 export class CurveObject extends BaseObject {
   pointsList;
   ctx;
-  drawType: MyCursor = 'curve';
+  drawType: MyCursor = "curve";
   constructor({ color, ctx, pointsList, userId, width, zoom }: CurveProps) {
     super({ color, width, userId });
     this.pointsList = pointsList;
@@ -185,11 +185,10 @@ export class LineObject extends BaseObject {
   startPoint;
   endPoint;
   roughCanvas;
-  drawType: MyCursor = 'line';
+  drawType: MyCursor = "line";
 
   constructor({ color, endPoint, roughCanvas, startPoint, userId, width }: LineProps) {
     super({ color, width, userId });
-    console.log('roughCanvas', roughCanvas);
     this.startPoint = startPoint;
     this.endPoint = endPoint;
     this.roughCanvas = roughCanvas;
@@ -197,8 +196,6 @@ export class LineObject extends BaseObject {
   }
 
   draw(offsetX: number, offsetY: number, zoom: number): void {
-    console.log(' this.roughCanvas', this.roughCanvas);
-    console.log(' this.roughCanvas.line', this.roughCanvas.line);
     this.roughCanvas.line(
       this.startPoint[0] * zoom + offsetX,
       this.startPoint[1] * zoom + offsetY,
@@ -249,7 +246,7 @@ export class RectangleObject extends BaseObject {
   endPoint;
   roughCanvas;
   fillStyle;
-  drawType: MyCursor = 'rectangle';
+  drawType: MyCursor = "rectangle";
   stroke;
   strokeWidth;
   drawableObj: Drawable | null = null;
@@ -317,7 +314,7 @@ export class EllipseObject extends BaseObject {
   endPoint;
   roughCanvas;
   fillStyle;
-  drawType: MyCursor = 'ellipse';
+  drawType: MyCursor = "ellipse";
   stroke;
   strokeWidth;
   drawableObj: Drawable | null = null;
