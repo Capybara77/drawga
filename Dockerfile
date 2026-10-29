@@ -1,8 +1,8 @@
 FROM node:current-alpine3.20 as node
 WORKDIR ./frontend
 COPY ./frontend .
-RUN yarn
-RUN yarn build-only
+RUN corepack enable && pnpm install --frozen-lockfile
+RUN pnpm build-only
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine-amd64 as build
 
