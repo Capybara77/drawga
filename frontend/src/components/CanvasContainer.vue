@@ -14,10 +14,12 @@ import { useOptionsStore } from '@/stores/options/';
 import { useZoomStore } from '@/stores/zoom/';
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from '@/types';
 import { getTypedDrawObject } from '@/utils/getTypedDrawObject/getTypedDrawObject';
-import { useEventListener } from '@vueuse/core';
+import { useEventListener, useMouse } from '@vueuse/core';
 import rough from 'roughjs';
 
-import { onMounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
+
+const { x: currentX, y: currentY } = useMouse();
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -32,17 +34,36 @@ const canvasContext = ref<CanvasRenderingContext2D>();
 const roughCanvas = ref();
 
 const allObjects = ref<BaseObject[]>([]);
+const tempCoordinates = ref<number[][]>([]);
 
-const cursorY = ref(0);
-const cursorX = ref(0);
+const cursorObject = ref({
+  x: 0,
+  y: 0,
+});
 
-const offsetXCustom = ref(0);
-const offsetYCustom = ref(0);
+const cursorStartObject = ref({
+  x: 0,
+  y: 0,
+});
 
-const cursorXStart = ref(0);
-const cursorYStart = ref(0);
+const offset = ref({
+  x: 0,
+  y: 0,
+});
 
-const currentCoordinates = ref<number[][]>([]);
+const computedCurrentCoords = computed(() => ({
+  x: currentX.value ?? 0 - offset.value.x,
+  y: currentY.value ?? 0 - offset.value.y,
+}));
+
+const startPoint = computed(() => [
+  (cursorStartObject.value.x - offset.value.x) / zoomStore.zoom,
+  (cursorStartObject.value.y - offset.value.y) / zoomStore.zoom,
+]);
+const endPoint = computed(() => [
+  computedCurrentCoords.value.x / zoomStore.zoom,
+  computedCurrentCoords.value.y / zoomStore.zoom,
+]);
 
 const isDrawing = ref(false);
 const isOnCanvas = ref(false);
@@ -50,6 +71,11 @@ const isSpacePressed = ref(false);
 const isMoving = ref(false);
 
 const userId = '123';
+
+const getAdjustedCoordinates = (x: number, y: number) => ({
+  x: x / zoomStore.zoom - offset.value.x / zoomStore.zoom,
+  y: y / zoomStore.zoom - offset.value.y / zoomStore.zoom,
+});
 
 const handleClose = (event: CustomEvent) => {
   console.log('Соединение закрыто', event.detail);
@@ -82,8 +108,8 @@ const handleCur = (event: CustomEvent) => {
     return;
   }
 
-  const x = +event.detail[2] * zoomStore.zoom + offsetXCustom.value;
-  const y = +event.detail[3] * zoomStore.zoom + offsetYCustom.value;
+  const x = +event.detail[2] * zoomStore.zoom + offset.value.x;
+  const y = +event.detail[3] * zoomStore.zoom + offset.value.y;
 
   const keyFrames = {
     transform: `translate(${x}px, ${y}px)`,
@@ -106,7 +132,7 @@ const handleDraw = (event: CustomEvent) => {
   }
 
   allObjects.value = [...allObjects.value, obj];
-  obj.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+  obj.draw(offset.value.x, offset.value.y, zoomStore.zoom);
 };
 
 const createSocketConnection = () => {
@@ -124,14 +150,14 @@ const redrawWithOffset = () => {
 
     if (
       element.isOverlay(
-        offsetXCustom.value,
-        offsetYCustom.value,
+        offset.value.x,
+        offset.value.y,
         canvasElement.value?.clientWidth ?? 0,
         canvasElement.value?.clientHeight ?? 0,
         zoomStore.zoom,
       )
     ) {
-      element.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom ?? 1);
+      element.draw(offset.value.x, offset.value.y, zoomStore.zoom ?? 1);
     }
   }
 };
@@ -165,17 +191,15 @@ const getNewCurveObject = () => {
     userId: userId,
     ctx: canvasContext.value,
     color: optionsStore.getterColorsWithOpacity.fillColor,
-    pointsList: currentCoordinates.value,
+    pointsList: tempCoordinates.value,
     width: optionsStore.lineWidth,
     zoom: zoomStore.zoom,
   };
 
-  const curve = new CurveObject(curveProps);
-
-  return curve;
+  return new CurveObject(curveProps);
 };
 
-const getNewRectObject = (event: PointerEvent) => {
+const getNewRectObject = () => {
   const rectangleProps: RectangleProps = {
     color: optionsStore.getterColorsWithOpacity.fillColor,
     width: optionsStore.lineWidth,
@@ -184,23 +208,41 @@ const getNewRectObject = (event: PointerEvent) => {
     stroke: optionsStore.getterColorsWithOpacity.borderColor,
     strokeWidth: optionsStore.lineWidth,
     userId: userId,
-    startPoint: [
-      (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-      (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-    ],
-    endPoint: [
-      event.shiftKey
-        ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
-        : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
-      event.shiftKey
-        ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-          ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
-            (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
-        : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
-    ],
+    startPoint: startPoint.value,
+    endPoint: endPoint.value,
   };
 
   return new RectangleObject(rectangleProps);
+};
+
+const getNewLineObject = () => {
+  const lineObjectProps: LineProps = {
+    color: optionsStore.getterColorsWithOpacity.fillColor,
+    width: optionsStore.lineWidth,
+    roughCanvas: roughCanvas.value,
+    userId: userId,
+    startPoint: startPoint.value,
+    endPoint: endPoint.value,
+  };
+
+  return new LineObject(lineObjectProps);
+};
+
+const getNewEllipseObject = () => {
+  const ellipseProps: EllipseProps = {
+    color: optionsStore.getterColorsWithOpacity.fillColor,
+    width: optionsStore.lineWidth,
+    startPoint: startPoint.value,
+    endPoint: endPoint.value,
+    fillStyle: optionsStore.fillStyle,
+    roughCanvas: roughCanvas.value,
+    stroke: optionsStore.getterColorsWithOpacity.borderColor,
+    strokeWidth: optionsStore.lineWidth,
+    isCircle: false,
+    userId: userId,
+  };
+
+  return new EllipseObject(ellipseProps);
 };
 
 const eraseObject = (obj: BaseObject) => {
@@ -216,10 +258,9 @@ const eraseObject = (obj: BaseObject) => {
 const onCanvasPointerDown = (event: PointerEvent) => {
   if (event.button === 1 || (isSpacePressed.value && event.button === 0)) {
     isMoving.value = true;
-    cursorX.value = event.clientX - offsetXCustom.value;
-    cursorY.value = event.clientY - offsetYCustom.value;
+    cursorObject.value.x = computedCurrentCoords.value.x;
+    cursorObject.value.y = computedCurrentCoords.value.y;
 
-    // canvasElement.style.cursor = 'grabbing';
     return;
   }
 
@@ -234,10 +275,10 @@ const onCanvasPointerDown = (event: PointerEvent) => {
   isDrawing.value = true;
   isOnCanvas.value = true;
 
-  currentCoordinates.value = [];
+  tempCoordinates.value = [];
 
-  cursorXStart.value = event.clientX;
-  cursorYStart.value = event.clientY;
+  cursorStartObject.value.x = currentX.value;
+  cursorStartObject.value.y = currentY.value;
 };
 
 const onCanvasPointerUp = (event: PointerEvent) => {
@@ -262,59 +303,19 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     }
 
     case 'line': {
-      const lineObjectProps: LineProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        roughCanvas: roughCanvas.value,
-        userId: userId,
-        startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        endPoint: [
-          (event.clientX - offsetXCustom.value) / zoomStore.zoom,
-          (event.clientY - offsetYCustom.value) / zoomStore.zoom,
-        ],
-      };
-
-      currentDrawing = new LineObject(lineObjectProps);
+      currentDrawing = getNewLineObject();
 
       break;
     }
 
     case 'rectangle': {
-      currentDrawing = getNewRectObject(event);
+      currentDrawing = getNewRectObject();
 
       break;
     }
 
     case 'ellipse': {
-      const ellipseProps: EllipseProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        endPoint: [
-          event.shiftKey
-            ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
-            : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
-          event.shiftKey
-            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-              ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
-                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
-            : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        fillStyle: optionsStore.fillStyle,
-        roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColorsWithOpacity.borderColor,
-        strokeWidth: optionsStore.lineWidth,
-        isCircle: false,
-        userId: userId,
-      };
-
-      currentDrawing = new EllipseObject(ellipseProps);
+      currentDrawing = getNewEllipseObject();
       break;
     }
 
@@ -340,26 +341,17 @@ const onCanvasPointerUp = (event: PointerEvent) => {
 
 const onCanvasPointerMove = (event: PointerEvent) => {
   const element = event.target as HTMLElement;
-
-  // const trailerX = event.clientX - trailer.offsetWidth / 2;
-  // const trailerY = event.clientY - trailer.offsetHeight / 2;
+  const { x, y } = getAdjustedCoordinates(currentX.value, currentY.value);
 
   if (element.id === 'canvas') {
-    //animateCursor(trailerX, trailerY, trailer);
-
-    const messageToServer = [
-      'cur',
-      userId,
-      event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
-      event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
-    ].map(String);
+    const messageToServer = ['cur', userId, x, y].map(String);
 
     socket.send(messageToServer);
   }
 
   if (isMoving.value) {
-    offsetXCustom.value = event.clientX - cursorX.value;
-    offsetYCustom.value = event.clientY - cursorY.value;
+    offset.value.x = currentX.value - cursorObject.value.x;
+    offset.value.y = currentY.value - cursorObject.value.y;
     redrawWithClearing();
 
     return;
@@ -367,31 +359,22 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
   if (!isDrawing.value) return;
 
-  const cursorXCurrent = event.clientX;
-  const cursorYCurrent = event.clientY;
-
   switch (cursorStore.cursor) {
     case 'eraser': {
       const allObjectsCount = allObjects.value.length;
 
       allObjects.value = allObjects.value.filter((drawObject) => {
         if (drawObject.drawType === 'curve') {
-          if (
-            (drawObject as CurveObject).isCloseToPoints(
-              cursorXCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
-              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
-              10,
-            )
-          ) {
+          if (drawObject.isCloseToPoints(x, y, 10)) {
             eraseObject(drawObject);
 
             return false;
           }
         } else if (drawObject.drawType === 'rectangle') {
           if (
-            (drawObject as RectangleObject).isOverlay(
-              -cursorYCurrent + offsetXCustom.value,
-              -event.clientY + offsetYCustom.value,
+            drawObject.isOverlay(
+              -currentY.value + offset.value.x,
+              -currentY.value + offset.value.y,
               1,
               1,
               zoomStore.zoom,
@@ -401,23 +384,16 @@ const onCanvasPointerMove = (event: PointerEvent) => {
             return false;
           }
         } else if (drawObject.drawType === 'line') {
-          if (
-            (drawObject as LineObject).isCloseToPoints(
-              cursorYCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
-              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
-              25,
-            )
-          ) {
+          const { x, y } = getAdjustedCoordinates(currentY.value, currentY.value);
+
+          if (drawObject.isCloseToPoints(x, y, 25)) {
             eraseObject(drawObject);
             return false;
           }
         } else if (drawObject.drawType === 'ellipse') {
-          if (
-            (drawObject as EllipseObject).closeToCentre(
-              cursorYCurrent / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
-              cursorYCurrent / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
-            )
-          ) {
+          const { x, y } = getAdjustedCoordinates(currentY.value, currentY.value);
+
+          if ((drawObject as EllipseObject).closeToCentre(x, y)) {
             eraseObject(drawObject);
             return false;
           }
@@ -433,96 +409,43 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     }
 
     case 'curve': {
-      const currentX = cursorXCurrent;
-      const currentY = cursorYCurrent;
-
-      // counter.value++;
-
-      // if (counter.value) {
-      currentCoordinates.value.push([
-        (currentX - offsetXCustom.value) / zoomStore.zoom,
-        (currentY - offsetYCustom.value) / zoomStore.zoom,
-      ]);
+      tempCoordinates.value.push(endPoint.value);
 
       // без этого сначала рисуется не оч красиво, а когда отпускаешь становится норм, но думаю на производительность давит
       redrawWithClearing();
 
       const curve = getNewCurveObject();
 
-      curve?.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
-      // }
+      curve?.draw(offset.value.x, offset.value.y, zoomStore.zoom);
 
       break;
     }
 
     case 'rectangle': {
-      if (event.shiftKey) {
-      }
-
-      const rect = getNewRectObject(event);
+      const rect = getNewRectObject();
 
       redrawWithClearing();
 
-      rect.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      rect.draw(offset.value.x, offset.value.y, zoomStore.zoom);
       break;
     }
 
     case 'line': {
-      const lineObjectProps: LineProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        roughCanvas: roughCanvas.value,
-        userId: userId,
-        startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        endPoint: [
-          (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
-        ],
-      };
-
-      const line = new LineObject(lineObjectProps);
+      const line = getNewLineObject();
 
       redrawWithClearing();
 
-      line.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      line.draw(offset.value.x, offset.value.y, zoomStore.zoom);
 
       break;
     }
 
     case 'ellipse': {
-      const ellipseProps: EllipseProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        endPoint: [
-          event.shiftKey
-            ? (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom
-            : (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
-          event.shiftKey
-            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-              ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom -
-                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
-            : (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        fillStyle: optionsStore.fillStyle,
-        roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColorsWithOpacity.borderColor,
-        strokeWidth: optionsStore.lineWidth,
-        isCircle: false,
-        userId: userId,
-      };
-
-      const ellipse = new EllipseObject(ellipseProps);
+      const ellipse = getNewEllipseObject();
 
       redrawWithClearing();
 
-      ellipse.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      ellipse.draw(offset.value.x, offset.value.y, zoomStore.zoom);
 
       break;
     }
@@ -577,7 +500,11 @@ onMounted(() => {
   }
 
   if (!canvasContext.value) {
-    canvasContext.value = canvasElement.value.getContext('2d') as CanvasRenderingContext2D;
+    const ctx = canvasElement.value.getContext('2d');
+    if (!ctx) {
+      throw new Error('Не удалось получить 2D контекст canvas');
+    }
+    canvasContext.value = ctx;
   }
 
   if (!roughCanvas.value) {
