@@ -1,27 +1,27 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { describe, beforeEach, it, expect } from 'vitest';
-import { constantsForKeyboard, useCursorStore } from './cursor';
-import type { MyCursor } from '@/types';
+import { setActivePinia, createPinia } from "pinia";
+import { describe, beforeEach, it, expect } from "vite-plus/test";
+import { constantsForKeyboard, useCursorStore } from "./cursor";
+import type { MyCursor } from "@/types";
 
-describe('Cursor Store', () => {
+describe("Cursor Store", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
 
-  it('инициализирует с правильным значением', () => {
+  it("инициализирует с правильным значением", () => {
     const store = useCursorStore();
-    expect(store.cursor).toBe('pointer');
+    expect(store.cursor).toBe("pointer");
   });
 
-  it('правильно обновляет состояние', () => {
+  it("правильно обновляет состояние", () => {
     const store = useCursorStore();
 
-    store.setCursor('eraser');
+    store.setCursor("eraser");
 
-    expect(store.cursor).toBe('eraser');
+    expect(store.cursor).toBe("eraser");
   });
 
-  it('обрабатывает все возможные типы курсоров', () => {
+  it("обрабатывает все возможные типы курсоров", () => {
     const store = useCursorStore();
 
     for (const cursor of Object.values(constantsForKeyboard)) {

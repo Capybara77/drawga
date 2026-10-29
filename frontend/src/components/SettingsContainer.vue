@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import ClearIcon from '@/icons/settings/ClearIcon/ClearIcon.vue';
-import MoonIcon from '@/icons/settings/MoonIcon/MoonIcon.vue';
-import SaveIcon from '@/icons/settings/SaveIcon/SaveIcon.vue';
-import ServerIcon from '@/icons/settings/ServerIcon/ServerIcon.vue';
-import SettingsIcon from '@/icons/settings/SettingsIcon/SettingsIcon.vue';
-import SunIcon from '@/icons/settings/SunIcon/SunIcon.vue';
-import UserIcon from '@/icons/settings/UserIcon/UserIcon.vue';
-import type { WebSocketService } from '@/services/webSocketService';
-import { useColorMode, useCycleList } from '@vueuse/core';
-import { computed, ref, watchEffect } from 'vue';
+import ClearIcon from "@/icons/settings/ClearIcon/ClearIcon.vue";
+import MoonIcon from "@/icons/settings/MoonIcon/MoonIcon.vue";
+import SaveIcon from "@/icons/settings/SaveIcon/SaveIcon.vue";
+import ServerIcon from "@/icons/settings/ServerIcon/ServerIcon.vue";
+import SettingsIcon from "@/icons/settings/SettingsIcon/SettingsIcon.vue";
+import SunIcon from "@/icons/settings/SunIcon/SunIcon.vue";
+import UserIcon from "@/icons/settings/UserIcon/UserIcon.vue";
+import type { WebSocketService } from "@/services/webSocketService";
+import { useColorMode, useCycleList } from "@vueuse/core";
+import { computed, ref, watchEffect } from "vue";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
 }>();
 
 const mode = useColorMode({
-  attribute: 'class',
-  initialValue: 'dark',
+  attribute: "class",
+  initialValue: "dark",
 });
 
-const { state, next } = useCycleList(['dark', 'light'] as const, { initialValue: mode });
+const { state, next } = useCycleList(["dark", "light"] as const, { initialValue: mode });
 
 watchEffect(() => (mode.value = state.value));
 
 const isSettingsOpened = ref(false);
 
-const isDarkTheme = computed(() => state.value === 'dark');
+const isDarkTheme = computed(() => state.value === "dark");
 
 const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
 };
 
 const clearBoard = () => {
-  socket.send(['clear:::'.length as unknown as string]);
-  socket.send(['clear']);
+  socket.send(["clear:::".length as unknown as string]);
+  socket.send(["clear"]);
 };
 </script>
 
@@ -45,7 +45,7 @@ const clearBoard = () => {
       </span>
     </button>
     <section class="settings-container" v-if="isSettingsOpened">
-      <button class="settings-item" onclick="location.replace('/login')" id="user-btn">
+      <button class="settings-item" onclick="location.replace(&quot;/login&quot;);" id="user-btn">
         <div class="settings-item-icon">
           <UserIcon />
         </div>
@@ -80,7 +80,7 @@ const clearBoard = () => {
           <SunIcon v-else />
         </div>
         <div class="settings-item-text" id="theme-inner-text">
-          {{ isDarkTheme ? 'Темная' : 'Светлая' }} тема
+          {{ isDarkTheme ? "Темная" : "Светлая" }} тема
         </div>
         <div class="settings-item-shortcut">Ctrl+Shift+T</div>
       </button>
@@ -88,7 +88,7 @@ const clearBoard = () => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .settings-wrapper {
   position: absolute;
   right: 10px;

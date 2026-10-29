@@ -12,6 +12,8 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    // ES2022 — ради Array.prototype.at; @vue/tsconfig по умолчанию даёт ES2020
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "plugins": [{ "name": "@vue/typescript-plugin" }],
     "paths": {
       "@/*": ["./src/*"]

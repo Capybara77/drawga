@@ -1,77 +1,77 @@
-import { getMinMax } from '@/utils';
-import { defineStore } from 'pinia';
+import { getMinMax } from "@/utils";
+import { defineStore } from "pinia";
 
 const defaultState = {
   allOptions: {
     colors: [
-      '000000',
-      '343a40',
-      '495057',
-      'c92a2a',
-      'a61e4d',
-      '862e9c',
-      '5f3dc4',
-      '364fc7',
-      '1864ab',
-      '0b7285',
-      '087f5b',
-      '2b8a3e',
-      '5c940d',
-      'e67700',
-      'd9480f',
+      "000000",
+      "343a40",
+      "495057",
+      "c92a2a",
+      "a61e4d",
+      "862e9c",
+      "5f3dc4",
+      "364fc7",
+      "1864ab",
+      "0b7285",
+      "087f5b",
+      "2b8a3e",
+      "5c940d",
+      "e67700",
+      "d9480f",
     ],
     lineWidths: [
       {
         value: 5,
-        label: 'smol',
+        label: "smol",
       },
       {
         value: 12,
-        label: 'norm',
+        label: "norm",
       },
       {
         value: 20,
-        label: 'larj',
+        label: "larj",
       },
     ],
     textSizes: [
       {
-        value: '0.875rem',
-        label: 'S',
+        value: "0.875rem",
+        label: "S",
       },
       {
-        value: '1rem',
-        label: 'M',
+        value: "1rem",
+        label: "M",
       },
       {
-        value: '1.2rem',
-        label: 'L',
+        value: "1.2rem",
+        label: "L",
       },
       {
-        value: '1.5rem',
-        label: 'XL',
+        value: "1.5rem",
+        label: "XL",
       },
     ],
-    fillStyles: ['hachure', 'solid', 'zigzag', 'cross-hatch', 'dashed', 'zigzag-line'],
+    fillStyles: ["hachure", "solid", "zigzag", "cross-hatch", "dashed", "zigzag-line"],
   },
   colors: {
-    fillColor: '5f3dc4',
-    borderColor: 'a61e4d',
-    textColor: '000000',
+    fillColor: "5f3dc4",
+    borderColor: "a61e4d",
+    textColor: "000000",
   },
   lineWidth: 12,
-  textSize: '1rem',
-  fillStyle: 'hachure',
+  textSize: "1rem",
+  fillStyle: "hachure",
   opacity: 1,
 };
 
-export const useOptionsStore = defineStore('options', {
+export const useOptionsStore = defineStore("options", {
   state: () => ({ ...defaultState }),
   getters: {
     getterColors: (state) => ({
-      fillColor: '#' + state.colors.fillColor,
-      borderColor: '#' + state.colors.borderColor,
-      textColor: '#' + state.colors.textColor,
+      fillColor: "#" + state.colors.fillColor,
+      borderColor: "#" + state.colors.borderColor,
+      textColor: "#" + state.colors.textColor,
     }),
     getterColorsWithOpacity: (state) => {
       const hexToRgb = (hex: string) => {
@@ -93,7 +93,7 @@ export const useOptionsStore = defineStore('options', {
       if (this.isValidHex(hexCode)) {
         this.colors.fillColor = hexCode;
       } else {
-        console.warn('Недопустимый HEX-код для fillColor. Используется значение по умолчанию.');
+        console.warn("Недопустимый HEX-код для fillColor. Используется значение по умолчанию.");
         this.colors.fillColor = defaultState.colors.fillColor;
       }
     },
@@ -102,7 +102,7 @@ export const useOptionsStore = defineStore('options', {
       if (this.isValidHex(hexCode)) {
         this.colors.borderColor = hexCode;
       } else {
-        console.warn('Недопустимый HEX-код для borderColor. Используется значение по умолчанию.');
+        console.warn("Недопустимый HEX-код для borderColor. Используется значение по умолчанию.");
         this.colors.borderColor = defaultState.colors.borderColor;
       }
     },
@@ -111,7 +111,7 @@ export const useOptionsStore = defineStore('options', {
       if (this.isValidHex(hexCode)) {
         this.colors.textColor = hexCode;
       } else {
-        console.warn('Недопустимый HEX-код для textColor. Используется значение по умолчанию.');
+        console.warn("Недопустимый HEX-код для textColor. Используется значение по умолчанию.");
         this.colors.textColor = defaultState.colors.textColor;
       }
     },

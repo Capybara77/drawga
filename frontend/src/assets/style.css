@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 :root {
   --clr-primary: rgb(95, 61, 196);
@@ -26,7 +26,7 @@
 
   --clr-default: rgb(54, 79, 199);
 
-  --cursor-custom: url('/icons/custom-cursor.svg');
+  --cursor-custom: url("/icons/custom-cursor.svg");
 
   --z-index-1: 10000000;
   --z-index-2: 10000000000;
@@ -36,7 +36,7 @@
 }
 
 * {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 
   margin: 0;
   padding: 0;
@@ -47,7 +47,7 @@ body {
 }
 
 button {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
 }

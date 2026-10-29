@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { useCursorStore } from '@/stores/cursor/';
-import { useOptionsStore } from '@/stores/options/';
-import type { MyCursor } from '@/types';
-import { computed, ref } from 'vue';
-import ColorPicker from './ColorPicker.vue';
+import { useCursorStore } from "@/stores/cursor/";
+import { useOptionsStore } from "@/stores/options/";
+import type { MyCursor } from "@/types";
+import { computed, ref } from "vue";
+import ColorPicker from "./ColorPicker.vue";
 
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
-const cursorsForHideAll: MyCursor[] = ['pointer', 'eraser', 'text', 'image'];
-const showFill: MyCursor[] = ['ellipse', 'line', 'line', 'curve', 'rectangle'];
-const showStroke: MyCursor[] = ['ellipse', 'rectangle'];
-const showText: MyCursor[] = ['text'];
-const showFillType: MyCursor[] = ['rectangle', 'ellipse'];
+const cursorsForHideAll: MyCursor[] = ["pointer", "eraser", "text", "image"];
+const showFill: MyCursor[] = ["ellipse", "line", "line", "curve", "rectangle"];
+const showStroke: MyCursor[] = ["ellipse", "rectangle"];
+const showText: MyCursor[] = ["text"];
+const showFillType: MyCursor[] = ["rectangle", "ellipse"];
 
 const isOptionsHidden = computed(() => cursorsForHideAll.includes(cursorStore.cursor as MyCursor));
 
@@ -46,15 +46,15 @@ const toggleTextColor = () => {
   isTextColorOpen.value = !isTextColorOpen.value;
 };
 
-const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
+const pickColor = (color: string, variant: "fill" | "border" | "text") => {
   switch (variant) {
-    case 'fill':
+    case "fill":
       optionsStore.setFillColor(color);
       break;
-    case 'border':
+    case "border":
       optionsStore.setBorderColor(color);
       break;
-    case 'text':
+    case "text":
       optionsStore.setTextColor(color);
       break;
     default:
@@ -69,80 +69,47 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     <div class="options-color-container" id="options-color-fill" v-if="isFillColor">
       <p>Цвет зарисовки</p>
       <div class="color-container">
-        <div
-          class="color-picker"
-          @click="toggleFillColor"
-          :style="{ backgroundColor: optionsStore.getterColors.fillColor }"
-        ></div>
+        <div class="color-picker" @click="toggleFillColor"
+          :style="{ backgroundColor: optionsStore.getterColors.fillColor }"></div>
 
-        <ColorPicker
-          :is-open="isFillColorOpen"
-          :colors-list="optionsStore.allOptions.colors"
-          @click="(color) => pickColor(color, 'fill')"
-        />
+        <ColorPicker :is-open="isFillColorOpen" :colors-list="optionsStore.allOptions.colors"
+          @click="(color) => pickColor(color, 'fill')" />
 
         <div class="color-picker-input">
           <p>#</p>
-          <input
-            placeholder="000000"
-            type="text"
-            id="color-picker-input"
-            v-model="optionsStore.colors.fillColor"
-          />
+          <input placeholder="000000" type="text" id="color-picker-input" v-model="optionsStore.colors.fillColor" />
         </div>
       </div>
     </div>
     <div class="options-color-container" id="options-color-border" v-if="isStrokeColor">
       <p>Цвет границы</p>
       <div class="color-container">
-        <div
-          class="color-picker"
-          id="stroke-color-picker"
-          @click="toggleBorderColor"
-          :style="{ backgroundColor: optionsStore.getterColors.borderColor }"
-        ></div>
+        <div class="color-picker" id="stroke-color-picker" @click="toggleBorderColor"
+          :style="{ backgroundColor: optionsStore.getterColors.borderColor }"></div>
 
-        <ColorPicker
-          :is-open="isBorderColorOpen"
-          :colors-list="optionsStore.allOptions.colors"
-          @click="(color) => pickColor(color, 'border')"
-        />
+        <ColorPicker :is-open="isBorderColorOpen" :colors-list="optionsStore.allOptions.colors"
+          @click="(color) => pickColor(color, 'border')" />
 
         <div class="color-picker-input" id="stroke-color-picker-container">
           <p>#</p>
-          <input
-            placeholder="000000"
-            type="text"
-            id="stroke-color-picker-input"
-            v-model="optionsStore.colors.borderColor"
-          />
+          <input placeholder="000000" type="text" id="stroke-color-picker-input"
+            v-model="optionsStore.colors.borderColor" />
         </div>
       </div>
     </div>
     <div class="options-color-container" id="options-color-text" v-if="isTextColor">
       <p>Цвет текста</p>
       <div class="color-container">
-        <div
-          class="color-picker"
-          id="text-color-picker"
-          @click="toggleTextColor"
-          :style="{ backgroundColor: optionsStore.getterColors.textColor }"
-        ></div>
+        <div class="color-picker" id="text-color-picker" @click="toggleTextColor"
+          :style="{ backgroundColor: optionsStore.getterColors.textColor }"></div>
 
-        <ColorPicker
-          :is-open="isTextColorOpen"
-          :colors-list="optionsStore.allOptions.colors"
-          @click="(color) => pickColor(color, 'text')"
-        />
+        <ColorPicker :is-open="isTextColorOpen" :colors-list="optionsStore.allOptions.colors"
+          @click="(color) => pickColor(color, 'text')" />
 
         <div class="color-picker-input" id="text-color-picker-container">
           <p>#</p>
-          <input
-            placeholder="000000"
-            type="text"
-            id="text-color-picker-input"
-            v-model="optionsStore.colors.textColor"
-          />
+          <input placeholder="000000" type="text" id="text-color-picker-input"
+            v-model="optionsStore.colors.textColor" />
         </div>
       </div>
     </div>
@@ -150,15 +117,10 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
       <p>Толщина линии</p>
       <div class="options-btns-container">
         <div v-for="lineSize in optionsStore.allOptions.lineWidths" :key="lineSize.label">
-          <button
-            :class="
-              'option-btn width-btn' +
-              (optionsStore.lineWidth === lineSize.value ? ' active-option' : '')
-            "
-            :data-line-width="lineSize.value"
-            :key="lineSize.value"
-            @click="() => optionsStore.setLineWidth(lineSize.value)"
-          >
+          <button :class="'option-btn width-btn' +
+            (optionsStore.lineWidth === lineSize.value ? ' active-option' : '')
+            " :data-line-width="lineSize.value" :key="lineSize.value"
+            @click="() => optionsStore.setLineWidth(lineSize.value)">
             {{ lineSize.label }}
           </button>
         </div>
@@ -168,15 +130,10 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
       <p>Размер текста</p>
       <div class="options-btns-container">
         <div v-for="textSize in optionsStore.allOptions.textSizes" :key="textSize.label">
-          <button
-            :class="
-              'option-btn font-size-btn ' +
-              (optionsStore.textSize === textSize.value ? 'active-option' : '')
-            "
-            :data-font-size="textSize.value"
-            :key="textSize.value"
-            @click="() => optionsStore.setTextSize(textSize.value)"
-          >
+          <button :class="'option-btn font-size-btn ' +
+            (optionsStore.textSize === textSize.value ? 'active-option' : '')
+            " :data-font-size="textSize.value" :key="textSize.value"
+            @click="() => optionsStore.setTextSize(textSize.value)">
             {{ textSize.label }}
           </button>
         </div>
@@ -184,26 +141,14 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
     </div>
     <div class="options-container" id="opacity-options-container">
       <p>Прозрачность линии</p>
-      <input
-        type="range"
-        min="0.1"
-        max="1"
-        step="0.1"
-        id="input-opacity"
-        v-model.lazy="optionsStore.opacity"
-      />
+      <input type="range" min="0.1" max="1" step="0.1" id="input-opacity" v-model.lazy="optionsStore.opacity" />
     </div>
     <div class="options-container" id="fill-style-options-container" v-if="isFillType">
       <p>Стиль заливки</p>
       <div class="fill-style-options-container">
-        <button
-          v-for="fillStyle in optionsStore.allOptions.fillStyles"
-          @click="() => optionsStore.setFillStyle(fillStyle)"
-          :key="fillStyle"
-          :class="
-            'fill-style-btn ' + (optionsStore.fillStyle === fillStyle ? 'active-fill-style' : '')
-          "
-        >
+        <button v-for="fillStyle in optionsStore.allOptions.fillStyles"
+          @click="() => optionsStore.setFillStyle(fillStyle)" :key="fillStyle" :class="'fill-style-btn ' + (optionsStore.fillStyle === fillStyle ? 'active-fill-style' : '')
+            ">
           {{ fillStyle }}
         </button>
       </div>
@@ -211,7 +156,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .options-wrapper {
   width: 200px;
   position: absolute;
@@ -342,7 +287,7 @@ const pickColor = (color: string, variant: 'fill' | 'border' | 'text') => {
   cursor: pointer;
 }
 
-input[type='range'] {
+input[type="range"] {
   appearance: none;
   width: 100%;
   height: 8px;
@@ -350,7 +295,7 @@ input[type='range'] {
   background-color: var(--clr-primary);
 }
 
-input[type='range']::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   height: 20px;
   width: 20px;
@@ -359,7 +304,7 @@ input[type='range']::-webkit-slider-thumb {
   transition: background 0.3s ease-in-out;
 }
 
-input[type='range']::-moz-range-thumb {
+input[type="range"]::-moz-range-thumb {
   appearance: none;
   height: 20px;
   width: 20px;
@@ -368,7 +313,7 @@ input[type='range']::-moz-range-thumb {
   transition: background 0.3s ease-in-out;
 }
 
-input[type='range']::-webkit-slider-runnable-track {
+input[type="range"]::-webkit-slider-runnable-track {
   appearance: none;
   box-shadow: none;
   border: none;
@@ -402,7 +347,7 @@ input[type='range']::-webkit-slider-runnable-track {
 }
 
 .options-color-container,
-.options-container > p {
+.options-container>p {
   color: var(--clr-text);
 }
 </style>

@@ -1,0 +1,1 @@
+export { useAllObjectsStore } from "./allObjects"

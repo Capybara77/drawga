@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { getTypedDrawObject } from './getTypedDrawObject'; // Указываем правильный путь к файлу с функцией
-import { RoughCanvas } from 'roughjs/bin/canvas';
-import { RectangleObject, EllipseObject, LineObject, CurveObject } from '@/constructors';
+import { describe, it, expect, vi } from "vite-plus/test";
+import { getTypedDrawObject } from "./getTypedDrawObject"; // Указываем правильный путь к файлу с функцией
+import { RoughCanvas } from "roughjs/bin/canvas";
+import { RectangleObject, EllipseObject, LineObject, CurveObject } from "@/constructors";
 
 const roughCanvas = {
   draw: vi.fn(),
@@ -16,25 +16,25 @@ const ctx = {
   stroke: vi.fn(),
 } as unknown as CanvasRenderingContext2D;
 
-describe('getTypedDrawObject error handling', () => {
+describe("getTypedDrawObject error handling", () => {
   const roughCanvas = {} as RoughCanvas;
   const ctx = {} as CanvasRenderingContext2D;
 
-  describe('невалидный JSON', () => {
-    it('возвращает null при невалидном JSON', () => {
-      const invalidJson = '{drawType: rectangle}'; // отсутствуют кавычки
+  describe("невалидный JSON", () => {
+    it("возвращает null при невалидном JSON", () => {
+      const invalidJson = "{drawType: rectangle}"; // отсутствуют кавычки
       expect(getTypedDrawObject(invalidJson, roughCanvas, ctx)).toBeNull();
     });
 
-    it('возвращает null при пустой строке', () => {
-      expect(getTypedDrawObject('', roughCanvas, ctx)).toBeNull();
+    it("возвращает null при пустой строке", () => {
+      expect(getTypedDrawObject("", roughCanvas, ctx)).toBeNull();
     });
   });
 
-  describe('отсутствующие поля', () => {
-    it('возвращает null при отсутствии drawType', () => {
+  describe("отсутствующие поля", () => {
+    it("возвращает null при отсутствии drawType", () => {
       const noDrawType = JSON.stringify({
-        objId: '123',
+        objId: "123",
         zoom: 1,
         width: 100,
         height: 50,
@@ -42,42 +42,42 @@ describe('getTypedDrawObject error handling', () => {
       expect(getTypedDrawObject(noDrawType, roughCanvas, ctx)).toBeNull();
     });
 
-    it('возвращает null при отсутствии обязательных полей для rectangle', () => {
+    it("возвращает null при отсутствии обязательных полей для rectangle", () => {
       const noWidth = JSON.stringify({
-        drawType: 'rectangle',
-        objId: '123',
+        drawType: "rectangle",
+        objId: "123",
         zoom: 1,
         height: 50,
       });
       expect(getTypedDrawObject(noWidth, roughCanvas, ctx)).toBeNull();
     });
 
-    it('возвращает null при отсутствии обязательных полей для line', () => {
+    it("возвращает null при отсутствии обязательных полей для line", () => {
       const noCoords = JSON.stringify({
-        drawType: 'line',
-        objId: '123',
+        drawType: "line",
+        objId: "123",
         zoom: 1,
       });
       expect(getTypedDrawObject(noCoords, roughCanvas, ctx)).toBeNull();
     });
   });
 
-  describe('неправильные типы данных', () => {
-    it('возвращает null при строковом значении вместо числового', () => {
+  describe("неправильные типы данных", () => {
+    it("возвращает null при строковом значении вместо числового", () => {
       const invalidType = JSON.stringify({
-        drawType: 'rectangle',
-        objId: '123',
-        zoom: '1', // должно быть числом
-        width: '100', // должно быть числом
+        drawType: "rectangle",
+        objId: "123",
+        zoom: "1", // должно быть числом
+        width: "100", // должно быть числом
         height: 50,
       });
       expect(getTypedDrawObject(invalidType, roughCanvas, ctx)).toBeNull();
     });
 
-    it('возвращает null при массиве вместо числа', () => {
+    it("возвращает null при массиве вместо числа", () => {
       const invalidArray = JSON.stringify({
-        drawType: 'ellipse',
-        objId: '123',
+        drawType: "ellipse",
+        objId: "123",
         zoom: 1,
         width: [100],
         height: 50,
@@ -86,11 +86,11 @@ describe('getTypedDrawObject error handling', () => {
     });
   });
 
-  describe('отрицательные значения', () => {
-    it('возвращает null при отрицательной ширине', () => {
+  describe("отрицательные значения", () => {
+    it("возвращает null при отрицательной ширине", () => {
       const negativeWidth = JSON.stringify({
-        drawType: 'rectangle',
-        objId: '123',
+        drawType: "rectangle",
+        objId: "123",
         zoom: 1,
         width: -100,
         height: 50,
@@ -98,10 +98,10 @@ describe('getTypedDrawObject error handling', () => {
       expect(getTypedDrawObject(negativeWidth, roughCanvas, ctx)).toBeNull();
     });
 
-    it('возвращает null при отрицательной высоте', () => {
+    it("возвращает null при отрицательной высоте", () => {
       const negativeHeight = JSON.stringify({
-        drawType: 'ellipse',
-        objId: '123',
+        drawType: "ellipse",
+        objId: "123",
         zoom: 1,
         width: 100,
         height: -50,
@@ -109,10 +109,10 @@ describe('getTypedDrawObject error handling', () => {
       expect(getTypedDrawObject(negativeHeight, roughCanvas, ctx)).toBeNull();
     });
 
-    it('возвращает null при отрицательном zoom', () => {
+    it("возвращает null при отрицательном zoom", () => {
       const negativeZoom = JSON.stringify({
-        drawType: 'rectangle',
-        objId: '123',
+        drawType: "rectangle",
+        objId: "123",
         zoom: -1,
         width: 100,
         height: 50,
@@ -122,13 +122,13 @@ describe('getTypedDrawObject error handling', () => {
   });
 });
 
-describe('getTypedDrawObject', () => {
+describe("getTypedDrawObject", () => {
   it('создаёт объект типа RectangleObject при передаче "rectangle"', () => {
     const inputStr = JSON.stringify({
-      drawType: 'rectangle',
-      userId: '123',
-      color: 'red',
-      objId: '123',
+      drawType: "rectangle",
+      userId: "123",
+      color: "red",
+      objId: "123",
       zoom: 1,
       width: 100,
       height: 50,
@@ -140,19 +140,19 @@ describe('getTypedDrawObject', () => {
     const result = getTypedDrawObject(inputStr, roughCanvas, ctx);
     expect(result).toBeInstanceOf(RectangleObject);
     if (result instanceof RectangleObject) {
-      expect(result.objId).toBe('123');
+      expect(result.objId).toBe("123");
       expect(result.zoom).toBe(1);
     }
   });
 
   it('создаёт объект типа EllipseObject при передаче "ellipse"', () => {
     const inputStr = JSON.stringify({
-      drawType: 'ellipse',
-      objId: '456',
-      color: 'red',
-      userId: '123',
+      drawType: "ellipse",
+      objId: "456",
+      color: "red",
+      userId: "123",
       zoom: 1,
-      tempObj: '12',
+      tempObj: "12",
       width: 80,
       height: 60,
       left: 15,
@@ -162,19 +162,19 @@ describe('getTypedDrawObject', () => {
     const result = getTypedDrawObject(inputStr, roughCanvas, ctx);
     expect(result).toBeInstanceOf(EllipseObject);
     if (result instanceof EllipseObject) {
-      expect(result.objId).toBe('456');
+      expect(result.objId).toBe("456");
       expect(result.zoom).toBe(1);
     }
   });
 
   it('создаёт объект типа LineObject при передаче "line"', () => {
     const inputStr = JSON.stringify({
-      drawType: 'line',
-      objId: '789',
+      drawType: "line",
+      objId: "789",
       zoom: 1,
-      userId: '1',
-      color: 'red',
-      tempObj: '1',
+      userId: "1",
+      color: "red",
+      tempObj: "1",
       width: 1,
       x1: 10,
       y1: 20,
@@ -185,18 +185,18 @@ describe('getTypedDrawObject', () => {
     const result = getTypedDrawObject(inputStr, roughCanvas, ctx);
     expect(result).toBeInstanceOf(LineObject);
     if (result instanceof LineObject) {
-      expect(result.objId).toBe('789');
+      expect(result.objId).toBe("789");
       expect(result.zoom).toBe(1);
     }
   });
 
   it('создаёт объект типа CurveObject при передаче "curve"', () => {
     const inputStr = JSON.stringify({
-      drawType: 'curve',
-      color: 'red',
-      objId: '101112',
-      userId: '123',
-      tempObj: '132',
+      drawType: "curve",
+      color: "red",
+      objId: "101112",
+      userId: "123",
+      tempObj: "132",
       width: 1,
       zoom: 1,
       path: [
@@ -209,15 +209,36 @@ describe('getTypedDrawObject', () => {
     const result = getTypedDrawObject(inputStr, roughCanvas, ctx);
     expect(result).toBeInstanceOf(CurveObject);
     if (result instanceof CurveObject) {
-      expect(result.objId).toBe('101112');
+      expect(result.objId).toBe("101112");
       expect(result.zoom).toBe(1);
     }
   });
 
-  it('возвращает null для неизвестного типа', () => {
+  it("линия с сервера рисуется переданным roughCanvas, а не тем, что пришёл в JSON", () => {
     const inputStr = JSON.stringify({
-      drawType: 'unknown',
-      objId: '131415',
+      drawType: "line",
+      color: "red",
+      objId: "line-1",
+      userId: "123",
+      tempObj: false,
+      width: 1,
+      zoom: 1,
+      startPoint: [0, 0],
+      endPoint: [10, 10],
+      roughCanvas: {}, // так сериализуется roughCanvas в JSON
+    });
+    const lineCanvas = { line: vi.fn() } as unknown as RoughCanvas;
+
+    const result = getTypedDrawObject(inputStr, lineCanvas, ctx);
+    result?.draw(0, 0, 1);
+
+    expect(lineCanvas.line).toHaveBeenCalledOnce();
+  });
+
+  it("возвращает null для неизвестного типа", () => {
+    const inputStr = JSON.stringify({
+      drawType: "unknown",
+      objId: "131415",
       zoom: 1,
     });
 

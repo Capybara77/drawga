@@ -1,11 +1,11 @@
 export function generateId(length: number) {
-  let result = '';
+  let result = "";
 
   if (length < 1 || isNaN(length)) {
-    throw new Error('Invalid length');
+    throw new Error("Invalid length");
   }
 
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
   const minLength = 8;
   length = Math.max(length, minLength);
 

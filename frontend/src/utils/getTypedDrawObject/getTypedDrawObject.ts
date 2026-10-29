@@ -4,8 +4,23 @@ import {
   EllipseObject,
   LineObject,
   CurveObject,
-} from '@/constructors';
-import type { RoughCanvas } from 'roughjs/bin/canvas';
+} from "@/constructors";
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { CurveProps, EllipseProps, LineProps, RectangleProps } from "@/types";
+
+// как объект приходит по сети: поля конструктора без canvas-ссылок (их не сериализовать) + служебные
+type Serialized<T extends string, P> = Omit<P, "roughCanvas" | "ctx"> & {
+  drawType: T;
+  objId: string;
+  tempObj: boolean;
+  zoom: number;
+};
+
+type SerializedDrawObject =
+  | Serialized<"rectangle", RectangleProps>
+  | Serialized<"ellipse", EllipseProps>
+  | Serialized<"line", LineProps>
+  | Serialized<"curve", CurveProps>;
 
 /**
  * Создаёт типизированный объект рисования из JSON строки
@@ -23,12 +38,12 @@ export function getTypedDrawObject(
     return null;
   }
 
-  let parsedString: BaseObject;
+  let parsedString: SerializedDrawObject;
 
   try {
     parsedString = JSON.parse(str);
   } catch (err) {
-    console.error('getTypedDrawObject error', err);
+    console.error("getTypedDrawObject error", err);
     return null;
   }
 
@@ -50,75 +65,32 @@ export function getTypedDrawObject(
     return null;
   }
 
-  switch (type) {
-    case 'rectangle': {
-      const r = new RectangleObject(parsedString);
-
-      r.roughCanvas = roughCanvas;
-      r.objId = parsedString.objId;
+  switch (parsedString.drawType) {
+    case "rectangle": {
+      const r = new RectangleObject({ ...parsedString, roughCanvas });
+      r.objId = objId;
       r.zoom = zoom;
-
       return r;
     }
-    case 'ellipse': {
-      const e = new EllipseObject(parsedString);
-      e.roughCanvas = roughCanvas;
-
-      e.objId = parsedString.objId;
+    case "ellipse": {
+      const e = new EllipseObject({ ...parsedString, roughCanvas });
+      e.objId = objId;
       e.zoom = zoom;
-
       return e;
     }
-    case 'line': {
-      const l = new LineObject(parsedString);
-
+    case "line": {
+      const l = new LineObject({ ...parsedString, roughCanvas });
+      l.objId = objId;
       l.zoom = zoom;
-      l.objId = parsedString.objId;
       return l;
     }
-    case 'curve': {
-      const c = new CurveObject(parsedString);
-
-      c.ctx = ctx;
-      c.objId = parsedString.objId;
+    case "curve": {
+      const c = new CurveObject({ ...parsedString, ctx });
+      c.objId = objId;
       c.zoom = zoom;
-
       return c;
     }
-    case 'text': {
-      // const {
-      //   color,
-      //   width,
-      //   userId,
-      //   zoom,
-      //   objId,
-      //   left,
-      //   top,
-      //   fontFamily,
-      //   text,
-      //   inputId,
-      //   fontSize,
-      //   textColor,
-      //   height,
-      // } = parsedString as TextObject;
-      // const t = new TextObject(
-      //   fontFamily,
-      //   color,
-      //   userId,
-      //   null,
-      //   top,
-      //   left,
-      //   text,
-      //   inputId,
-      //   fontSize,
-      //   textColor,
-      //   width,
-      //   height,
-      // );
-      // t.objId = objId;
-      // t.zoom = zoom;
-      // return t;
-    }
+    // text: восстановление TextObject было тут закомментировано — вернуть, когда дойдём до текста
     default:
       return null;
   }

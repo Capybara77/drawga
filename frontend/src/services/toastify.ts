@@ -1,28 +1,28 @@
-import Toastify from 'toastify-js';
-import 'toastify-js/src/toastify.css';
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 const toastifyStyle = {
   background:
-    document.documentElement.className === 'lightTheme'
-      ? 'rgba(255, 255, 255, 0.8)'
-      : 'rgba(49, 49, 49, 0.8)',
+    document.documentElement.className === "lightTheme"
+      ? "rgba(255, 255, 255, 0.8)"
+      : "rgba(49, 49, 49, 0.8)",
   color:
-    document.documentElement.className === 'lightTheme' ? 'rgb(51, 51, 51)' : 'rgb(233, 233, 233)',
-  border: '2px solid rgb(95, 61, 196)',
-  borderRadius: '5px',
-  boxShadow: 'none',
-  fill: 'red',
+    document.documentElement.className === "lightTheme" ? "rgb(51, 51, 51)" : "rgb(233, 233, 233)",
+  border: "2px solid rgb(95, 61, 196)",
+  borderRadius: "5px",
+  boxShadow: "none",
+  fill: "red",
 };
 
 export const disconnectToast = () => {
   Toastify({
-    text: 'Пользователь отключился',
+    text: "Пользователь отключился",
     duration: 2000,
     //destination: "http://skorobogach-i-galoshi.tk/",
     newWindow: true,
     close: true,
-    gravity: 'bottom', // `top` or `bottom`
-    position: 'right', // `left`, `center` or `right`
+    gravity: "bottom", // `top` or `bottom`
+    position: "right", // `left`, `center` or `right`
     stopOnFocus: true, // Prevents dismissing of toast on hover
     style: toastifyStyle,
     onClick: function () {}, // Callback after click
@@ -36,8 +36,8 @@ export const testToast = (text: string) => {
     //destination: "http://skorobogach-i-galoshi.tk/",
     newWindow: true,
     close: true,
-    gravity: 'bottom', // `top` or `bottom`
-    position: 'right', // `left`, `center` or `right`
+    gravity: "bottom", // `top` or `bottom`
+    position: "right", // `left`, `center` or `right`
     stopOnFocus: true, // Prevents dismissing of toast on hover
     style: toastifyStyle,
     onClick: function () {}, // Callback after click
@@ -46,12 +46,12 @@ export const testToast = (text: string) => {
 
 export const closeToast = () =>
   Toastify({
-    text: 'Соединение прервано. Нажмите здесь.',
+    text: "Соединение прервано. Нажмите здесь.",
     duration: 0,
     newWindow: true,
     close: false,
-    gravity: 'bottom', // `top` or `bottom`
-    position: 'right', // `left`, `center` or `right`
+    gravity: "bottom", // `top` or `bottom`
+    position: "right", // `left`, `center` or `right`
     stopOnFocus: true, // Prevents dismissing of toast on hover
     style: toastifyStyle,
     onClick: function () {
