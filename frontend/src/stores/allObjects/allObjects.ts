@@ -2,7 +2,7 @@ import { BaseObject } from "@/constructors";
 import { defineStore } from "pinia";
 
 // запись в журнале: что сделали и с какими объектами
-type Action = { type: "add" | "remove"; objects: BaseObject[] };
+export type Action = { type: "add" | "remove"; objects: BaseObject[] };
 
 type State = {
   objects: BaseObject[]; // что сейчас на доске
@@ -27,6 +27,14 @@ export const useAllObjectsStore = defineStore("allObjects", {
     receive(obj: BaseObject) {
       this.objects = [...this.objects, obj];
     },
+    receiveRemove(toRemove: string[]) {
+      this.objects = this.objects.filter((o) => !toRemove.includes(o.objId));
+    },
+    clear() {
+      this.undoStack.push({ type: "remove", objects: this.objects });
+      this.objects = [];
+      this.redoStack = [];
+    },
     add(obj: BaseObject) {
       this.objects = [...this.objects, obj];
       this.undoStack.push({ type: "add", objects: [obj] });
@@ -48,7 +56,7 @@ export const useAllObjectsStore = defineStore("allObjects", {
       }
       this.redoStack = [];
     },
-    undo() {
+    undo(): Action | undefined {
       const action = this.undoStack.pop();
       if (!action) {
         return;
@@ -61,8 +69,10 @@ export const useAllObjectsStore = defineStore("allObjects", {
           ? without(this.objects, action.objects)
           : [...this.objects, ...action.objects];
       this.redoStack.push(action);
+
+      return { ...action, type: action.type === "add" ? "remove" : "add" };
     },
-    redo() {
+    redo(): Action | undefined {
       const action = this.redoStack.pop();
       if (!action) {
         return;
@@ -74,6 +84,8 @@ export const useAllObjectsStore = defineStore("allObjects", {
           ? [...this.objects, ...action.objects]
           : without(this.objects, action.objects);
       this.undoStack.push(action);
+
+      return action;
     },
   },
   getters: {

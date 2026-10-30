@@ -94,3 +94,72 @@ describe("allObjects store", () => {
     expect(store.objects).not.toBe(before);
   });
 });
+
+// 🎓 ТЗ на синхронизацию по сокету — эти тесты должен сделать зелёными пользователь
+describe("allObjects store: синхронизация по сокету", () => {
+  let store: ReturnType<typeof useAllObjectsStore>;
+  const [A, B, C] = [obj("A"), obj("B"), obj("C")];
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    store = useAllObjectsStore();
+  });
+
+  it("receiveRemove убирает объекты по objId и не пишет в журнал", () => {
+    store.receive(A);
+    store.receive(B);
+    store.receive(C);
+
+    store.receiveRemove(["A", "C"]);
+
+    expect(ids(store.objects)).toEqual(["B"]);
+    expect(store.canUndo).toBe(false);
+  });
+
+  it("receiveRemove не ломает свой журнал: undo своего рисунка работает дальше", () => {
+    store.add(A);
+    store.receive(B);
+
+    store.receiveRemove(["B"]);
+    store.undo();
+
+    expect(ids(store.objects)).toEqual([]);
+  });
+
+  it("undo рисунка возвращает, что изменилось на доске: объект убран", () => {
+    store.add(A);
+
+    expect(store.undo()).toEqual({ type: "remove", objects: [A] });
+  });
+
+  it("undo ластика возвращает, что изменилось на доске: объекты вернулись", () => {
+    store.add(A);
+    store.add(B);
+    store.remove([A, B]);
+
+    expect(store.undo()).toEqual({ type: "add", objects: [A, B] });
+  });
+
+  it("redo возвращает то же действие, что было в журнале", () => {
+    store.add(A);
+    store.undo();
+    expect(store.redo()).toEqual({ type: "add", objects: [A] });
+
+    store.remove([A]);
+    store.undo();
+    expect(store.redo()).toEqual({ type: "remove", objects: [A] });
+  });
+
+  it("undo/redo с пустым журналом возвращают undefined", () => {
+    expect(store.undo()).toBeUndefined();
+    expect(store.redo()).toBeUndefined();
+  });
+
+  it("clear очищает redo, как и любое новое действие", () => {
+    store.add(A);
+    store.undo();
+    store.clear();
+
+    expect(store.canRedo).toBe(false);
+  });
+});

@@ -1,0 +1,9 @@
+// Zed: формат на сохранение через oxfmt (vp fmt) с настройками из frontend/vite.config.ts
+// ponytail: prettier после перехода на Vite+ удалён, а языковой сервер форматирует по-своему
+{
+  "languages": {
+    "TypeScript": { "formatter": { "external": { "command": "pnpm", "arguments": ["--dir", "frontend", "exec", "vp", "fmt", "--stdin-filepath", "{buffer_path}"] } } },
+    "JavaScript": { "formatter": { "external": { "command": "pnpm", "arguments": ["--dir", "frontend", "exec", "vp", "fmt", "--stdin-filepath", "{buffer_path}"] } } },
+    "Vue.js": { "formatter": { "external": { "command": "pnpm", "arguments": ["--dir", "frontend", "exec", "vp", "fmt", "--stdin-filepath", "{buffer_path}"] } } }
+  }
+}
