@@ -62,6 +62,18 @@ const pickColor = (color: string, variant: "fill" | "border" | "text") => {
   }
   closeAllPickers();
 };
+
+const colorKeys = { fill: "fillColor", border: "borderColor", text: "textColor" } as const;
+
+// поле hex: в стор — по Enter или уходу из поля, через ту же нормализацию, что и палитра
+const onHexChange = (event: Event, variant: "fill" | "border" | "text") => {
+  const input = event.target as HTMLInputElement;
+  pickColor(input.value, variant);
+  // если стор не изменился (ввели мусор), Vue поле не перерисует — возвращаем значение сами
+  input.value = optionsStore.colors[colorKeys[variant]];
+  // снимаем фокус, чтобы цифры снова переключали инструменты
+  input.blur();
+};
 </script>
 
 <template>
@@ -69,47 +81,83 @@ const pickColor = (color: string, variant: "fill" | "border" | "text") => {
     <div class="options-color-container" id="options-color-fill" v-if="isFillColor">
       <p>Цвет зарисовки</p>
       <div class="color-container">
-        <div class="color-picker" @click="toggleFillColor"
-          :style="{ backgroundColor: optionsStore.getterColors.fillColor }"></div>
+        <div
+          class="color-picker"
+          @click="toggleFillColor"
+          :style="{ backgroundColor: optionsStore.getterColors.fillColor }"
+        ></div>
 
-        <ColorPicker :is-open="isFillColorOpen" :colors-list="optionsStore.allOptions.colors"
-          @click="(color) => pickColor(color, 'fill')" />
+        <ColorPicker
+          :is-open="isFillColorOpen"
+          :colors-list="optionsStore.allOptions.colors"
+          @color-click="(color) => pickColor(color, 'fill')"
+        />
 
         <div class="color-picker-input">
           <p>#</p>
-          <input placeholder="000000" type="text" id="color-picker-input" v-model="optionsStore.colors.fillColor" />
+          <input
+            placeholder="000000"
+            type="text"
+            id="color-picker-input"
+            :value="optionsStore.colors.fillColor"
+            @change="onHexChange($event, 'fill')"
+          />
         </div>
       </div>
     </div>
     <div class="options-color-container" id="options-color-border" v-if="isStrokeColor">
       <p>Цвет границы</p>
       <div class="color-container">
-        <div class="color-picker" id="stroke-color-picker" @click="toggleBorderColor"
-          :style="{ backgroundColor: optionsStore.getterColors.borderColor }"></div>
+        <div
+          class="color-picker"
+          id="stroke-color-picker"
+          @click="toggleBorderColor"
+          :style="{ backgroundColor: optionsStore.getterColors.borderColor }"
+        ></div>
 
-        <ColorPicker :is-open="isBorderColorOpen" :colors-list="optionsStore.allOptions.colors"
-          @click="(color) => pickColor(color, 'border')" />
+        <ColorPicker
+          :is-open="isBorderColorOpen"
+          :colors-list="optionsStore.allOptions.colors"
+          @color-click="(color) => pickColor(color, 'border')"
+        />
 
         <div class="color-picker-input" id="stroke-color-picker-container">
           <p>#</p>
-          <input placeholder="000000" type="text" id="stroke-color-picker-input"
-            v-model="optionsStore.colors.borderColor" />
+          <input
+            placeholder="000000"
+            type="text"
+            id="stroke-color-picker-input"
+            :value="optionsStore.colors.borderColor"
+            @change="onHexChange($event, 'border')"
+          />
         </div>
       </div>
     </div>
     <div class="options-color-container" id="options-color-text" v-if="isTextColor">
       <p>Цвет текста</p>
       <div class="color-container">
-        <div class="color-picker" id="text-color-picker" @click="toggleTextColor"
-          :style="{ backgroundColor: optionsStore.getterColors.textColor }"></div>
+        <div
+          class="color-picker"
+          id="text-color-picker"
+          @click="toggleTextColor"
+          :style="{ backgroundColor: optionsStore.getterColors.textColor }"
+        ></div>
 
-        <ColorPicker :is-open="isTextColorOpen" :colors-list="optionsStore.allOptions.colors"
-          @click="(color) => pickColor(color, 'text')" />
+        <ColorPicker
+          :is-open="isTextColorOpen"
+          :colors-list="optionsStore.allOptions.colors"
+          @color-click="(color) => pickColor(color, 'text')"
+        />
 
         <div class="color-picker-input" id="text-color-picker-container">
           <p>#</p>
-          <input placeholder="000000" type="text" id="text-color-picker-input"
-            v-model="optionsStore.colors.textColor" />
+          <input
+            placeholder="000000"
+            type="text"
+            id="text-color-picker-input"
+            :value="optionsStore.colors.textColor"
+            @change="onHexChange($event, 'text')"
+          />
         </div>
       </div>
     </div>
@@ -117,10 +165,15 @@ const pickColor = (color: string, variant: "fill" | "border" | "text") => {
       <p>Толщина линии</p>
       <div class="options-btns-container">
         <div v-for="lineSize in optionsStore.allOptions.lineWidths" :key="lineSize.label">
-          <button :class="'option-btn width-btn' +
-            (optionsStore.lineWidth === lineSize.value ? ' active-option' : '')
-            " :data-line-width="lineSize.value" :key="lineSize.value"
-            @click="() => optionsStore.setLineWidth(lineSize.value)">
+          <button
+            :class="
+              'option-btn width-btn' +
+              (optionsStore.lineWidth === lineSize.value ? ' active-option' : '')
+            "
+            :data-line-width="lineSize.value"
+            :key="lineSize.value"
+            @click="() => optionsStore.setLineWidth(lineSize.value)"
+          >
             {{ lineSize.label }}
           </button>
         </div>
@@ -130,10 +183,15 @@ const pickColor = (color: string, variant: "fill" | "border" | "text") => {
       <p>Размер текста</p>
       <div class="options-btns-container">
         <div v-for="textSize in optionsStore.allOptions.textSizes" :key="textSize.label">
-          <button :class="'option-btn font-size-btn ' +
-            (optionsStore.textSize === textSize.value ? 'active-option' : '')
-            " :data-font-size="textSize.value" :key="textSize.value"
-            @click="() => optionsStore.setTextSize(textSize.value)">
+          <button
+            :class="
+              'option-btn font-size-btn ' +
+              (optionsStore.textSize === textSize.value ? 'active-option' : '')
+            "
+            :data-font-size="textSize.value"
+            :key="textSize.value"
+            @click="() => optionsStore.setTextSize(textSize.value)"
+          >
             {{ textSize.label }}
           </button>
         </div>
@@ -141,14 +199,26 @@ const pickColor = (color: string, variant: "fill" | "border" | "text") => {
     </div>
     <div class="options-container" id="opacity-options-container">
       <p>Прозрачность линии</p>
-      <input type="range" min="0.1" max="1" step="0.1" id="input-opacity" v-model.lazy="optionsStore.opacity" />
+      <input
+        type="range"
+        min="0.1"
+        max="1"
+        step="0.1"
+        id="input-opacity"
+        v-model.lazy="optionsStore.opacity"
+      />
     </div>
     <div class="options-container" id="fill-style-options-container" v-if="isFillType">
       <p>Стиль заливки</p>
       <div class="fill-style-options-container">
-        <button v-for="fillStyle in optionsStore.allOptions.fillStyles"
-          @click="() => optionsStore.setFillStyle(fillStyle)" :key="fillStyle" :class="'fill-style-btn ' + (optionsStore.fillStyle === fillStyle ? 'active-fill-style' : '')
-            ">
+        <button
+          v-for="fillStyle in optionsStore.allOptions.fillStyles"
+          @click="() => optionsStore.setFillStyle(fillStyle)"
+          :key="fillStyle"
+          :class="
+            'fill-style-btn ' + (optionsStore.fillStyle === fillStyle ? 'active-fill-style' : '')
+          "
+        >
           {{ fillStyle }}
         </button>
       </div>
@@ -347,7 +417,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 .options-color-container,
-.options-container>p {
+.options-container > p {
   color: var(--clr-text);
 }
 </style>

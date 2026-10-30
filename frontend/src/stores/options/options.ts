@@ -65,8 +65,20 @@ const defaultState = {
   opacity: 1,
 };
 
+// цвет в сторе — hex без #: "#ABC" / "abc" / "#aabbcc" → "aabbcc", невалидный → undefined
+const normalizeHex = (hex: string) => {
+  const digits = hex.trim().replace(/^#/, "").toLowerCase();
+
+  if (/^[0-9a-f]{3}$/.test(digits)) {
+    return [...digits].map((d) => d + d).join("");
+  }
+
+  return /^[0-9a-f]{6}$/.test(digits) ? digits : undefined;
+};
+
 export const useOptionsStore = defineStore("options", {
-  state: () => ({ ...defaultState }),
+  // structuredClone: иначе colors — общий объект с defaultState, и смена цвета портит дефолт
+  state: () => structuredClone(defaultState),
   getters: {
     getterColors: (state) => ({
       fillColor: "#" + state.colors.fillColor,
@@ -90,8 +102,9 @@ export const useOptionsStore = defineStore("options", {
   },
   actions: {
     setFillColor(hexCode: string) {
-      if (this.isValidHex(hexCode)) {
-        this.colors.fillColor = hexCode;
+      const hex = normalizeHex(hexCode);
+      if (hex) {
+        this.colors.fillColor = hex;
       } else {
         console.warn("Недопустимый HEX-код для fillColor. Используется значение по умолчанию.");
         this.colors.fillColor = defaultState.colors.fillColor;
@@ -99,8 +112,9 @@ export const useOptionsStore = defineStore("options", {
     },
 
     setBorderColor(hexCode: string) {
-      if (this.isValidHex(hexCode)) {
-        this.colors.borderColor = hexCode;
+      const hex = normalizeHex(hexCode);
+      if (hex) {
+        this.colors.borderColor = hex;
       } else {
         console.warn("Недопустимый HEX-код для borderColor. Используется значение по умолчанию.");
         this.colors.borderColor = defaultState.colors.borderColor;
@@ -108,8 +122,9 @@ export const useOptionsStore = defineStore("options", {
     },
 
     setTextColor(hexCode: string) {
-      if (this.isValidHex(hexCode)) {
-        this.colors.textColor = hexCode;
+      const hex = normalizeHex(hexCode);
+      if (hex) {
+        this.colors.textColor = hex;
       } else {
         console.warn("Недопустимый HEX-код для textColor. Используется значение по умолчанию.");
         this.colors.textColor = defaultState.colors.textColor;
@@ -135,10 +150,6 @@ export const useOptionsStore = defineStore("options", {
     setOpacity(value: number) {
       const result = getMinMax(0.1, 1, value);
       this.opacity = result;
-    },
-    isValidHex(hexCode: string): boolean {
-      const hexColorRegex = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-      return hexColorRegex.test(hexCode);
     },
     isValidSize(size: string): boolean {
       const sizeRegex = /^(\d+(\.\d+)?|0)rem$/;

@@ -20,6 +20,7 @@ import rough from "roughjs";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
 import { toServerMessages } from "@/utils/toServerMessages";
+import { getHistoryHotkey, isTyping } from "@/utils/hotkeys";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -532,36 +533,62 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 };
 
 const onKeyDown = (event: KeyboardEvent) => {
+  // event.preventDefault();
+
+  if (isTyping(event)) {
+    return;
+  }
+
+  const historyKey = getHistoryHotkey(event);
+
+  if (historyKey) {
+    event.preventDefault();
+    allObjectsStore[historyKey]();
+
+    return;
+  }
+
   const code = event.code;
 
-  if (code === "Space") {
-    isSpacePressed.value = true;
+  switch (code) {
+    case "Space": {
+      isSpacePressed.value = true;
 
-    return;
+      return;
+    }
+    case "Minus": {
+      zoomStore.decreaseZoom();
+
+      return;
+    }
+    case "Equal": {
+      zoomStore.increaseZoom();
+
+      return;
+    }
+
+    default: {
+      const keyboardNumber = event.key;
+      const newCursor = constantsForKeyboard[keyboardNumber];
+
+      if (newCursor) {
+        cursorStore.setCursor(newCursor);
+      }
+    }
   }
 
-  if (code === "Minus") {
-    zoomStore.decreaseZoom();
-
-    return;
-  }
-
-  if (code === "Equal") {
-    zoomStore.increaseZoom();
-
-    return;
-  }
-
-  if (!code.startsWith("Digit")) {
-    return;
-  }
-
-  const keyCodeArr = code.split("Digit");
-  const keyboardNumber = keyCodeArr[1];
-
-  const newCursor = constantsForKeyboard[keyboardNumber];
-
-  cursorStore.setCursor(newCursor);
+  //   if (!code.startsWith("Digit")) {
+  //     return;
+  //   }
+  //
+  //   const keyCodeArr = code.split("Digit");
+  //   const keyboardNumber = keyCodeArr[1];
+  //
+  //   const newCursor = constantsForKeyboard[keyboardNumber];
+  //
+  //   if (event.metaKey || event.altKey) {
+  //     cursorStore.setCursor(newCursor);
+  //   }
 };
 
 const onKeyUp = (event: KeyboardEvent) => {

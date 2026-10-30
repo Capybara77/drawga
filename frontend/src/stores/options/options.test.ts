@@ -126,6 +126,27 @@ describe("options store", () => {
     expect(store.colors.textColor).toBe("0000ff");
   });
 
+  it("цвет хранится без #, даже если пришёл с # (палитра, вставка из буфера)", () => {
+    const store = useOptionsStore();
+    store.setFillColor("#c92a2a");
+    expect(store.colors.fillColor).toBe("c92a2a");
+    expect(store.getterColors.fillColor).toBe("#c92a2a");
+    expect(store.getterColorsWithOpacity.fillColor).toBe("rgba(201, 42, 42, 1)");
+  });
+
+  it("короткий hex разворачивается в полный", () => {
+    const store = useOptionsStore();
+    store.setBorderColor("#abc");
+    expect(store.colors.borderColor).toBe("aabbcc");
+  });
+
+  it("смена цвета не портит значения по умолчанию для следующего стора", () => {
+    useOptionsStore().setFillColor("ff0000");
+
+    setActivePinia(createPinia());
+    expect(useOptionsStore().colors.fillColor).toBe("5f3dc4");
+  });
+
   it("метод setLineWidth обновляет толщину линии", () => {
     const store = useOptionsStore();
     store.setLineWidth(20);
