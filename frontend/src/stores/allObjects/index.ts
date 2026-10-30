@@ -1,1 +1,1 @@
-export { useAllObjectsStore } from "./allObjects"
+export { useAllObjectsStore } from "./allObjects";

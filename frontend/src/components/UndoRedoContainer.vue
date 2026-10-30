@@ -2,17 +2,27 @@
 import { useAllObjectsStore } from "@/stores/allObjects";
 import Undo from "@primeicons/vue/undo";
 
-const allObjectsStore = useAllObjectsStore()
+const allObjectsStore = useAllObjectsStore();
 </script>
 
 <template>
   <div class="undo-container">
-    <button class='undoredo-btn' id="undo" :disabled="!allObjectsStore.canUndo" title="undo button"
-      @click="allObjectsStore.undo()">
+    <button
+      class="undoredo-btn"
+      id="undo"
+      :disabled="!allObjectsStore.canUndo"
+      title="undo button"
+      @click="allObjectsStore.undo()"
+    >
       <Undo />
     </button>
-    <button class='undoredo-btn' id="redo" :disabled="!allObjectsStore.canRedo" title="redo button"
-      @click="allObjectsStore.redo()">
+    <button
+      class="undoredo-btn"
+      id="redo"
+      :disabled="!allObjectsStore.canRedo"
+      title="redo button"
+      @click="allObjectsStore.redo()"
+    >
       <Undo />
     </button>
   </div>

@@ -32,7 +32,7 @@ const zoomStore = useZoomStore();
   padding: 0 10px;
 }
 
-.zoom-container>* {
+.zoom-container > * {
   cursor: pointer;
 }
 

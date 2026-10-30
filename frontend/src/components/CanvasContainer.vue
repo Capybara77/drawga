@@ -14,13 +14,14 @@ import { useOptionsStore } from "@/stores/options/";
 import { useZoomStore } from "@/stores/zoom/";
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from "@/types";
 import { getTypedDrawObject } from "@/utils/getTypedDrawObject/getTypedDrawObject";
-import { useEventListener } from "@vueuse/core";
+import { useEventListener, useThrottleFn } from "@vueuse/core";
 import rough from "roughjs";
 
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
 import { toServerMessages } from "@/utils/toServerMessages";
 import { getHistoryHotkey, isTyping } from "@/utils/hotkeys";
+import { generateId } from "@/utils";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -53,6 +54,7 @@ const isMoving = ref(false);
 // стёрли ли уже что-то за текущее движение ластиком — тогда склеиваем в одну запись undo
 const isErasedInStroke = ref(false);
 
+let strokeId = "";
 const userId = "123";
 
 allObjectsStore.$onAction(({ name, after }) => {
@@ -121,7 +123,11 @@ const handleDraw = (event: CustomEvent) => {
     return;
   }
 
-  allObjectsStore.receive(obj);
+  const action = event.detail[0] === "drawObj" ? "receive" : "receiveTemp";
+
+  allObjectsStore[action](obj);
+
+  // allObjectsStore.receive(obj);
   obj.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
 };
 
@@ -145,11 +151,30 @@ const createSocketConnection = () => {
   useEventListener(socket, "drawObj", handleDraw);
   useEventListener(socket, "cur", handleCur);
   useEventListener(socket, "delete", handleDelete);
+  useEventListener(socket, "temp", handleDraw);
 };
 
 const redrawWithOffset = () => {
   for (let index = 0; index < allObjectsStore.size; index++) {
     const element = allObjectsStore.objects[index];
+
+    if (
+      element.isOverlay(
+        offsetXCustom.value,
+        offsetYCustom.value,
+        canvasElement.value?.clientWidth ?? 0,
+        canvasElement.value?.clientHeight ?? 0,
+        zoomStore.zoom,
+      )
+    ) {
+      element.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom ?? 1);
+    }
+  }
+};
+
+const redrawWithOffsetTemp = () => {
+  for (let index = 0; index < allObjectsStore.previews.length; index++) {
+    const element = allObjectsStore.previews[index];
 
     if (
       element.isOverlay(
@@ -177,6 +202,7 @@ const clearCanvas = () => {
 const redrawWithClearing = () => {
   clearCanvas();
   redrawWithOffset();
+  redrawWithOffsetTemp();
 };
 
 const updateCanvasSize = () => {
@@ -229,7 +255,9 @@ const getNewRectObject = (event: PointerEvent) => {
     ],
   };
 
-  return new RectangleObject(rectangleProps);
+  const rect = new RectangleObject(rectangleProps);
+
+  return rect;
 };
 
 const onCanvasPointerDown = (event: PointerEvent) => {
@@ -255,6 +283,7 @@ const onCanvasPointerDown = (event: PointerEvent) => {
   isErasedInStroke.value = false;
 
   currentCoordinates.value = [];
+  strokeId = generateId(6);
 
   cursorXStart.value = event.clientX;
   cursorYStart.value = event.clientY;
@@ -346,6 +375,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     return;
   }
 
+  currentDrawing.objId = strokeId;
+
   // allObjects.value = [...allObjects.value, currentDrawing];
   allObjectsStore.add(currentDrawing);
 
@@ -382,6 +413,10 @@ const isHit = (drawObject: BaseObject, x: number, y: number): boolean => {
       return false;
   }
 };
+
+const sendTemp = useThrottleFn((obj) => {
+  socket.send(["temp", JSON.stringify(obj)]);
+}, 50);
 
 const onCanvasPointerMove = (event: PointerEvent) => {
   const element = event.target as HTMLElement;
@@ -449,7 +484,11 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       const curve = getNewCurveObject();
 
-      curve?.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      if (curve) {
+        curve.objId = strokeId;
+        curve.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+        sendTemp(curve);
+      }
       // }
 
       break;
@@ -459,11 +498,15 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       if (event.shiftKey) {
       }
 
-      const rect = getNewRectObject(event);
-
       redrawWithClearing();
 
-      rect.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      const rect = getNewRectObject(event);
+
+      if (rect) {
+        rect.objId = strokeId;
+        rect.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+        sendTemp(rect);
+      }
       break;
     }
 
@@ -487,7 +530,11 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 
       redrawWithClearing();
 
-      line.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      if (line) {
+        line.objId = strokeId;
+        line.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+        sendTemp(line);
+      }
 
       break;
     }
@@ -518,11 +565,15 @@ const onCanvasPointerMove = (event: PointerEvent) => {
         userId: userId,
       };
 
-      const ellipse = new EllipseObject(ellipseProps);
-
       redrawWithClearing();
 
-      ellipse.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+      const ellipse = new EllipseObject(ellipseProps);
+
+      if (ellipse) {
+        ellipse.objId = strokeId;
+        ellipse.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
+        sendTemp(ellipse);
+      }
 
       break;
     }
@@ -621,13 +672,10 @@ watch(zoomStore, () => {
   redrawWithClearing();
 });
 
-// стор всегда подменяет массив objects, поэтому хватает слежки за ссылкой
-watch(
-  () => allObjectsStore.objects,
-  () => {
-    redrawWithClearing();
-  },
-);
+// стор всегда подменяет массив objects / previews, поэтому хватает слежки за ссылкой
+watch([() => allObjectsStore.objects, () => allObjectsStore.previews], () => {
+  redrawWithClearing();
+});
 </script>
 
 <template>

@@ -6,6 +6,7 @@ export type Action = { type: "add" | "remove"; objects: BaseObject[] };
 
 type State = {
   objects: BaseObject[]; // что сейчас на доске
+  previews: BaseObject[];
   undoStack: Action[];
   redoStack: Action[];
 };
@@ -19,6 +20,7 @@ const without = (objects: BaseObject[], toDrop: BaseObject[]) => {
 export const useAllObjectsStore = defineStore("allObjects", {
   state: (): State => ({
     objects: [],
+    previews: [],
     undoStack: [],
     redoStack: [],
   }),
@@ -26,6 +28,16 @@ export const useAllObjectsStore = defineStore("allObjects", {
     // объект пришёл с сервера (чужой или загрузка доски) — в журнал не пишем
     receive(obj: BaseObject) {
       this.objects = [...this.objects, obj];
+      this.previews = this.previews.filter((curr) => curr.objId !== obj.objId);
+    },
+    receiveTemp(obj: BaseObject) {
+      const objInObjects = this.objects.find((curr) => curr.objId === obj.objId);
+
+      if (objInObjects) {
+        return;
+      }
+
+      this.previews = [...this.previews.filter((curr) => curr.objId !== obj.objId), obj];
     },
     receiveRemove(toRemove: string[]) {
       this.objects = this.objects.filter((o) => !toRemove.includes(o.objId));
