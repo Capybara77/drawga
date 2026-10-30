@@ -1,20 +1,31 @@
 <script setup lang="ts">
-const props = defineProps<{
+const { colorsList } = defineProps<{
   isOpen: boolean;
-  onClick: (color: string) => void;
   colorsList: string[];
+}>();
+
+defineEmits<{
+  colorClick: [color: string];
 }>();
 </script>
 
 <template>
-  <div class="color-list" id="color-list" v-if="props.isOpen">
+  <div class="color-list" id="color-list" v-if="isOpen">
     <div
-      v-for="color in props.colorsList"
+      v-for="color in colorsList"
       :key="color"
       class="color-item"
       :id="'color-item-#' + color"
       :style="{ backgroundColor: `#${color}` }"
-      @click="() => props.onClick(color)"
+      @click="$emit('colorClick', color)"
     ></div>
   </div>
 </template>
+
+<style scoped>
+.color-item {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}
+</style>
