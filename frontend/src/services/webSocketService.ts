@@ -59,15 +59,11 @@ export class WebSocketService extends EventTarget {
         "Невозможно отправить данные. WebSocket не открыт. Текущее состояние:",
         this.socket.readyState,
       );
+
+      return;
     }
 
-    const formattedData = formatDataToWS(data);
-
-    try {
-      this.socket.send(String(formattedData.length));
-      this.socket.send(formattedData);
-    } catch (error) {
-      console.error("Пизда рисованию:", error);
-    }
+    // одно сообщение WebSocket = одна команда; границы сообщений держит сам протокол
+    this.socket.send(formatDataToWS(data));
   }
 }
