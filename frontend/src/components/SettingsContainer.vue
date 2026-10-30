@@ -32,7 +32,6 @@ const toggleSettings = () => {
 };
 
 const clearBoard = () => {
-  socket.send(["clear:::".length as unknown as string]);
   socket.send(["clear"]);
 };
 </script>

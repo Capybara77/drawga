@@ -13,6 +13,7 @@ public sealed class DrawState
     {
         Sockets = new ConcurrentDictionary<int, List<WebSocket>>();
         History = new ConcurrentDictionary<int, List<byte[]>>();
+        SendLocks = new ConcurrentDictionary<WebSocket, SemaphoreSlim>();
         PrivateBoards = new[] { 7, 9 };
         BoardManager = new BoardManager(History);
     }
@@ -22,5 +23,7 @@ public sealed class DrawState
     public int[] PrivateBoards { get; private set; }
     public ConcurrentDictionary<int, List<WebSocket>> Sockets { get; }
     public ConcurrentDictionary<int, List<byte[]>> History { get; }
+    // WebSocket не разрешает два SendAsync одновременно, а пишут в сокет циклы всех участников доски
+    public ConcurrentDictionary<WebSocket, SemaphoreSlim> SendLocks { get; }
     public BoardManager BoardManager { get; }
 }

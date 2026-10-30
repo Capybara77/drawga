@@ -35,37 +35,44 @@ public class DrawController : Controller, IDisposable
         }
 
         var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        var sockets = _state.Sockets.GetOrAdd(id, _ => new());
 
-        if (!_state.Sockets.ContainsKey(id))
+        // списки досок общие для всех подключений — трогаем только под lock
+        lock (sockets)
         {
-            _state.Sockets.TryAdd(id, new());
-        }
+            if (sockets.Count == 0)
+            {
+                _state.BoardManager.LoadBoard(id, $"{id}.board");
+            }
 
-        if (_state.Sockets[id].Count == 0)
-        {
-            _state.BoardManager.LoadBoard(id, $"{id}.board");
+            sockets.Add(socket);
         }
-
-        _state.Sockets[id].Add(socket);
 
         if (ClientConnectedAsync != null)
         {
             await ClientConnectedAsync(socket, id);
         }
 
-        var msg = FormatMessage("message", $"Элементов на доске: {_state.History[id].Count}");
+        var history = _state.History.GetOrAdd(id, _ => new());
+        byte[][] snapshot;
 
-        await socket.SendAsync(Encoding.UTF8.GetBytes(msg), WebSocketMessageType.Text, true,
-            CancellationToken.None);
-
-        if (!_state.History.ContainsKey(id))
-            _state.History.TryAdd(id, new());
+        lock (history)
+        {
+            snapshot = history.ToArray();
+        }
 
         try
         {
-            foreach (var t in _state.History[id])
+            await SendAsync(socket, Encoding.UTF8.GetBytes(FormatMessage("message", $"Элементов на доске: {snapshot.Length}")));
+
+            foreach (var t in snapshot)
             {
-                await socket.SendAsync(t, WebSocketMessageType.Text, true, CancellationToken.None);
+                await SendAsync(socket, t);
+            }
+
+            if (_state.PrivateBoards.Contains(id))
+            {
+                await SendAsync(socket, Encoding.UTF8.GetBytes(FormatMessage("message", "Это закрытая доска. Изменения не сохраняются")));
             }
         }
         catch
@@ -73,29 +80,18 @@ public class DrawController : Controller, IDisposable
             // ignored
         }
 
-        if (_state.PrivateBoards.Contains(id))
-        {
-            var saveMsg = FormatMessage("message", "Это закрытая доска. Изменения не сохраняются");
-
-            await socket.SendAsync(Encoding.UTF8.GetBytes(saveMsg),
-                WebSocketMessageType.Text, true, CancellationToken.None);
-        }
-
         while (socket.State == WebSocketState.Open)
         {
             try
             {
-                var bufferSize = new byte[32];
-                await socket.ReceiveAsync(bufferSize, CancellationToken.None);
+                var buffer = await SocketMessages.ReceiveAsync(socket);
 
-                var successParse = int.TryParse(Encoding.UTF8.GetString(bufferSize), out int size);
+                if (buffer == null)
+                    break;
 
-                if (!successParse || _state.PrivateBoards.Contains(id))
+                if (_state.PrivateBoards.Contains(id))
                     continue;
 
-                var buffer = new byte[size];
-
-                await socket.ReceiveAsync(buffer, CancellationToken.None);
                 var message = Encoding.UTF8.GetString(buffer);
 
                 AddToHistory(buffer, id);
@@ -103,7 +99,7 @@ public class DrawController : Controller, IDisposable
 
                 if (message == "save")
                 {
-                    _state.BoardManager.SaveBoard(id, $"{id}.board");
+                    SaveHistory(id);
                 }
 
                 await SendData(socket, buffer, id);
@@ -115,11 +111,18 @@ public class DrawController : Controller, IDisposable
             }
         }
 
-        _state.Sockets[id].Remove(socket);
+        lock (sockets)
+        {
+            sockets.Remove(socket);
+        }
+
         if (ClientDisconnectAsync != null)
         {
             await ClientDisconnectAsync(socket, id);
         }
+
+        await CloseAsync(socket);
+        _state.SendLocks.TryRemove(socket, out _);
     }
 
     private static string FormatMessage(string msgType, string msgContent)
@@ -145,11 +148,28 @@ public class DrawController : Controller, IDisposable
 
     private Task SaveBoard(WebSocket client, int boardId)
     {
-        if (_state.Sockets.ContainsKey(boardId) && _state.Sockets[boardId].Count != 0) return Task.CompletedTask;
+        if (_state.Sockets.TryGetValue(boardId, out var sockets))
+        {
+            lock (sockets)
+            {
+                if (sockets.Count != 0) return Task.CompletedTask;
+            }
+        }
 
-        _state.BoardManager.SaveBoard(boardId, $"{boardId}.board");
-        _state.History[boardId] = new();
+        // ponytail: историю в памяти не обнуляем — если двое вышли одновременно, оба сохранят,
+        // и второй раньше затирал файл пустым списком. При следующем входе LoadBoard всё равно перечитает файл
+        SaveHistory(boardId);
         return Task.CompletedTask;
+    }
+
+    private void SaveHistory(int boardId)
+    {
+        var history = _state.History[boardId];
+
+        lock (history)
+        {
+            _state.BoardManager.SaveBoard(boardId, $"{boardId}.board");
+        }
     }
 
     private Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
@@ -164,13 +184,11 @@ public class DrawController : Controller, IDisposable
 
         var delId = (JsonConvert.DeserializeObject(parts[1]) as dynamic)?.objId.ToString();
 
-        var historyToDelete = _state.History[id]
-            .Where(bytes => delId != null && Encoding.UTF8.GetString(bytes).Contains(delId))
-            .ToArray();
+        var history = _state.History[id];
 
-        foreach (var bytes in historyToDelete)
+        lock (history)
         {
-            _state.History[id].Remove(bytes);
+            history.RemoveAll(bytes => delId != null && Encoding.UTF8.GetString(bytes).Contains(delId));
         }
 
         return Task.CompletedTask;
@@ -178,38 +196,91 @@ public class DrawController : Controller, IDisposable
 
     private void AddToHistory(byte[] buffer, int id)
     {
-        if (_state.History[id].Count > MaxArrayLength)
-        {
-            _state.History[id].Remove(_state.History[id][0]);
-        }
-
         var message = Encoding.UTF8.GetString(buffer);
-
-        if (message.StartsWith("clear"))
-        {
-            _state.History[id].Clear();
-        }
 
         if (message.StartsWith("cur"))
             return;
 
-        _state.History[id].Add(buffer);
+        var history = _state.History[id];
+
+        lock (history)
+        {
+            if (history.Count > MaxArrayLength)
+            {
+                history.RemoveAt(0);
+            }
+
+            if (message.StartsWith("clear"))
+            {
+                history.Clear();
+            }
+
+            history.Add(buffer);
+        }
     }
 
     private async Task SendData(WebSocket socketSender, byte[] buffer, int id)
     {
-        for (var i = 0; i < _state.Sockets[id].Count; i++)
+        var sockets = _state.Sockets[id];
+        WebSocket[] clients;
+
+        lock (sockets)
         {
-            var client = _state.Sockets[id][i];
-            if (client.State != WebSocketState.Open)
+            clients = sockets.ToArray();
+        }
+
+        foreach (var client in clients)
+        {
+            if (client == socketSender || client.State != WebSocketState.Open)
+                continue;
+
+            try
             {
-                continue;
+                await SendAsync(client, buffer);
             }
+            catch (Exception e)
+            {
+                // отвалился получатель — это не повод рвать соединение отправителя
+                Console.WriteLine(e.Message);
+            }
+        }
+    }
 
-            if (socketSender == client)
-                continue;
+    private async Task SendAsync(WebSocket socket, byte[] data)
+    {
+        var sendLock = _state.SendLocks.GetOrAdd(socket, _ => new SemaphoreSlim(1, 1));
+        await sendLock.WaitAsync();
 
-            await client.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+        try
+        {
+            await socket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+        finally
+        {
+            sendLock.Release();
+        }
+    }
+
+    // закрываем по-человечески, иначе клиент видит обрыв 1006
+    private async Task CloseAsync(WebSocket socket)
+    {
+        var sendLock = _state.SendLocks.GetOrAdd(socket, _ => new SemaphoreSlim(1, 1));
+        await sendLock.WaitAsync();
+
+        try
+        {
+            if (socket.State is WebSocketState.Open or WebSocketState.CloseReceived)
+            {
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+            }
+        }
+        catch
+        {
+            // ignored
+        }
+        finally
+        {
+            sendLock.Release();
         }
     }
     
