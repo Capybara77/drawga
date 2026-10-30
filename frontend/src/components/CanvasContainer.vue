@@ -19,6 +19,7 @@ import rough from "roughjs";
 
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
+import { toServerMessages } from "@/utils/toServerMessages";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -27,7 +28,7 @@ const { socket } = defineProps<{
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 const zoomStore = useZoomStore();
-const allObjectsStore = useAllObjectsStore()
+const allObjectsStore = useAllObjectsStore();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>("canvasElement");
 const canvasContext = ref<CanvasRenderingContext2D>();
@@ -52,6 +53,18 @@ const isMoving = ref(false);
 const isErasedInStroke = ref(false);
 
 const userId = "123";
+
+allObjectsStore.$onAction(({ name, after }) => {
+  if (name === "undo" || name === "redo") {
+    after((result) => {
+      if (!result) {
+        return;
+      }
+      const msgs = toServerMessages(result);
+      msgs.forEach((msg) => socket.send(msg));
+    });
+  }
+});
 
 const handleClose = (event: CustomEvent) => {
   console.log("Соединение закрыто", event.detail);
@@ -111,6 +124,18 @@ const handleDraw = (event: CustomEvent) => {
   obj.draw(offsetXCustom.value, offsetYCustom.value, zoomStore.zoom);
 };
 
+const handleDelete = (event: CustomEvent) => {
+  const str = event.detail[1] as string;
+  const { objId } = JSON.parse(str) as { objId: string };
+  allObjectsStore.receiveRemove([objId]);
+};
+
+const createWindowListeners = () => {
+  useEventListener(window, "resize", updateCanvasSize);
+  useEventListener(window, "keydown", onKeyDown);
+  useEventListener(window, "keyup", onKeyUp);
+};
+
 const createSocketConnection = () => {
   useEventListener(socket, "move", handleMove);
   useEventListener(socket, "clear", handleClear);
@@ -118,6 +143,7 @@ const createSocketConnection = () => {
   useEventListener(socket, "message", handleMessage);
   useEventListener(socket, "drawObj", handleDraw);
   useEventListener(socket, "cur", handleCur);
+  useEventListener(socket, "delete", handleDelete);
 };
 
 const redrawWithOffset = () => {
@@ -196,8 +222,8 @@ const getNewRectObject = (event: PointerEvent) => {
         : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
       event.shiftKey
         ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-        ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
+          ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
+            (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
         : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
     ],
   };
@@ -295,8 +321,8 @@ const onCanvasPointerUp = (event: PointerEvent) => {
             : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
           event.shiftKey
             ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-            ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
-              (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
+              ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
+                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
             : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
         ],
         fillStyle: optionsStore.fillStyle,
@@ -320,14 +346,11 @@ const onCanvasPointerUp = (event: PointerEvent) => {
   }
 
   // allObjects.value = [...allObjects.value, currentDrawing];
-  allObjectsStore.add(currentDrawing)
+  allObjectsStore.add(currentDrawing);
 
   redrawWithClearing();
 
-  const messageToServer = [
-    "drawObj",
-    JSON.stringify(allObjectsStore.peek),
-  ].map(String);
+  const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
 
   socket.send(messageToServer);
 };
@@ -401,6 +424,13 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       if (toErase.length > 0) {
         isErasedInStroke.value = true;
       }
+
+      const result = toServerMessages({ type: "remove", objects: toErase });
+
+      result.forEach((msg) => {
+        socket.send(msg);
+      });
+
       break;
     }
 
@@ -475,8 +505,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
             : (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
           event.shiftKey
             ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-            ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom -
-              (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
+              ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom -
+                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
             : (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
         ],
         fillStyle: optionsStore.fillStyle,
@@ -557,10 +587,7 @@ onMounted(() => {
   canvasElement.value.height = window.innerHeight;
 
   createSocketConnection();
-
-  useEventListener(window, "resize", updateCanvasSize);
-  useEventListener(window, "keydown", onKeyDown);
-  useEventListener(window, "keyup", onKeyUp);
+  createWindowListeners();
 });
 
 watch(zoomStore, () => {
@@ -574,12 +601,16 @@ watch(
     redrawWithClearing();
   },
 );
-
 </script>
 
 <template>
-  <canvas id="canvas" ref="canvasElement" @pointerdown.stop="onCanvasPointerDown" @pointerup="onCanvasPointerUp"
-    @pointermove="onCanvasPointerMove"></canvas>
+  <canvas
+    id="canvas"
+    ref="canvasElement"
+    @pointerdown.stop="onCanvasPointerDown"
+    @pointerup="onCanvasPointerUp"
+    @pointermove="onCanvasPointerMove"
+  ></canvas>
 </template>
 
 <style scoped>
