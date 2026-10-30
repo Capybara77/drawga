@@ -163,3 +163,69 @@ describe("allObjects store: синхронизация по сокету", () =>
     expect(store.canRedo).toBe(false);
   });
 });
+
+// 🎓 ТЗ на живой прогресс рисования: черновики чужих фигур, пока автор ещё ведёт мышь
+describe("allObjects store: черновики (temp)", () => {
+  let store: ReturnType<typeof useAllObjectsStore>;
+  const draft = (objId: string, step: number) => ({ objId, step }) as unknown as BaseObject;
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    store = useAllObjectsStore();
+  });
+
+  it("в начале черновиков нет", () => {
+    expect(store.previews).toEqual([]);
+  });
+
+  it("receiveTemp показывает черновик, но не кладёт его на доску и в журнал", () => {
+    store.receiveTemp(draft("A", 1));
+
+    expect(ids(store.previews)).toEqual(["A"]);
+    expect(store.objects).toEqual([]);
+    expect(store.canUndo).toBe(false);
+  });
+
+  it("новый кадр той же фигуры заменяет старый, а не добавляется", () => {
+    const next = draft("A", 2);
+    store.receiveTemp(draft("A", 1));
+    store.receiveTemp(next);
+
+    expect(store.previews).toEqual([next]);
+  });
+
+  it("черновики разных фигур живут вместе", () => {
+    store.receiveTemp(draft("A", 1));
+    store.receiveTemp(draft("B", 1));
+
+    expect(ids(store.previews)).toEqual(["A", "B"]);
+  });
+
+  it("готовая фигура (receive) убирает свой черновик", () => {
+    store.receiveTemp(draft("A", 1));
+    store.receiveTemp(draft("B", 1));
+
+    store.receive(obj("A"));
+
+    expect(ids(store.previews)).toEqual(["B"]);
+    expect(ids(store.objects)).toEqual(["A"]);
+  });
+
+  it("каждый кадр подменяет массив previews — чтобы watch канваса мог смотреть на ссылку", () => {
+    store.receiveTemp(draft("A", 1));
+    const before = store.previews;
+
+    store.receiveTemp(draft("A", 2));
+
+    expect(store.previews).not.toBe(before);
+  });
+
+  it("receiveTemp должен игнорировать объект, если фигура с таким objId уже лежит в objects", () => {
+    store.receive(obj("A"));
+
+    store.receiveTemp(obj("A"));
+
+    expect(ids(store.objects)).toEqual(["A"]);
+    expect(ids(store.previews)).toEqual([]);
+  });
+});

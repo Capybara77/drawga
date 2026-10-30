@@ -16,7 +16,7 @@ public class DrawController : Controller, IDisposable
 
     public event Func<WebSocket, int, Task>? ClientDisconnectAsync;
     public event Func<WebSocket, int, Task>? ClientConnectedAsync;
-    
+
     private bool _disposed;
 
     public DrawController()
@@ -198,7 +198,7 @@ public class DrawController : Controller, IDisposable
     {
         var message = Encoding.UTF8.GetString(buffer);
 
-        if (message.StartsWith("cur"))
+        if (message.StartsWith("cur") || message.StartsWith("temp"))
             return;
 
         var history = _state.History[id];
@@ -283,18 +283,18 @@ public class DrawController : Controller, IDisposable
             sendLock.Release();
         }
     }
-    
+
     protected override void Dispose(bool disposing)
     {
         if (_disposed) return;
-        
+
         if (disposing)
         {
             ClientDisconnectAsync -= SaveBoard;
             ClientDisconnectAsync -= EventForClientDisconnectAsync;
             ClientConnectedAsync -= OnClientConnectedAsync;
         }
-        
+
         _disposed = true;
     }
 
@@ -303,4 +303,5 @@ public class DrawController : Controller, IDisposable
         base.Dispose();
         Dispose(true);
         GC.SuppressFinalize(this);
-    }}
+    }
+}

@@ -43,9 +43,13 @@ const pickCursor = (newCursor: MyCursor) => {
 
 <template>
   <div class="cursor-container">
-    <div v-for="item in items" :key="item.key"
-      :class="'cursor-item' + (cursorStore.cursor === item.key ? ' active-shape' : '')" :title="item.title"
-      @click="() => pickCursor(item.key)">
+    <div
+      v-for="item in items"
+      :key="item.key"
+      :class="'cursor-item' + (cursorStore.cursor === item.key ? ' active-shape' : '')"
+      :title="item.title"
+      @click="() => pickCursor(item.key)"
+    >
       <button class="top-btn" :data-shape-option="item.key" :id="item.key + '-btn'">
         <component :is="item.icon"></component>
       </button>

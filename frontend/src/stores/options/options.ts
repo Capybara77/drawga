@@ -70,7 +70,7 @@ const normalizeHex = (hex: string) => {
   const digits = hex.trim().replace(/^#/, "").toLowerCase();
 
   if (/^[0-9a-f]{3}$/.test(digits)) {
-    return [...digits].map((d) => d + d).join("");
+    return digits.replace(/./g, "$&$&");
   }
 
   return /^[0-9a-f]{6}$/.test(digits) ? digits : undefined;

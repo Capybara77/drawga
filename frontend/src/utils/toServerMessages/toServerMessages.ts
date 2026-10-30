@@ -4,8 +4,13 @@ export const toServerMessages = (action: Action): string[][] => {
   const { objects, type } = action;
 
   return objects.map((obj) => {
-    return type === "add"
-      ? ["drawObj", JSON.stringify(obj)]
-      : ["delete", JSON.stringify({ objId: obj.objId })];
+    switch (type) {
+      case "add": {
+        return ["drawObj", JSON.stringify(obj)];
+      }
+      case "remove": {
+        return ["delete", JSON.stringify({ objId: obj.objId })];
+      }
+    }
   });
 };
