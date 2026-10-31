@@ -7,7 +7,6 @@ import {
   RectangleObject,
   EllipseObject,
 } from "@/constructors";
-import { testToast } from "@/services/toastify";
 import { WebSocketService } from "@/services/webSocketService";
 import { constantsForKeyboard, useCursorStore } from "@/stores/cursor/";
 import { useOptionsStore } from "@/stores/options/";
@@ -25,6 +24,7 @@ import { generateId } from "@/utils";
 import { getMyName } from "@/utils/myName/myName";
 import { useParticipantsStore } from "@/stores/participants";
 import CursorLayer from "./CursorLayer.vue";
+import { useToast } from "@nuxt/ui/composables/useToast";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -35,6 +35,8 @@ const optionsStore = useOptionsStore();
 const zoomStore = useZoomStore();
 const allObjectsStore = useAllObjectsStore();
 const participantsStore = useParticipantsStore();
+
+const toast = useToast();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>("canvasElement");
 const canvasContext = ref<CanvasRenderingContext2D>();
@@ -79,16 +81,26 @@ const handleClose = (event: CustomEvent) => {
 };
 
 const handleMessage = (event: CustomEvent) => {
-  testToast(event.detail[1]);
+  toast.add({
+    title: event.detail[1],
+    actions: [],
+  });
 };
 
 const handleMove = (event: CustomEvent) => {
   const data = event.detail as string[];
-  console.log("Получена команда move:", data);
+
+  toast.add({
+    title: "Получена команда move: " + data,
+    actions: [],
+  });
 };
 
 const handleClear = (event: CustomEvent) => {
-  console.log("Получена команда clear", event.detail);
+  toast.add({
+    title: "Получена команда clear: " + event.detail,
+    actions: [],
+  });
 };
 
 const handleCur = (event: CustomEvent) => {
@@ -250,6 +262,10 @@ const getNewRectObject = (event: PointerEvent) => {
 };
 
 const onCanvasPointerDown = (event: PointerEvent) => {
+  // захват: move/up идут в холст, даже если курсор ушёл на панель поверх него —
+  // иначе отпускание над панелью не завершало штрих
+  canvasElement.value?.setPointerCapture(event.pointerId);
+
   if (event.button === 1 || (isSpacePressed.value && event.button === 0)) {
     isMoving.value = true;
     cursorX.value = event.clientX - offsetXCustom.value;
@@ -281,12 +297,14 @@ const onCanvasPointerDown = (event: PointerEvent) => {
 const onCanvasPointerUp = (event: PointerEvent) => {
   const element = event.target as HTMLElement;
 
-  if (event.button === 2 || element.id !== "canvas" || isOnCanvas.value === false) return;
-
+  // сдвиг сбрасываем до проверок ниже: pointerdown сдвига не ставит isOnCanvas,
+  // и после перезагрузки (isOnCanvas ещё false) сдвиг залипал
   if (isMoving.value) {
     isMoving.value = false;
     return;
   }
+
+  if (event.button === 2 || element.id !== "canvas" || isOnCanvas.value === false) return;
 
   isDrawing.value = false;
 
