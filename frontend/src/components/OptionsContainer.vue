@@ -32,17 +32,23 @@ const closeAllPickers = () => {
 };
 
 const toggleFillColor = () => {
-  closeAllPickers();
+  isBorderColorOpen.value = false;
+  isTextColorOpen.value = false;
+
   isFillColorOpen.value = !isFillColorOpen.value;
 };
 
 const toggleBorderColor = () => {
-  closeAllPickers();
+  isFillColorOpen.value = false;
+  isTextColorOpen.value = false;
+
   isBorderColorOpen.value = !isBorderColorOpen.value;
 };
 
 const toggleTextColor = () => {
-  closeAllPickers();
+  isFillColorOpen.value = false;
+  isBorderColorOpen.value = false;
+
   isTextColorOpen.value = !isTextColorOpen.value;
 };
 

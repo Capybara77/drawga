@@ -42,8 +42,11 @@ staticwebassets.pack.sentinel
 
 */Migrations
 
-
 *.db-shm
 *.db-wal
 
 */.idea
+
+# Auto-generated type declarations
+auto-imports.d.ts
+components.d.ts

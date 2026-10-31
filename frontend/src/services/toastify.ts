@@ -3,11 +3,10 @@ import "toastify-js/src/toastify.css";
 
 const toastifyStyle = {
   background:
-    document.documentElement.className === "lightTheme"
+    document.documentElement.className === "light"
       ? "rgba(255, 255, 255, 0.8)"
       : "rgba(49, 49, 49, 0.8)",
-  color:
-    document.documentElement.className === "lightTheme" ? "rgb(51, 51, 51)" : "rgb(233, 233, 233)",
+  color: document.documentElement.className === "light" ? "rgb(51, 51, 51)" : "rgb(233, 233, 233)",
   border: "2px solid rgb(95, 61, 196)",
   borderRadius: "5px",
   boxShadow: "none",

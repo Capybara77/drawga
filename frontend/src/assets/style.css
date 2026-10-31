@@ -1,61 +1,139 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+/* шрифты — первыми: @import url после остальных правил браузер игнорирует */
+@import url("https://fonts.googleapis.com/css2?family=DM%20Sans:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source%20Serif%204:wght@300;400;500;600;700;800&display=swap");
+
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* ======================== ТЕМА PARCHMENT (экспорт с ui.nuxt.com/theme) ======================== */
+
+@theme {
+  --font-sans: "DM Sans", sans-serif;
+  --font-serif: "Source Serif 4", serif;
+}
+
+@theme static {
+  --color-clay-50: oklch(97.4% 0.009 48.308);
+  --color-clay-100: oklch(94.2% 0.019 52.207);
+  --color-clay-200: oklch(88.5% 0.036 51.142);
+  --color-clay-300: oklch(82.1% 0.058 50.392);
+  --color-clay-400: oklch(74.1% 0.094 47.255);
+  --color-clay-500: oklch(67.2% 0.131 38.798);
+  --color-clay-600: oklch(58.9% 0.138 37.63);
+  --color-clay-700: oklch(51.4% 0.123 37.45);
+  --color-clay-800: oklch(44.4% 0.103 36.916);
+  --color-clay-900: oklch(38.8% 0.086 36.46);
+  --color-clay-950: oklch(25.9% 0.054 38.197);
+  --color-parchment-50: oklch(98% 0.006 100);
+  --color-parchment-100: oklch(96.5% 0.011 99);
+  --color-parchment-200: oklch(93.6% 0.014 97.348);
+  --color-parchment-300: oklch(85.8% 0.018 100);
+  --color-parchment-400: oklch(72.1% 0.015 102.54);
+  --color-parchment-500: oklch(57.8% 0.008 88.877);
+  --color-parchment-600: oklch(43.2% 0.006 91.526);
+  --color-parchment-700: oklch(38.2% 0.003 84.572);
+  --color-parchment-800: oklch(29.3% 0.003 106.588);
+  --color-parchment-900: oklch(21.7% 0.002 106.561);
+  --color-parchment-950: oklch(14.6% 0 0);
+}
+
+/* until v5 ships --ui-font-heading */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+  }
+}
 
 :root {
-  --clr-primary: rgb(95, 61, 196);
-  --clr-primary-dark: rgb(52, 6, 190);
-  --clr-primary-light: rgb(126, 85, 250);
-  --clr-primary-active: rgba(95, 61, 196, 0.4);
-  --clr-white: rgb(255, 255, 255);
-  --clr-black: rgb(0, 0, 0);
-  --clr-gray-light: rgb(211, 211, 211);
-  --clr-gray-dark: rgb(138, 138, 138);
+  --ui-radius: 0.375rem;
 
-  --clr-border: rgb(230, 225, 225);
-  --clr-background-transparent: rgba(255, 255, 255, 0.8);
-  --clr-hover: rgb(238, 238, 238);
+  /* neutral = parchment (вместо ui.colors.neutral в vite.config.ts — см. комментарий там) */
+  --ui-color-neutral-50: var(--color-parchment-50);
+  --ui-color-neutral-100: var(--color-parchment-100);
+  --ui-color-neutral-200: var(--color-parchment-200);
+  --ui-color-neutral-300: var(--color-parchment-300);
+  --ui-color-neutral-400: var(--color-parchment-400);
+  --ui-color-neutral-500: var(--color-parchment-500);
+  --ui-color-neutral-600: var(--color-parchment-600);
+  --ui-color-neutral-700: var(--color-parchment-700);
+  --ui-color-neutral-800: var(--color-parchment-800);
+  --ui-color-neutral-900: var(--color-parchment-900);
+  --ui-color-neutral-950: var(--color-parchment-950);
+}
 
-  --clr-text: rgb(51, 51, 51);
+:root,
+.light {
+  --ui-bg: var(--ui-color-neutral-100);
+  --ui-bg-muted: var(--ui-color-neutral-200);
+  --ui-bg-elevated: var(--ui-color-neutral-200);
+  --ui-bg-accented: var(--ui-color-neutral-300);
+  --ui-border: var(--ui-color-neutral-300);
+  --ui-border-muted: var(--ui-color-neutral-300);
+  --ui-border-accented: var(--ui-color-neutral-400);
+}
 
-  --clr-trailer: rgb(0, 0, 0);
-  --clr-canvas: rgb(255, 255, 255);
+.dark {
+  --ui-primary: var(--ui-color-primary-500);
+  --ui-bg-accented: var(--ui-color-neutral-800);
+  --ui-bg: var(--ui-color-neutral-900);
+  --ui-bg-muted: var(--ui-color-neutral-800);
+  --ui-bg-elevated: var(--ui-color-neutral-800);
+  --ui-border: var(--ui-color-neutral-800);
+  --ui-border-muted: var(--ui-color-neutral-700);
+  --ui-border-accented: var(--ui-color-neutral-700);
+}
 
-  --clr-icon: rgb(51, 51, 51);
-  --clr-fill: rgb(51, 51, 51);
+/* ======================== НАШИ ТОКЕНЫ ======================== */
+/*
+ * Компоненты пользуются только --clr-*. Здесь — единственное место, где они связаны с темой
+ * библиотеки: сменим тему или библиотеку — правим правую часть, компоненты не трогаем.
+ * Светлая/тёмная переключается сама: --ui-* уже разные для :root и .dark.
+ */
+:root {
+  --clr-primary: var(--ui-primary);
+  --clr-primary-dark: var(--ui-color-primary-700);
+  --clr-primary-active: color-mix(in oklch, var(--ui-primary) 25%, transparent);
+  --clr-default: var(--ui-primary);
 
-  --clr-shortcut: rgb(165, 165, 165);
+  --clr-canvas: var(--ui-bg);
+  /* панели поверх холста: на тон светлее него и чуть прозрачные */
+  --clr-panel: var(--ui-color-neutral-50);
+  --clr-background-transparent: color-mix(in oklch, var(--clr-panel) 85%, transparent);
+  /* не --ui-border: в тёмной Parchment он того же тона, что и панели, — рамки пропадают */
+  --clr-border: var(--ui-border-muted);
+  --clr-hover: var(--ui-bg-accented);
 
-  --clr-default: rgb(54, 79, 199);
+  --clr-text: var(--ui-text);
+  --clr-icon: var(--ui-text-toned);
+  --clr-fill: var(--ui-text-toned);
+  --clr-shortcut: var(--ui-text-dimmed);
 
-  --cursor-custom: url("/icons/custom-cursor.svg");
-
-  --z-index-1: 10000000;
-  --z-index-2: 10000000000;
-  --z-index-3: 100000000000000;
+  /* ponytail: значения выше максимума z-index браузер сам урезает до предела — оставил как было */
   --z-index-4: 100000000000000000;
   --z-index-max: 10000000000000000000000000;
 }
 
-* {
-  font-family: "Roboto", sans-serif;
+.dark {
+  --clr-panel: var(--ui-color-neutral-800);
+}
 
-  margin: 0;
-  padding: 0;
+/* ======================== БАЗА ======================== */
+/* в @layer base, чтобы не перебивать классы компонентов Nuxt UI; сброс отступов и шрифт даёт Tailwind */
+@layer base {
+  hr {
+    background-color: var(--clr-shortcut);
+    height: 2px;
+    border: none;
+  }
 }
 
 body {
   overflow: hidden;
-}
-
-button {
-  font-family: "Roboto", sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-hr {
-  background-color: var(--clr-shortcut);
-  height: 2px;
-  border: none;
 }
 
 .wrapper {
@@ -64,52 +142,4 @@ hr {
   justify-content: center;
   align-items: center;
   position: relative;
-}
-
-.main-container,
-.main-container button,
-.main-container input {
-  position: relative;
-  overflow: hidden;
-
-  color: var(--clr-text);
-  width: 100%;
-  height: 100%;
-}
-
-.main-container img {
-  background-color: var(--clr-background-icons);
-}
-
-/* ======================== ТЕМНАЯ ТЕМА ======================== */
-
-.dark {
-  --clr-primary: rgb(95, 61, 196);
-  --clr-primary-dark: rgb(61, 8, 219);
-  --clr-primary-active: rgba(95, 61, 196, 0.4);
-  --clr-gray-light: rgb(211, 211, 211);
-  --clr-gray-dark: rgb(138, 138, 138);
-
-  --clr-border: rgb(65, 65, 65);
-  --clr-background-transparent: rgba(49, 49, 49, 0.8);
-  --clr-hover: rgb(94, 94, 94);
-
-  --clr-text: rgb(233, 233, 233);
-  --clr-trailer: #ccc;
-
-  --clr-canvas: #333;
-
-  --clr-icon: #ccc;
-  --clr-fill: #ccc;
-}
-
-/* ======================== ТЕКСТ ======================== */
-
-.text-element {
-  position: absolute !important;
-  background: transparent;
-  font-size: 2rem;
-  border: 1px solid black;
-  outline: none;
-  color: var(--clr-text);
 }

@@ -13,10 +13,10 @@ describe("options store", () => {
         const store = useOptionsStore();
 
         store.setFillColor("ff");
-        expect(store.colors.fillColor).toBe("5f3dc4");
+        expect(store.colors.fillColor).toBe("d97757");
 
         store.setBorderColor("a61e4dff");
-        expect(store.colors.borderColor).toBe("a61e4d");
+        expect(store.colors.borderColor).toBe("a1492f");
 
         store.setTextColor("xyztuw");
         expect(store.colors.textColor).toBe("000000");
@@ -73,8 +73,8 @@ describe("options store", () => {
   it("инициализируется с начальным состоянием", () => {
     const store = useOptionsStore();
     expect(store.colors).toEqual({
-      fillColor: "5f3dc4",
-      borderColor: "a61e4d",
+      fillColor: "d97757",
+      borderColor: "a1492f",
       textColor: "000000",
     });
     expect(store.lineWidth).toBe(12);
@@ -86,8 +86,8 @@ describe("options store", () => {
   it("геттер getterColors возвращает правильные цвета с префиксом #", () => {
     const store = useOptionsStore();
     expect(store.getterColors).toEqual({
-      fillColor: "#5f3dc4",
-      borderColor: "#a61e4d",
+      fillColor: "#d97757",
+      borderColor: "#a1492f",
       textColor: "#000000",
     });
   });
@@ -95,15 +95,15 @@ describe("options store", () => {
   it("геттер getterColorsWithOpacity возвращает цвета с прозрачностью", () => {
     const store = useOptionsStore();
     expect(store.getterColorsWithOpacity).toEqual({
-      fillColor: "rgba(95, 61, 196, 1)",
-      borderColor: "rgba(166, 30, 77, 1)",
+      fillColor: "rgba(217, 119, 87, 1)",
+      borderColor: "rgba(161, 73, 47, 1)",
       textColor: "rgba(0, 0, 0, 1)",
     });
 
     store.setOpacity(0.5);
     expect(store.getterColorsWithOpacity).toEqual({
-      fillColor: "rgba(95, 61, 196, 0.5)",
-      borderColor: "rgba(166, 30, 77, 0.5)",
+      fillColor: "rgba(217, 119, 87, 0.5)",
+      borderColor: "rgba(161, 73, 47, 0.5)",
       textColor: "rgba(0, 0, 0, 0.5)",
     });
   });
@@ -144,7 +144,7 @@ describe("options store", () => {
     useOptionsStore().setFillColor("ff0000");
 
     setActivePinia(createPinia());
-    expect(useOptionsStore().colors.fillColor).toBe("5f3dc4");
+    expect(useOptionsStore().colors.fillColor).toBe("d97757");
   });
 
   it("метод setLineWidth обновляет толщину линии", () => {
