@@ -6,7 +6,9 @@ const defaultState = {
     colors: [
       "000000",
       "343a40",
-      "495057",
+      // clay-500 и clay-700 из темы Parchment — по умолчанию рисуем ими
+      "d97757",
+      "a1492f",
       "c92a2a",
       "a61e4d",
       "862e9c",
@@ -18,7 +20,6 @@ const defaultState = {
       "2b8a3e",
       "5c940d",
       "e67700",
-      "d9480f",
     ],
     lineWidths: [
       {
@@ -55,8 +56,8 @@ const defaultState = {
     fillStyles: ["hachure", "solid", "zigzag", "cross-hatch", "dashed", "zigzag-line"],
   },
   colors: {
-    fillColor: "5f3dc4",
-    borderColor: "a61e4d",
+    fillColor: "d97757",
+    borderColor: "a1492f",
     textColor: "000000",
   },
   lineWidth: 12,

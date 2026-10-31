@@ -1,31 +1,32 @@
 <script setup lang="ts">
-import ClearIcon from "@/icons/settings/ClearIcon/ClearIcon.vue";
-import MoonIcon from "@/icons/settings/MoonIcon/MoonIcon.vue";
-import SaveIcon from "@/icons/settings/SaveIcon/SaveIcon.vue";
-import ServerIcon from "@/icons/settings/ServerIcon/ServerIcon.vue";
-import SettingsIcon from "@/icons/settings/SettingsIcon/SettingsIcon.vue";
-import SunIcon from "@/icons/settings/SunIcon/SunIcon.vue";
-import UserIcon from "@/icons/settings/UserIcon/UserIcon.vue";
 import type { WebSocketService } from "@/services/webSocketService";
-import { useColorMode, useCycleList } from "@vueuse/core";
+import { useColorMode, useCycleList, type BasicColorSchema } from "@vueuse/core";
 import { computed, ref, watchEffect } from "vue";
+import Sun from "@primeicons/vue/sun";
+import User from "@primeicons/vue/user";
+import Wrench from "@primeicons/vue/wrench";
+import Server from "@primeicons/vue/server";
+import Moon from "@primeicons/vue/moon";
+import Desktop from "@primeicons/vue/desktop";
+import Save from "@primeicons/vue/save";
+import DeleteLeft from "@primeicons/vue/delete-left";
+
+const modes: BasicColorSchema[] = ["dark", "light", "auto"];
 
 const { socket } = defineProps<{
   socket: WebSocketService;
 }>();
 
-const mode = useColorMode({
+const { store, system } = useColorMode({
   attribute: "class",
-  initialValue: "dark",
+  initialValue: "auto",
 });
 
-const { state, next } = useCycleList(["dark", "light"] as const, { initialValue: mode });
-
-watchEffect(() => (mode.value = state.value));
+const { state, next } = useCycleList(modes, { initialValue: store.value });
 
 const isSettingsOpened = ref(false);
 
-const isDarkTheme = computed(() => state.value === "dark");
+const myColorMode = computed(() => (store.value === "auto" ? system.value : store.value));
 
 const toggleSettings = () => {
   isSettingsOpened.value = !isSettingsOpened.value;
@@ -33,41 +34,46 @@ const toggleSettings = () => {
 
 const clearBoard = () => {
   socket.send(["clear"]);
+  isSettingsOpened.value = false;
 };
+
+watchEffect(() => {
+  store.value = state.value;
+});
 </script>
 
 <template>
   <div class="settings-wrapper">
     <button class="settings-show-btn" id="settings-show-btn" @click="toggleSettings">
       <span>
-        <SettingsIcon />
+        <Wrench />
       </span>
     </button>
     <section class="settings-container" v-if="isSettingsOpened">
       <button class="settings-item" onclick="location.replace(&quot;/login&quot;);" id="user-btn">
         <div class="settings-item-icon">
-          <UserIcon />
+          <User />
         </div>
         <div class="settings-item-text">Профиль</div>
         <div class="settings-item-shortcut">Ctrl+U</div>
       </button>
       <button class="settings-item" id="save-btn">
         <div class="settings-item-icon">
-          <SaveIcon />
+          <Save />
         </div>
         <div class="settings-item-text">Сохранить файл</div>
         <div class="settings-item-shortcut">Ctrl+D</div>
       </button>
       <button class="settings-item" id="save-server-btn">
         <div class="settings-item-icon">
-          <ServerIcon />
+          <Server />
         </div>
         <div class="settings-item-text">Сохранить доску на сервере</div>
         <div class="settings-item-shortcut">Ctrl+Shift+O</div>
       </button>
       <button class="settings-item" id="clear-btn" @click="clearBoard">
         <div class="settings-item-icon">
-          <ClearIcon />
+          <DeleteLeft />
         </div>
         <div class="settings-item-text">Очистить полотно</div>
         <div class="settings-item-shortcut">Ctrl+Shift+Del</div>
@@ -75,11 +81,12 @@ const clearBoard = () => {
       <hr />
       <button class="settings-item" id="change-theme-btn" @click="next()">
         <div class="settings-item-icon">
-          <MoonIcon v-if="isDarkTheme" />
-          <SunIcon v-else />
+          <Desktop v-if="store === 'auto'" />
+          <Moon v-else-if="myColorMode === 'dark'" />
+          <Sun v-else />
         </div>
         <div class="settings-item-text" id="theme-inner-text">
-          {{ isDarkTheme ? "Темная" : "Светлая" }} тема
+          {{ store === "dark" ? "Темная" : store === "auto" ? "Системная" : "Светлая" }} тема
         </div>
         <div class="settings-item-shortcut">Ctrl+Shift+T</div>
       </button>
@@ -146,6 +153,18 @@ const clearBoard = () => {
   margin-right: 5px;
   width: 20px;
   height: 20px;
+  color: var(--clr-icon);
+}
+
+.settings-item-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-show-btn svg {
+  width: 26px;
+  height: 26px;
+  color: var(--clr-icon);
 }
 
 .settings-item-text {
