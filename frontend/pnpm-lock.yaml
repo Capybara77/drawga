@@ -215,9 +215,6 @@ importers:
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
-      toastify-js:
-        specifier: ^1.12.0
-        version: 1.12.0
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -3783,9 +3780,6 @@ packages:
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
-
-  toastify-js@1.12.0:
-    resolution: {integrity: sha512-HeMHCO9yLPvP9k0apGSdPUWrUbLnxUKNFzgUoZp1PHCLploIX/4DSQ7V8H25ef+h4iO9n0he7ImfcndnN6nDrQ==}
 
   totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
@@ -7680,8 +7674,6 @@ snapshots:
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
-
-  toastify-js@1.12.0: {}
 
   totalist@3.0.1: {}
 

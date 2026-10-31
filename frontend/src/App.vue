@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Confirm from "./components/ConfirmContainer.vue";
 import CursorContainer from "./components/CursorContainer.vue";
 import OptionsContainer from "./components/OptionsContainer.vue";
 import SettingsContainer from "./components/SettingsContainer.vue";
@@ -14,7 +13,6 @@ const socket = new WebSocketService();
 
 <template>
   <UApp>
-    <Confirm />
     <CursorContainer />
     <OptionsContainer />
     <ZoomContainer />

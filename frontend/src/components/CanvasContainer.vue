@@ -96,9 +96,11 @@ const handleMove = (event: CustomEvent) => {
   });
 };
 
-const handleClear = (event: CustomEvent) => {
+const handleClear = () => {
+  allObjectsStore.clear();
+
   toast.add({
-    title: "Получена команда clear: " + event.detail,
+    title: "Получена команда clear",
     actions: [],
   });
 };
