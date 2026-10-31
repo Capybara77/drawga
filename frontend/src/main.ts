@@ -4,7 +4,6 @@ import { createPinia } from "pinia";
 import ui from "@nuxt/ui/vue-plugin";
 
 import "./assets/style.css";
-import "./assets/toastify.css";
 
 const pinia = createPinia();
 const app = createApp(App);
