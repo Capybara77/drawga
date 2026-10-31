@@ -14,7 +14,7 @@ import { useOptionsStore } from "@/stores/options/";
 import { useZoomStore } from "@/stores/zoom/";
 import type { CurveProps, EllipseProps, LineProps, RectangleProps } from "@/types";
 import { getTypedDrawObject } from "@/utils/getTypedDrawObject/getTypedDrawObject";
-import { useEventListener, useThrottleFn } from "@vueuse/core";
+import { useEventListener, useIntervalFn, useThrottleFn } from "@vueuse/core";
 import rough from "roughjs";
 
 import { onMounted, ref, useTemplateRef, watch } from "vue";
@@ -22,6 +22,9 @@ import { useAllObjectsStore } from "@/stores/allObjects";
 import { toServerMessages } from "@/utils/toServerMessages";
 import { getHistoryHotkey, isTyping } from "@/utils/hotkeys";
 import { generateId } from "@/utils";
+import { getMyName } from "@/utils/myName/myName";
+import { useParticipantsStore } from "@/stores/participants";
+import CursorLayer from "./CursorLayer.vue";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -31,6 +34,7 @@ const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 const zoomStore = useZoomStore();
 const allObjectsStore = useAllObjectsStore();
+const participantsStore = useParticipantsStore();
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>("canvasElement");
 const canvasContext = ref<CanvasRenderingContext2D>();
@@ -55,7 +59,8 @@ const isMoving = ref(false);
 const isErasedInStroke = ref(false);
 
 let strokeId = "";
-const userId = "123";
+const userId = generateId(6);
+const userName = getMyName(localStorage);
 
 allObjectsStore.$onAction(({ name, after }) => {
   if (name === "undo" || name === "redo") {
@@ -87,30 +92,14 @@ const handleClear = (event: CustomEvent) => {
 };
 
 const handleCur = (event: CustomEvent) => {
-  const userId = event.detail[1];
-  let t;
+  const [_action, id, x, y, name] = event.detail;
 
-  t = document.getElementById(userId);
-
-  if (t === null) {
-    t = document.createElement("div");
-    t.id = userId;
-    t.className = "trailer";
-    document.body.appendChild(t);
-    return;
-  }
-
-  const x = +event.detail[2] * zoomStore.zoom + offsetXCustom.value;
-  const y = +event.detail[3] * zoomStore.zoom + offsetYCustom.value;
-
-  const keyFrames = {
-    transform: `translate(${x}px, ${y}px)`,
-  };
-
-  t.animate(keyFrames, {
-    fill: "forwards",
-  });
+  participantsStore.moveCursor({ id, x: +x, y: +y, name });
 };
+
+useIntervalFn(() => {
+  participantsStore.removeStale(Date.now(), 5000);
+}, 1000);
 
 const handleDraw = (event: CustomEvent) => {
   const obj = getTypedDrawObject(
@@ -432,6 +421,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       userId,
       event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
       event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
+      userName,
     ].map(String);
 
     socket.send(messageToServer);
@@ -686,6 +676,7 @@ watch([() => allObjectsStore.objects, () => allObjectsStore.previews], () => {
     @pointerup="onCanvasPointerUp"
     @pointermove="onCanvasPointerMove"
   ></canvas>
+  <CursorLayer :offsetX="offsetXCustom" :offsetY="offsetYCustom" />
 </template>
 
 <style scoped>

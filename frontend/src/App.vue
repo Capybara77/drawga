@@ -5,7 +5,6 @@ import OptionsContainer from "./components/OptionsContainer.vue";
 import SettingsContainer from "./components/SettingsContainer.vue";
 import ZoomContainer from "./components/ZoomContainer.vue";
 import CanvasContainer from "./components/CanvasContainer.vue";
-import TrailerComponent from "./components/TrailerComponent.vue";
 import { WebSocketService } from "./services/webSocketService";
 import UndoRedoContainer from "./components/UndoRedoContainer.vue";
 
@@ -13,7 +12,6 @@ const socket = new WebSocketService();
 </script>
 
 <template>
-  <TrailerComponent />
   <Confirm />
   <CursorContainer />
   <OptionsContainer />
