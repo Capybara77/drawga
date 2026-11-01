@@ -8,18 +8,20 @@ import ColorPicker from "./ColorPicker.vue";
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
-const cursorsForHideAll: MyCursor[] = ["pointer", "eraser", "text", "image"];
-const showFill: MyCursor[] = ["ellipse", "line", "line", "curve", "rectangle"];
+const cursorsForHideAll: MyCursor[] = ["pointer", "eraser", "image"];
+const showFill: MyCursor[] = ["ellipse", "line", "curve", "rectangle"];
 const showStroke: MyCursor[] = ["ellipse", "rectangle"];
 const showText: MyCursor[] = ["text"];
 const showFillType: MyCursor[] = ["rectangle", "ellipse"];
+const showStrokeWidth: MyCursor[] = ["ellipse", "line", "curve", "rectangle"];
 
-const isOptionsHidden = computed(() => cursorsForHideAll.includes(cursorStore.cursor as MyCursor));
+const isOptionsHidden = computed(() => cursorsForHideAll.includes(cursorStore.cursor));
 
-const isFillColor = computed(() => showFill.includes(cursorStore.cursor as MyCursor));
-const isStrokeColor = computed(() => showStroke.includes(cursorStore.cursor as MyCursor));
-const isTextColor = computed(() => showText.includes(cursorStore.cursor as MyCursor));
-const isFillType = computed(() => showFillType.includes(cursorStore.cursor as MyCursor));
+const isFillColor = computed(() => showFill.includes(cursorStore.cursor));
+const isStrokeColor = computed(() => showStroke.includes(cursorStore.cursor));
+const isText = computed(() => showText.includes(cursorStore.cursor));
+const isFillType = computed(() => showFillType.includes(cursorStore.cursor));
+const isStrokeWitdh = computed(() => showStrokeWidth.includes(cursorStore.cursor));
 
 const isFillColorOpen = ref(false);
 const isBorderColorOpen = ref(false);
@@ -139,7 +141,7 @@ const onHexChange = (event: Event, variant: "fill" | "border" | "text") => {
         </div>
       </div>
     </div>
-    <div class="options-color-container" id="options-color-text" v-if="isTextColor">
+    <div class="options-color-container" v-if="isText">
       <p>Цвет текста</p>
       <div class="color-container">
         <div
@@ -167,7 +169,7 @@ const onHexChange = (event: Event, variant: "fill" | "border" | "text") => {
         </div>
       </div>
     </div>
-    <div class="options-container" id="width-options-container">
+    <div class="options-container" id="width-options-container" v-if="isStrokeWitdh">
       <p>Толщина линии</p>
       <div class="options-btns-container">
         <div v-for="lineSize in optionsStore.allOptions.lineWidths" :key="lineSize.label">
@@ -185,7 +187,22 @@ const onHexChange = (event: Event, variant: "fill" | "border" | "text") => {
         </div>
       </div>
     </div>
-    <div class="options-container" id="font-size-options-container" v-if="isTextColor">
+    <div class="options-container" v-if="isText">
+      <p>Шрифт</p>
+      <div class="font-btns-container">
+        <button
+          v-for="font in optionsStore.allOptions.fonts"
+          :key="font"
+          :class="'option-btn ' + (optionsStore.fontFamily === font ? 'active-option' : '')"
+          :style="{ fontFamily: font }"
+          :data-font-family="font"
+          @click="() => optionsStore.setFontFamily(font)"
+        >
+          {{ font }}
+        </button>
+      </div>
+    </div>
+    <div class="options-container" id="font-size-options-container" v-if="isText">
       <p>Размер текста</p>
       <div class="options-btns-container">
         <div v-for="textSize in optionsStore.allOptions.textSizes" :key="textSize.label">
@@ -344,6 +361,15 @@ const onHexChange = (event: Event, variant: "fill" | "border" | "text") => {
   border-radius: 5px;
   cursor: pointer;
   color: var(--clr-text);
+}
+
+/* название шрифта длинное — столбиком, каждая кнопка своим шрифтом */
+.font-btns-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 2px;
 }
 
 /* .options-btns-container > div {

@@ -8,6 +8,7 @@ import type {
   LineProps,
   MyCursor,
   RectangleProps,
+  TextProps,
 } from "./types";
 import { generateId, commonIsOverlay, getSvgPathFromStroke } from "./utils";
 
@@ -41,58 +42,39 @@ export abstract class BaseObject {
 
 export class TextObject extends BaseObject {
   drawType: MyCursor = "text";
-  inputElement: HTMLTextAreaElement | null;
-  top: number;
-  left: number;
-  fontFamily: string;
-  text: string;
-  inputId: string;
-  fontSize: string;
-  textColor: string;
-  height: number;
+  ctx;
+  x;
+  y;
+  fontSize;
+  fontFamily;
+  text;
 
-  constructor(
-    fontFamily: string,
-    color: string,
-    userId: string,
-    inputElement: HTMLTextAreaElement | null,
-    top: number,
-    left: number,
-    text: string,
-    inputId: string,
-    fontSize: string,
-    textColor: string,
-    width: number,
-    height: number,
-  ) {
-    super({ color, width, userId });
+  constructor({ x, y, color, ctx, fontSize, text, userId, fontFamily, objId }: TextProps) {
+    super({ color, userId, width: 0 });
 
+    this.x = x;
+    this.y = y;
+    this.ctx = ctx;
     this.userId = userId;
-    this.top = top;
-    this.left = left;
-    this.fontFamily = fontFamily;
-    this.text = text;
-    this.inputId = inputId;
-    this.inputElement = inputElement ?? null;
     this.fontSize = fontSize;
-    this.textColor = textColor;
-    this.height = height;
-
-    if (inputElement !== null) {
-      inputElement.value = text;
-    }
+    this.text = text;
+    this.color = color;
+    this.fontFamily = fontFamily;
+    this.objId = objId;
   }
 
   draw(offsetX: number, offsetY: number, zoom: number): void {
-    if (this.inputElement === null) {
-      return;
-    }
+    this.ctx.font = `${this.fontSize * zoom}px ${this.fontFamily}`;
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillStyle = `#${this.color}`;
 
-    this.inputElement.style.left = this.left * zoom + offsetX + "px";
-    this.inputElement.style.top = this.top * zoom + offsetY + "px";
-    this.inputElement.style.fontSize = `${this.zoom * 32}px`;
-    this.inputElement.style.width = `${this.width * zoom}px`;
-    this.inputElement.style.height = `${this.height * zoom}px`;
+    this.text.split("\n").forEach((line, index) => {
+      const lineHeight = this.fontSize * 1.25 * zoom;
+      const newX = this.x * zoom + offsetX;
+      const newY = this.y * zoom + offsetY;
+
+      this.ctx.fillText(line, newX, newY + lineHeight / 2 + index * lineHeight);
+    });
   }
 
   isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
@@ -104,7 +86,7 @@ export class CurveObject extends BaseObject {
   pointsList;
   ctx;
   drawType: MyCursor = "curve";
-  constructor({ color, ctx, pointsList, userId, width, zoom }: CurveProps) {
+  constructor({ color, ctx, pointsList, userId, width }: CurveProps) {
     super({ color, width, userId });
     this.pointsList = pointsList;
     this.ctx = ctx;
@@ -133,7 +115,6 @@ export class CurveObject extends BaseObject {
     const myPath = new Path2D(pathData);
 
     const tempColor = this.ctx.fillStyle;
-
     this.ctx.fillStyle = this.color;
     this.ctx.fill(myPath);
     this.ctx.fillStyle = tempColor;

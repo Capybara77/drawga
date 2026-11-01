@@ -37,33 +37,35 @@ const defaultState = {
     ],
     textSizes: [
       {
-        value: "0.875rem",
+        value: 20,
         label: "S",
       },
       {
-        value: "1rem",
+        value: 24,
         label: "M",
       },
       {
-        value: "1.2rem",
+        value: 28,
         label: "L",
       },
       {
-        value: "1.5rem",
+        value: 32,
         label: "XL",
       },
     ],
+    fonts: ["Pangolin", "Nunito", "JetBrains Mono"],
     fillStyles: ["hachure", "solid", "zigzag", "cross-hatch", "dashed", "zigzag-line"],
   },
   colors: {
     fillColor: "d97757",
     borderColor: "a1492f",
-    textColor: "000000",
+    textColor: "e67700",
   },
   lineWidth: 12,
-  textSize: "1rem",
+  textSize: 24,
   fillStyle: "hachure",
   opacity: 1,
+  fontFamily: "Pangolin",
 };
 
 // цвет в сторе — hex без #: "#ABC" / "abc" / "#aabbcc" → "aabbcc", невалидный → undefined
@@ -111,7 +113,9 @@ export const useOptionsStore = defineStore("options", {
         this.colors.fillColor = defaultState.colors.fillColor;
       }
     },
-
+    setFontFamily(font: string) {
+      this.fontFamily = font;
+    },
     setBorderColor(hexCode: string) {
       const hex = normalizeHex(hexCode);
       if (hex) {
@@ -121,7 +125,6 @@ export const useOptionsStore = defineStore("options", {
         this.colors.borderColor = defaultState.colors.borderColor;
       }
     },
-
     setTextColor(hexCode: string) {
       const hex = normalizeHex(hexCode);
       if (hex) {
@@ -135,15 +138,8 @@ export const useOptionsStore = defineStore("options", {
       const result = getMinMax(5, 20, width);
       this.lineWidth = result;
     },
-    setTextSize(size: string) {
-      if (this.isValidSize(size)) {
-        this.textSize = size;
-      } else {
-        console.warn(
-          `Недопустимый формат размера текста "${size}". Используется значение по умолчанию.`,
-        );
-        this.textSize = defaultState.textSize;
-      }
+    setTextSize(size: number) {
+      this.textSize = size;
     },
     setFillStyle(style: string) {
       this.fillStyle = style;

@@ -6,12 +6,13 @@ import {
   LineObject,
   RectangleObject,
   EllipseObject,
+  TextObject,
 } from "@/constructors";
 import { WebSocketService } from "@/services/webSocketService";
 import { constantsForKeyboard, useCursorStore } from "@/stores/cursor/";
 import { useOptionsStore } from "@/stores/options/";
 import { useZoomStore } from "@/stores/zoom/";
-import type { CurveProps, EllipseProps, LineProps, RectangleProps } from "@/types";
+import type { CurveProps, EllipseProps, LineProps, RectangleProps, TextProps } from "@/types";
 import { getTypedDrawObject } from "@/utils/getTypedDrawObject/getTypedDrawObject";
 import { useEventListener, useIntervalFn, useThrottleFn } from "@vueuse/core";
 import rough from "roughjs";
@@ -20,11 +21,12 @@ import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
 import { toServerMessages } from "@/utils/toServerMessages";
 import { getHistoryHotkey, isTyping } from "@/utils/hotkeys";
-import { generateId } from "@/utils";
+import { fitCanvas, generateId } from "@/utils";
 import { getMyName } from "@/utils/myName/myName";
 import { useParticipantsStore } from "@/stores/participants";
 import CursorLayer from "./CursorLayer.vue";
 import { useToast } from "@nuxt/ui/composables/useToast";
+import TextEditor from "./TextEditor.vue";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -59,6 +61,9 @@ const isSpacePressed = ref(false);
 const isMoving = ref(false);
 // стёрли ли уже что-то за текущее движение ластиком — тогда склеиваем в одну запись undo
 const isErasedInStroke = ref(false);
+
+const textDraft = ref<{ x: number; y: number; id: string } | null>(null);
+let isTextDrafting = false;
 
 let strokeId = "";
 const userId = generateId(6);
@@ -209,14 +214,40 @@ const redrawWithClearing = () => {
 };
 
 const updateCanvasSize = () => {
-  if (!canvasElement.value) return;
+  if (!canvasElement.value || !canvasContext.value) return;
 
-  canvasElement.value.width = window.innerWidth;
-  canvasElement.value.height = window.innerHeight;
+  fitCanvas(
+    canvasElement.value,
+    canvasContext.value,
+    window.innerWidth,
+    window.innerHeight,
+    window.devicePixelRatio,
+  );
   redrawWithClearing();
 };
 
-const getNewCurveObject = () => {
+const getNewTextObject = (text: string) => {
+  if (!canvasContext.value || !textDraft.value || !text) return;
+
+  const textProps: TextProps = {
+    fontSize: optionsStore.textSize,
+    color: optionsStore.colors.textColor,
+    ctx: canvasContext.value,
+    text,
+    userId,
+    x: (textDraft.value.x - offsetXCustom.value) / zoomStore.zoom,
+    y: (textDraft.value.y - offsetYCustom.value) / zoomStore.zoom,
+    fontFamily: optionsStore.fontFamily,
+    width: 0,
+    objId: textDraft.value.id,
+  };
+
+  const textObj = new TextObject(textProps);
+
+  return textObj;
+};
+
+const getNewCurveObject = (): CurveObject | undefined => {
   if (!canvasContext.value) return;
 
   const curveProps: CurveProps = {
@@ -267,6 +298,8 @@ const onCanvasPointerDown = (event: PointerEvent) => {
   // захват: move/up идут в холст, даже если курсор ушёл на панель поверх него —
   // иначе отпускание над панелью не завершало штрих
   canvasElement.value?.setPointerCapture(event.pointerId);
+
+  isTextDrafting = !!textDraft.value;
 
   if (event.button === 1 || (isSpacePressed.value && event.button === 0)) {
     isMoving.value = true;
@@ -373,6 +406,18 @@ const onCanvasPointerUp = (event: PointerEvent) => {
       };
 
       currentDrawing = new EllipseObject(ellipseProps);
+      break;
+    }
+
+    case "text": {
+      if (isTextDrafting) {
+        break;
+      }
+
+      const lineHeight = optionsStore.textSize * zoomStore.zoom * 1.25;
+
+      textDraft.value = { x: event.clientX, y: event.clientY - lineHeight / 2, id: strokeId };
+
       break;
     }
 
@@ -637,25 +682,33 @@ const onKeyDown = (event: KeyboardEvent) => {
       }
     }
   }
-
-  //   if (!code.startsWith("Digit")) {
-  //     return;
-  //   }
-  //
-  //   const keyCodeArr = code.split("Digit");
-  //   const keyboardNumber = keyCodeArr[1];
-  //
-  //   const newCursor = constantsForKeyboard[keyboardNumber];
-  //
-  //   if (event.metaKey || event.altKey) {
-  //     cursorStore.setCursor(newCursor);
-  //   }
 };
 
 const onKeyUp = (event: KeyboardEvent) => {
   if (event.code === "Space") {
     isSpacePressed.value = false;
   }
+};
+
+const handleCommit = (text: string) => {
+  const textObj = getNewTextObject(text);
+
+  if (!textObj) return;
+
+  allObjectsStore.add(textObj);
+  redrawWithClearing();
+  const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
+  socket.send(messageToServer);
+
+  textDraft.value = null;
+};
+
+const handleCommitTemp = (text: string) => {
+  const textObj = getNewTextObject(text);
+
+  if (!textObj) return;
+
+  sendTemp(textObj);
 };
 
 onMounted(() => {
@@ -671,8 +724,7 @@ onMounted(() => {
     roughCanvas.value = rough.canvas(canvasElement.value);
   }
 
-  canvasElement.value.width = window.innerWidth;
-  canvasElement.value.height = window.innerHeight;
+  updateCanvasSize();
 
   createSocketConnection();
   createWindowListeners();
@@ -697,6 +749,16 @@ watch([() => allObjectsStore.objects, () => allObjectsStore.previews], () => {
     @pointermove="onCanvasPointerMove"
   ></canvas>
   <CursorLayer :offsetX="offsetXCustom" :offsetY="offsetYCustom" />
+  <TextEditor
+    v-if="textDraft"
+    :x="textDraft.x"
+    :y="textDraft.y"
+    :fontSize="optionsStore.textSize * zoomStore.zoom"
+    :color="optionsStore.colors.textColor"
+    :fontFamily="optionsStore.fontFamily"
+    @commit="handleCommit"
+    @commitTemp="handleCommitTemp"
+  />
 </template>
 
 <style scoped>

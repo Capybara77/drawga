@@ -4,9 +4,10 @@ import {
   EllipseObject,
   LineObject,
   CurveObject,
+  TextObject,
 } from "@/constructors";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-import type { CurveProps, EllipseProps, LineProps, RectangleProps } from "@/types";
+import type { CurveProps, EllipseProps, LineProps, RectangleProps, TextProps } from "@/types";
 
 // как объект приходит по сети: поля конструктора без canvas-ссылок (их не сериализовать) + служебные
 type Serialized<T extends string, P> = Omit<P, "roughCanvas" | "ctx"> & {
@@ -20,6 +21,7 @@ type SerializedDrawObject =
   | Serialized<"rectangle", RectangleProps>
   | Serialized<"ellipse", EllipseProps>
   | Serialized<"line", LineProps>
+  | Serialized<"text", TextProps>
   | Serialized<"curve", CurveProps>;
 
 /**
@@ -89,6 +91,13 @@ export function getTypedDrawObject(
       c.objId = objId;
       c.zoom = zoom;
       return c;
+    }
+    case "text": {
+      const t = new TextObject({ ...parsedString, ctx });
+      t.objId = objId;
+      t.zoom = zoom;
+
+      return t;
     }
     // text: восстановление TextObject было тут закомментировано — вернуть, когда дойдём до текста
     default:

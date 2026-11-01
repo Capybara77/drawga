@@ -188,6 +188,18 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/caveat':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/jetbrains-mono':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/nunito':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/pangolin':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@iconify-json/heroicons':
         specifier: ^1.2.3
         version: 1.2.3
@@ -744,6 +756,18 @@ packages:
     resolution: {integrity: sha512-043dyEKD9TDSfz080YH2vobubgg+NIo/9Fw4RAl7sEMpD8Am1DNrrSTl/GpMBjyGHoD/FbJY2QLawY+HSQsEIA==}
     peerDependencies:
       vue: '>=3.3.0'
+
+  '@fontsource/caveat@5.3.0':
+    resolution: {integrity: sha512-eHTfzQxFSW9ABERRLNruHoNJmKed2J7pqTUc5lp4a4POMgXGKpxmWj3d9Hz10kmAg6iuTTLe6UagbA4bnsmfQw==}
+
+  '@fontsource/jetbrains-mono@5.3.0':
+    resolution: {integrity: sha512-fqDfB5I9f1p1TV486aUgB9t8zP84P0O1FtQR5Ol9vjwPy+S+EIGlVYm1cvj2W5shcZMTg2nZFdVMoH5wFu8a1A==}
+
+  '@fontsource/nunito@5.3.0':
+    resolution: {integrity: sha512-vw9TaTQJ/zpEpKrsODuPmOvaVjXgdda6B+xXA4YqjrdeJ62MLgVoDerdRXFQHyBnSCt2yQ2nHKCHPP/Pv7Xq4Q==}
+
+  '@fontsource/pangolin@5.3.0':
+    resolution: {integrity: sha512-3avtyqWX2QiQXKxVChWeVtF3FpB/wcojYXP13oO30WG44Ox9bCUHuHEtMd6NVgqpXSUqNLFaLm8K+29xVzkDZQ==}
 
   '@iconify-json/heroicons@1.2.3':
     resolution: {integrity: sha512-n+vmCEgTesRsOpp5AB5ILB6srsgsYK+bieoQBNlafvoEhjVXLq8nIGN4B0v/s4DUfa0dOrjwE/cKJgIKdJXOEg==}
@@ -4688,6 +4712,14 @@ snapshots:
       '@floating-ui/dom': 1.8.0
       '@floating-ui/utils': 0.2.12
       vue: 3.5.13(typescript@5.7.3)
+
+  '@fontsource/caveat@5.3.0': {}
+
+  '@fontsource/jetbrains-mono@5.3.0': {}
+
+  '@fontsource/nunito@5.3.0': {}
+
+  '@fontsource/pangolin@5.3.0': {}
 
   '@iconify-json/heroicons@1.2.3':
     dependencies:
