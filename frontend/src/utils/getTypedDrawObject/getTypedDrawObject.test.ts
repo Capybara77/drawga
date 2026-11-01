@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { getTypedDrawObject } from "./getTypedDrawObject"; // Указываем правильный путь к файлу с функцией
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { RectangleObject, EllipseObject, LineObject, CurveObject } from "@/constructors";
+import { RectangleObject, EllipseObject, LineObject, CurveObject, TextObject } from "@/constructors";
 
 const roughCanvas = {
   draw: vi.fn(),
@@ -233,6 +233,58 @@ describe("getTypedDrawObject", () => {
     result?.draw(0, 0, 1);
 
     expect(lineCanvas.line).toHaveBeenCalledOnce();
+  });
+
+  it('создаёт объект типа TextObject при передаче "text"', () => {
+    const inputStr = JSON.stringify({
+      drawType: "text",
+      color: "#e67700",
+      objId: "text-1",
+      userId: "123",
+      tempObj: false,
+      width: 0,
+      zoom: 1,
+      x: 10,
+      y: 20,
+      text: "привет\nмир",
+      fontSize: 24,
+      fontFamily: "Pangolin",
+      ctx: {}, // так сериализуется ctx в JSON
+    });
+
+    const result = getTypedDrawObject(inputStr, roughCanvas, ctx);
+    expect(result).toBeInstanceOf(TextObject);
+    if (result instanceof TextObject) {
+      expect(result.objId).toBe("text-1");
+      expect(result.text).toBe("привет\nмир");
+      expect(result.x).toBe(10);
+      expect(result.y).toBe(20);
+      // цвет пришёл с # — повторно не добавляется
+      expect(result.color).toBe("#e67700");
+    }
+  });
+
+  it("текст с сервера рисуется переданным ctx, по строке на fillText", () => {
+    const inputStr = JSON.stringify({
+      drawType: "text",
+      color: "#e67700",
+      objId: "text-2",
+      userId: "123",
+      tempObj: false,
+      width: 0,
+      zoom: 1,
+      x: 0,
+      y: 0,
+      text: "раз\nдва",
+      fontSize: 24,
+      fontFamily: "Pangolin",
+      ctx: {},
+    });
+    const textCtx = { fillText: vi.fn() } as unknown as CanvasRenderingContext2D;
+
+    getTypedDrawObject(inputStr, roughCanvas, textCtx)?.draw(0, 0, 1);
+
+    expect(textCtx.fillText).toHaveBeenCalledTimes(2);
   });
 
   it("возвращает null для неизвестного типа", () => {

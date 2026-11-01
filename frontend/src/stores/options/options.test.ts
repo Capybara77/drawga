@@ -19,7 +19,7 @@ describe("options store", () => {
         expect(store.colors.borderColor).toBe("a1492f");
 
         store.setTextColor("xyztuw");
-        expect(store.colors.textColor).toBe("000000");
+        expect(store.colors.textColor).toBe("e67700");
       });
     });
 
@@ -54,20 +54,6 @@ describe("options store", () => {
       });
     });
 
-    describe("размер текста нахер", () => {
-      it("не принимает невалидный формат", () => {
-        const store = useOptionsStore();
-
-        store.setTextSize("42px");
-        expect(store.textSize).toBe("1rem");
-
-        store.setTextSize("большой");
-        expect(store.textSize).toBe("1rem");
-
-        store.setTextSize("-2rem");
-        expect(store.textSize).toBe("1rem");
-      });
-    });
   });
 
   it("инициализируется с начальным состоянием", () => {
@@ -75,10 +61,11 @@ describe("options store", () => {
     expect(store.colors).toEqual({
       fillColor: "d97757",
       borderColor: "a1492f",
-      textColor: "000000",
+      textColor: "e67700",
     });
     expect(store.lineWidth).toBe(12);
-    expect(store.textSize).toBe("1rem");
+    expect(store.textSize).toBe(24);
+    expect(store.fontFamily).toBe("Pangolin");
     expect(store.fillStyle).toBe("hachure");
     expect(store.opacity).toBe(1);
   });
@@ -88,7 +75,7 @@ describe("options store", () => {
     expect(store.getterColors).toEqual({
       fillColor: "#d97757",
       borderColor: "#a1492f",
-      textColor: "#000000",
+      textColor: "#e67700",
     });
   });
 
@@ -97,14 +84,14 @@ describe("options store", () => {
     expect(store.getterColorsWithOpacity).toEqual({
       fillColor: "rgba(217, 119, 87, 1)",
       borderColor: "rgba(161, 73, 47, 1)",
-      textColor: "rgba(0, 0, 0, 1)",
+      textColor: "rgba(230, 119, 0, 1)",
     });
 
     store.setOpacity(0.5);
     expect(store.getterColorsWithOpacity).toEqual({
       fillColor: "rgba(217, 119, 87, 0.5)",
       borderColor: "rgba(161, 73, 47, 0.5)",
-      textColor: "rgba(0, 0, 0, 0.5)",
+      textColor: "rgba(230, 119, 0, 0.5)",
     });
   });
 
@@ -155,8 +142,14 @@ describe("options store", () => {
 
   it("метод setTextSize обновляет размер текста", () => {
     const store = useOptionsStore();
-    store.setTextSize("1.5rem");
-    expect(store.textSize).toBe("1.5rem");
+    store.setTextSize(32);
+    expect(store.textSize).toBe(32);
+  });
+
+  it("метод setFontFamily обновляет шрифт", () => {
+    const store = useOptionsStore();
+    store.setFontFamily("JetBrains Mono");
+    expect(store.fontFamily).toBe("JetBrains Mono");
   });
 
   it("метод setFillStyle обновляет стиль заливки", () => {

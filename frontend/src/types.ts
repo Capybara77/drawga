@@ -58,3 +58,16 @@ export type EllipseProps = {
   isCircle: boolean;
   userId: string;
 };
+
+export type TextProps = {
+  color: string;
+  x: number;
+  y: number;
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  fontSize: number;
+  fontFamily: string;
+  userId: string;
+  width: number;
+  objId: string;
+};
