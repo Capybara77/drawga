@@ -5,6 +5,7 @@ import type {
   BaseProps,
   CurveProps,
   EllipseProps,
+  ImageProps,
   LineProps,
   MyCursor,
   RectangleProps,
@@ -321,7 +322,7 @@ export class EllipseObject extends BaseObject {
     this.stroke = stroke;
     this.strokeWidth = strokeWidth;
     this.isCircle = isCircle;
-    this.userId = this.userId;
+    this.userId = userId;
   }
 
   draw(offsetX: number, offsetY: number, zoom: number): void {
@@ -385,5 +386,61 @@ export class EllipseObject extends BaseObject {
       return true;
     }
     return false;
+  }
+}
+
+export class ImageObject extends BaseObject {
+  drawType: MyCursor = "image";
+
+  ctx;
+  x;
+  y;
+  src;
+  width;
+  height;
+  image;
+
+  constructor({ x, y, userId, color = "", width, height, src, ctx }: ImageProps) {
+    super({ color, userId, width });
+
+    this.x = x;
+    this.y = y;
+    this.ctx = ctx;
+    this.userId = userId;
+    this.color = color;
+    this.width = width;
+    this.height = height;
+    this.src = src;
+
+    this.image = new Image(width, height);
+    this.image.src = src;
+  }
+
+  draw(offsetX: number, offsetY: number, zoom: number): void {
+    this.ctx.drawImage(
+      this.image,
+      this.x * zoom + offsetX,
+      this.y * zoom + offsetY,
+      this.width * zoom,
+      this.height * zoom,
+    );
+  }
+
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
+    return true;
+    //     x *= -1;
+    //     y *= -1;
+    //
+    //     let Xmin = Math.min(this.startPoint[0], this.endPoint[0]);
+    //     let Xmax = Math.max(this.startPoint[0], this.endPoint[0]);
+    //     let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
+    //     let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
+    //
+    //     Xmin *= zoom;
+    //     Ymin *= zoom;
+    //     Xmax *= zoom;
+    //     Ymax *= zoom;
+    //
+    //     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 }
