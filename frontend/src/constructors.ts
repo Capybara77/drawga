@@ -78,8 +78,36 @@ export class TextObject extends BaseObject {
     });
   }
 
-  isOverlay(x: number, y: number, offsetX: number, offsetY: number): boolean {
-    return true;
+  isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
+    this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+
+    const lineHeight = this.fontSize * 1.25;
+    const lines = this.text.split("\n");
+
+    let width = 0;
+    const height = lines.length * lineHeight;
+
+    lines.forEach((line) => {
+      const lineWidth = this.ctx.measureText(line).width;
+      if (lineWidth > width) {
+        width = lineWidth;
+      }
+    });
+
+    x *= -1;
+    y *= -1;
+
+    let Xmin = this.x;
+    let Xmax = this.x + width;
+    let Ymin = this.y;
+    let Ymax = this.y + height;
+
+    Xmin *= zoom;
+    Ymin *= zoom;
+    Xmax *= zoom;
+    Ymax *= zoom;
+
+    return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 }
 
@@ -427,20 +455,19 @@ export class ImageObject extends BaseObject {
   }
 
   isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
-    return true;
-    //     x *= -1;
-    //     y *= -1;
-    //
-    //     let Xmin = Math.min(this.startPoint[0], this.endPoint[0]);
-    //     let Xmax = Math.max(this.startPoint[0], this.endPoint[0]);
-    //     let Ymin = Math.min(this.startPoint[1], this.endPoint[1]);
-    //     let Ymax = Math.max(this.startPoint[1], this.endPoint[1]);
-    //
-    //     Xmin *= zoom;
-    //     Ymin *= zoom;
-    //     Xmax *= zoom;
-    //     Ymax *= zoom;
-    //
-    //     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
+    x *= -1;
+    y *= -1;
+
+    let Xmin = this.x;
+    let Xmax = this.x + this.width;
+    let Ymin = this.y;
+    let Ymax = this.y + this.height;
+
+    Xmin *= zoom;
+    Ymin *= zoom;
+    Xmax *= zoom;
+    Ymax *= zoom;
+
+    return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
 }
