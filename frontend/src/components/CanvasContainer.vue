@@ -7,14 +7,22 @@ import {
   RectangleObject,
   EllipseObject,
   TextObject,
+  ImageObject,
 } from "@/constructors";
 import { WebSocketService } from "@/services/webSocketService";
 import { constantsForKeyboard, useCursorStore } from "@/stores/cursor/";
 import { useOptionsStore } from "@/stores/options/";
 import { useZoomStore } from "@/stores/zoom/";
-import type { CurveProps, EllipseProps, LineProps, RectangleProps, TextProps } from "@/types";
+import type {
+  CurveProps,
+  EllipseProps,
+  ImageProps,
+  LineProps,
+  RectangleProps,
+  TextProps,
+} from "@/types";
 import { getTypedDrawObject } from "@/utils/getTypedDrawObject/getTypedDrawObject";
-import { useEventListener, useIntervalFn, useThrottleFn } from "@vueuse/core";
+import { useEventListener, useFileDialog, useIntervalFn, useThrottleFn } from "@vueuse/core";
 import rough from "roughjs";
 
 import { onMounted, ref, useTemplateRef, watch } from "vue";
@@ -23,10 +31,12 @@ import { toServerMessages } from "@/utils/toServerMessages";
 import { getHistoryHotkey, isTyping } from "@/utils/hotkeys";
 import { fitCanvas, generateId } from "@/utils";
 import { getMyName } from "@/utils/myName/myName";
+import { screenRectToBoard } from "@/utils/screenRectToBoard/screenRectToBoard";
 import { useParticipantsStore } from "@/stores/participants";
 import CursorLayer from "./CursorLayer.vue";
 import { useToast } from "@nuxt/ui/composables/useToast";
 import TextEditor from "./TextEditor.vue";
+import ImageEditor from "./ImageEditor.vue";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -39,6 +49,17 @@ const allObjectsStore = useAllObjectsStore();
 const participantsStore = useParticipantsStore();
 
 const toast = useToast();
+
+const {
+  open,
+  files,
+  onCancel,
+  onChange: onImageChange,
+  reset,
+} = useFileDialog({
+  accept: "image/*",
+  reset: true,
+});
 
 const canvasElement = useTemplateRef<HTMLCanvasElement>("canvasElement");
 const canvasContext = ref<CanvasRenderingContext2D>();
@@ -63,11 +84,60 @@ const isMoving = ref(false);
 const isErasedInStroke = ref(false);
 
 const textDraft = ref<{ x: number; y: number; id: string } | null>(null);
+const imageDraft = ref<{ x: number; y: number; src: string; width: number; height: number } | null>(
+  null,
+);
 let isTextDrafting = false;
 
 let strokeId = "";
 const userId = generateId(6);
 const userName = getMyName(localStorage);
+
+onImageChange(async (payload) => {
+  const file = payload?.item(0);
+
+  if (!file) return;
+
+  const bm = await createImageBitmap(file);
+
+  const scale = Math.min(1, 1600 / Math.max(bm.width, bm.height));
+  const previewScale = Math.min(1, 400 / Math.max(bm.width, bm.height));
+  const tempCanvas = document.createElement("canvas");
+  const scaledW = Math.round(bm.width * scale);
+  const scaledH = Math.round(bm.height * scale);
+
+  tempCanvas.width = scaledW;
+  tempCanvas.height = scaledH;
+
+  const tempCtx = tempCanvas.getContext("2d");
+
+  if (!tempCtx) return;
+
+  tempCtx.drawImage(bm, 0, 0, scaledW, scaledH);
+  //   const imageObj = getNewImageObject(tempCanvas.toDataURL("image/webp", 0.8), scaledW, scaledH);
+  //
+  //   if (!imageObj) return;
+  //
+  //   await imageObj.image.decode();
+  // allObjectsStore.receiveTemp(imageObj);
+
+  // превью — DOM поверх холста, поэтому всё в экранных пикселях; в координаты доски переводим при коммите
+  imageDraft.value = {
+    x: cursorXStart.value,
+    y: cursorYStart.value,
+    src: tempCanvas.toDataURL("image/webp", 0.8),
+    width: scaledW * previewScale * zoomStore.zoom,
+    height: scaledH * previewScale * zoomStore.zoom,
+  };
+
+  cursorStore.setCursor("pointer");
+
+  //
+  //   const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
+  //   socket.send(messageToServer);
+
+  // redrawWithClearing();
+});
 
 allObjectsStore.$onAction(({ name, after }) => {
   if (name === "undo" || name === "redo") {
@@ -226,7 +296,32 @@ const updateCanvasSize = () => {
   redrawWithClearing();
 };
 
-const getNewTextObject = (text: string) => {
+const getNewImageObject = (
+  src: string,
+  width: number,
+  height: number,
+  x: number,
+  y: number,
+): ImageObject | undefined => {
+  if (!canvasContext.value || !canvasElement.value) return;
+
+  const imageProps: ImageProps = {
+    color: optionsStore.colors.textColor,
+    ctx: canvasContext.value,
+    userId,
+    x,
+    y,
+    width,
+    height,
+    src,
+  };
+
+  const imageObj = new ImageObject(imageProps);
+
+  return imageObj;
+};
+
+const getNewTextObject = (text: string): TextObject | undefined => {
   if (!canvasContext.value || !textDraft.value || !text) return;
 
   const textProps: TextProps = {
@@ -410,13 +505,17 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     }
 
     case "text": {
-      if (isTextDrafting) {
-        break;
-      }
+      if (isTextDrafting) break;
 
       const lineHeight = optionsStore.textSize * zoomStore.zoom * 1.25;
 
       textDraft.value = { x: event.clientX, y: event.clientY - lineHeight / 2, id: strokeId };
+
+      break;
+    }
+
+    case "image": {
+      open();
 
       break;
     }
@@ -690,7 +789,7 @@ const onKeyUp = (event: KeyboardEvent) => {
   }
 };
 
-const handleCommit = (text: string) => {
+const handleCommitText = (text: string) => {
   const textObj = getNewTextObject(text);
 
   if (!textObj) return;
@@ -703,12 +802,40 @@ const handleCommit = (text: string) => {
   textDraft.value = null;
 };
 
-const handleCommitTemp = (text: string) => {
+const handleCommitTextTemp = (text: string) => {
   const textObj = getNewTextObject(text);
 
   if (!textObj) return;
 
   sendTemp(textObj);
+};
+
+const handleImageCommit = async (props: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}) => {
+  if (!imageDraft.value) return;
+
+  const { x, y, width, height } = screenRectToBoard(
+    props,
+    offsetXCustom.value,
+    offsetYCustom.value,
+    zoomStore.zoom,
+  );
+
+  const imageObject = getNewImageObject(imageDraft.value.src, width, height, x, y);
+
+  if (!imageObject) return;
+  await imageObject.image.decode();
+
+  allObjectsStore.add(imageObject);
+
+  const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
+  socket.send(messageToServer);
+
+  imageDraft.value = null;
 };
 
 onMounted(() => {
@@ -744,21 +871,21 @@ watch([() => allObjectsStore.objects, () => allObjectsStore.previews], () => {
   <canvas
     id="canvas"
     ref="canvasElement"
-    @pointerdown.stop="onCanvasPointerDown"
+    @pointerdown="onCanvasPointerDown"
     @pointerup="onCanvasPointerUp"
     @pointermove="onCanvasPointerMove"
   ></canvas>
   <CursorLayer :offsetX="offsetXCustom" :offsetY="offsetYCustom" />
   <TextEditor
     v-if="textDraft"
-    :x="textDraft.x"
-    :y="textDraft.y"
+    v-bind="textDraft"
     :fontSize="optionsStore.textSize * zoomStore.zoom"
     :color="optionsStore.colors.textColor"
     :fontFamily="optionsStore.fontFamily"
-    @commit="handleCommit"
-    @commitTemp="handleCommitTemp"
+    @commit="handleCommitText"
+    @commitTemp="handleCommitTextTemp"
   />
+  <ImageEditor v-if="imageDraft" v-bind="imageDraft" @commit="handleImageCommit" />
 </template>
 
 <style scoped>

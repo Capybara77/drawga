@@ -71,3 +71,14 @@ export type TextProps = {
   width: number;
   objId: string;
 };
+
+export type ImageProps = {
+  src: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  userId: string;
+  ctx: CanvasRenderingContext2D;
+  color: string;
+};

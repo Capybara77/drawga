@@ -1,6 +1,10 @@
 import type { MyCursor } from "@/types";
 import { defineStore } from "pinia";
 
+type State = {
+  cursor: MyCursor;
+};
+
 export const constantsForKeyboard: Record<string, MyCursor> = {
   1: "pointer",
   2: "eraser",
@@ -13,8 +17,8 @@ export const constantsForKeyboard: Record<string, MyCursor> = {
 };
 
 export const useCursorStore = defineStore("cursor", {
-  state: () => ({
-    cursor: "pointer" as MyCursor,
+  state: (): State => ({
+    cursor: "pointer",
   }),
   actions: {
     setCursor(cursor: MyCursor) {
