@@ -31,12 +31,6 @@ onMounted(() => {
   if (editor.value) editor.value.style.width = `${props.width}px`;
 });
 
-// useResizeObserver(editor, (entries) => {
-//   const entry = entries[0];
-//   const { width, height } = entry.contentRect;
-//   emits("commitTemp", `resize w: ${width} / h: ${height}`);
-// });
-
 onClickOutside(editor, (event) => {
   if (!editor.value) return;
 
