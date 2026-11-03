@@ -22,6 +22,18 @@ describe("toServerMessages", () => {
     ]);
   });
 
+  it("замена уходит как все delete, потом все drawObj — сервер хранит только историю сообщений", () => {
+    const before = [obj("A"), obj("B")];
+    const after = [{ ...obj("A"), color: "red" }, { ...obj("B"), color: "red" }] as BaseObject[];
+
+    expect(toServerMessages({ type: "replace", before, after })).toEqual([
+      ["delete", JSON.stringify({ objId: "A" })],
+      ["delete", JSON.stringify({ objId: "B" })],
+      ["drawObj", JSON.stringify(after[0])],
+      ["drawObj", JSON.stringify(after[1])],
+    ]);
+  });
+
   it("пустое изменение — ни одного сообщения", () => {
     expect(toServerMessages({ type: "remove", objects: [] })).toEqual([]);
   });

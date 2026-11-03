@@ -8,7 +8,15 @@ export type MyCursor =
   | "line"
   | "text"
   | "image"
-  | "eraser";
+  | "eraser"
+  | "hand";
+
+export type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 export type BaseProps = {
   color: string;

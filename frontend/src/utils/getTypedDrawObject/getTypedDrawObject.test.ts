@@ -298,3 +298,24 @@ describe("getTypedDrawObject", () => {
     expect(result).toBeNull();
   });
 });
+
+describe("getTypedDrawObject: черновик перемещения", () => {
+  it("сохраняет tempObj, иначе у других перемещение не отличить от обычного черновика", () => {
+    const str = JSON.stringify({
+      drawType: "rectangle",
+      objId: "r",
+      tempObj: true,
+      zoom: 1,
+      userId: "u",
+      color: "c",
+      width: 1,
+      startPoint: [0, 0],
+      endPoint: [1, 1],
+      fillStyle: "solid",
+      stroke: "s",
+      strokeWidth: 1,
+    });
+
+    expect(getTypedDrawObject(str, roughCanvas, ctx)?.tempObj).toBe(true);
+  });
+});

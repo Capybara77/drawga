@@ -25,7 +25,7 @@ import { getTypedDrawObject } from "@/utils/getTypedDrawObject/getTypedDrawObjec
 import { useEventListener, useFileDialog, useIntervalFn, useThrottleFn } from "@vueuse/core";
 import rough from "roughjs";
 
-import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
 import { toServerMessages } from "@/utils/toServerMessages";
 import { getHistoryHotkey, isTyping } from "@/utils/hotkeys";
@@ -37,6 +37,15 @@ import CursorLayer from "./CursorLayer.vue";
 import { useToast } from "@nuxt/ui/composables/useToast";
 import TextEditor from "./TextEditor.vue";
 import ImageEditor from "./ImageEditor.vue";
+import { toBoard } from "@/utils/toBoard/toBoard";
+import { cursorMessage, drawMessage, tempMessage } from "@/utils/socketMessages/socketMessages";
+import { isPanStart, usePan } from "@/composables/usePan";
+import { useSelection } from "@/composables/useSelection";
+import {
+  drawMarquee,
+  drawObjectOutline,
+  drawSelectionBox,
+} from "@/utils/selection/selection";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -59,11 +68,9 @@ const canvasElement = useTemplateRef<HTMLCanvasElement>("canvasElement");
 const canvasContext = ref<CanvasRenderingContext2D>();
 const roughCanvas = ref();
 
-const cursorY = ref(0);
-const cursorX = ref(0);
-
-const offsetXCustom = ref(0);
-const offsetYCustom = ref(0);
+const { endPan, isMoving, movePan, offsetXCustom, offsetYCustom, startPan } = usePan();
+const selection = useSelection();
+const hoverCursor = ref("default");
 
 const cursorXStart = ref(0);
 const cursorYStart = ref(0);
@@ -73,7 +80,12 @@ const currentCoordinates = ref<number[][]>([]);
 const isDrawing = ref(false);
 const isOnCanvas = ref(false);
 const isSpacePressed = ref(false);
-const isMoving = ref(false);
+const canvasCursor = computed(() => {
+  if (isMoving.value) return "grabbing";
+  if (isSpacePressed.value || cursorStore.cursor === "hand") return "grab";
+
+  return hoverCursor.value;
+});
 // стёрли ли уже что-то за текущее движение ластиком — тогда склеиваем в одну запись undo
 const isErasedInStroke = ref(false);
 
@@ -86,6 +98,9 @@ let isTextDrafting = false;
 let strokeId = "";
 const userId = generateId(6);
 const userName = getMyName(localStorage);
+
+const offsetBoard = (point: { x: number; y: number }) =>
+  toBoard({ offsetX: offsetXCustom.value, offsetY: offsetYCustom.value }, zoomStore.zoom)(point);
 
 onImageChange(async (payload) => {
   const file = payload?.item(0);
@@ -215,8 +230,17 @@ const createSocketConnection = () => {
 };
 
 const redrawWithOffset = () => {
+  // объект, который сейчас тянут (мы или кто-то другой), рисуется черновиком вместо оригинала
+  const hiddenIds = new Set(allObjectsStore.previews.filter((p) => p.tempObj).map((p) => p.objId));
+
+  selection.drafts.value.forEach((draft) => hiddenIds.add(draft.objId));
+
   for (let index = 0; index < allObjectsStore.size; index++) {
     const element = allObjectsStore.objects[index];
+
+    if (hiddenIds.has(element.objId)) {
+      continue;
+    }
 
     if (
       element.isOverlay(
@@ -250,6 +274,31 @@ const redrawWithOffsetTemp = () => {
   }
 };
 
+const drawSelection = () => {
+  const ctx = canvasContext.value;
+
+  if (!ctx) return;
+
+  const { box, drafts, marquee, selected } = selection;
+  const offset = [offsetXCustom.value, offsetYCustom.value, zoomStore.zoom] as const;
+
+  drafts.value.forEach((draft) => draft.draw(...offset));
+
+  if (marquee.value) {
+    drawMarquee(ctx, marquee.value, ...offset);
+  }
+
+  if (selected.value.length > 1) {
+    const shown = drafts.value.length ? drafts.value : selected.value;
+
+    shown.forEach((o) => drawObjectOutline(ctx, o.bounds(), ...offset));
+  }
+
+  if (box.value) {
+    drawSelectionBox(ctx, box.value, ...offset);
+  }
+};
+
 const clearCanvas = () => {
   canvasContext.value?.clearRect(
     0,
@@ -263,6 +312,7 @@ const redrawWithClearing = () => {
   clearCanvas();
   redrawWithOffset();
   redrawWithOffsetTemp();
+  drawSelection();
 };
 
 const updateCanvasSize = () => {
@@ -278,23 +328,17 @@ const updateCanvasSize = () => {
   redrawWithClearing();
 };
 
-const getNewLineObject = (
-  cursorXCurrent: number,
-  cursorYCurrent: number,
-): LineObject | undefined => {
+const getNewLineObject = (event: PointerEvent): LineObject | undefined => {
+  const start = offsetBoard({ x: cursorXStart.value, y: cursorYStart.value });
+  const end = offsetBoard({ x: event.clientX, y: event.clientY });
+
   const lineObjectProps: LineProps = {
     color: optionsStore.getterColorsWithOpacity.fillColor,
     width: optionsStore.lineWidth,
     roughCanvas: roughCanvas.value,
     userId: userId,
-    startPoint: [
-      (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-      (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-    ],
-    endPoint: [
-      (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
-      (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
-    ],
+    startPoint: [start.boardX, start.boardY],
+    endPoint: [end.boardX, end.boardY],
   };
 
   const lineObj = new LineObject(lineObjectProps);
@@ -302,28 +346,15 @@ const getNewLineObject = (
   return lineObj;
 };
 
-const getNewEllipseObject = (
-  event: PointerEvent,
-  cursorXCurrent: number,
-  cursorYCurrent: number,
-) => {
+const getNewEllipseObject = (event: PointerEvent) => {
+  const start = offsetBoard({ x: cursorXStart.value, y: cursorYStart.value });
+  const end = offsetBoard({ x: event.clientX, y: event.clientY });
+
   const ellipseProps: EllipseProps = {
     color: optionsStore.getterColorsWithOpacity.fillColor,
     width: optionsStore.lineWidth,
-    startPoint: [
-      (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-      (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-    ],
-    endPoint: [
-      event.shiftKey
-        ? (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom
-        : (cursorXCurrent - offsetXCustom.value) / zoomStore.zoom,
-      event.shiftKey
-        ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-          ((cursorXCurrent - offsetXCustom.value) / zoomStore.zoom -
-            (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
-        : (cursorYCurrent - offsetYCustom.value) / zoomStore.zoom,
-    ],
+    startPoint: [start.boardX, start.boardY],
+    endPoint: [end.boardX, end.boardY],
     fillStyle: optionsStore.fillStyle,
     roughCanvas: roughCanvas.value,
     stroke: optionsStore.getterColorsWithOpacity.borderColor,
@@ -365,14 +396,16 @@ const getNewImageObject = (
 const getNewTextObject = (text: string): TextObject | undefined => {
   if (!canvasContext.value || !textDraft.value || !text) return;
 
+  const board = offsetBoard({ x: textDraft.value.x, y: textDraft.value.y });
+
   const textProps: TextProps = {
     fontSize: optionsStore.textSize,
     color: optionsStore.colors.textColor,
     ctx: canvasContext.value,
     text,
     userId,
-    x: (textDraft.value.x - offsetXCustom.value) / zoomStore.zoom,
-    y: (textDraft.value.y - offsetYCustom.value) / zoomStore.zoom,
+    x: board.boardX,
+    y: board.boardY,
     fontFamily: optionsStore.fontFamily,
     width: 0,
     objId: textDraft.value.id,
@@ -401,6 +434,9 @@ const getNewCurveObject = (): CurveObject | undefined => {
 };
 
 const getNewRectObject = (event: PointerEvent): RectangleObject | undefined => {
+  const start = offsetBoard({ x: cursorXStart.value, y: cursorYStart.value });
+  const end = offsetBoard({ x: event.clientX, y: event.clientY });
+
   const rectangleProps: RectangleProps = {
     color: optionsStore.getterColorsWithOpacity.fillColor,
     width: optionsStore.lineWidth,
@@ -409,20 +445,8 @@ const getNewRectObject = (event: PointerEvent): RectangleObject | undefined => {
     stroke: optionsStore.getterColorsWithOpacity.borderColor,
     strokeWidth: optionsStore.lineWidth,
     userId: userId,
-    startPoint: [
-      (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-      (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-    ],
-    endPoint: [
-      event.shiftKey
-        ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
-        : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
-      event.shiftKey
-        ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-          ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
-            (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
-        : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
-    ],
+    startPoint: [start.boardX, start.boardY],
+    endPoint: [end.boardX, end.boardY],
   };
 
   const rect = new RectangleObject(rectangleProps);
@@ -437,12 +461,9 @@ const onCanvasPointerDown = (event: PointerEvent) => {
 
   isTextDrafting = !!textDraft.value;
 
-  if (event.button === 1 || (isSpacePressed.value && event.button === 0)) {
-    isMoving.value = true;
-    cursorX.value = event.clientX - offsetXCustom.value;
-    cursorY.value = event.clientY - offsetYCustom.value;
+  if (isPanStart(event.button, isSpacePressed.value, cursorStore.cursor)) {
+    startPan(event);
 
-    // canvasElement.style.cursor = 'grabbing';
     return;
   }
 
@@ -463,17 +484,18 @@ const onCanvasPointerDown = (event: PointerEvent) => {
 
   cursorXStart.value = event.clientX;
   cursorYStart.value = event.clientY;
+
+  if (cursorStore.cursor === "pointer" && event.button === 0) {
+    const { boardX, boardY } = offsetBoard({ x: event.clientX, y: event.clientY });
+
+    selection.press(boardX, boardY, zoomStore.zoom, event.shiftKey);
+  }
 };
 
 const onCanvasPointerUp = (event: PointerEvent) => {
   const element = event.target as HTMLElement;
 
-  // сдвиг сбрасываем до проверок ниже: pointerdown сдвига не ставит isOnCanvas,
-  // и после перезагрузки (isOnCanvas ещё false) сдвиг залипал
-  if (isMoving.value) {
-    isMoving.value = false;
-    return;
-  }
+  endPan();
 
   if (event.button === 2 || element.id !== "canvas" || isOnCanvas.value === false) return;
 
@@ -482,6 +504,16 @@ const onCanvasPointerUp = (event: PointerEvent) => {
   let currentDrawing: BaseObject | undefined;
 
   switch (cursorStore.cursor) {
+    case "pointer": {
+      const action = selection.release();
+
+      if (action) {
+        toServerMessages(action).forEach((msg) => socket.send(msg));
+      }
+
+      break;
+    }
+
     case "curve": {
       currentDrawing = getNewCurveObject();
 
@@ -489,22 +521,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     }
 
     case "line": {
-      const lineObjectProps: LineProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        roughCanvas: roughCanvas.value,
-        userId: userId,
-        startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        endPoint: [
-          (event.clientX - offsetXCustom.value) / zoomStore.zoom,
-          (event.clientY - offsetYCustom.value) / zoomStore.zoom,
-        ],
-      };
-
-      currentDrawing = new LineObject(lineObjectProps);
+      currentDrawing = getNewLineObject(event);
 
       break;
     }
@@ -516,32 +533,7 @@ const onCanvasPointerUp = (event: PointerEvent) => {
     }
 
     case "ellipse": {
-      const ellipseProps: EllipseProps = {
-        color: optionsStore.getterColorsWithOpacity.fillColor,
-        width: optionsStore.lineWidth,
-        startPoint: [
-          (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom,
-          (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        endPoint: [
-          event.shiftKey
-            ? (event.clientX - offsetXCustom.value) / zoomStore.zoom
-            : (event.clientX - offsetXCustom.value) / zoomStore.zoom,
-          event.shiftKey
-            ? (cursorYStart.value - offsetYCustom.value) / zoomStore.zoom +
-              ((event.clientX - offsetXCustom.value) / zoomStore.zoom -
-                (cursorXStart.value - offsetXCustom.value) / zoomStore.zoom)
-            : (event.clientY - offsetYCustom.value) / zoomStore.zoom,
-        ],
-        fillStyle: optionsStore.fillStyle,
-        roughCanvas: roughCanvas.value,
-        stroke: optionsStore.getterColorsWithOpacity.borderColor,
-        strokeWidth: optionsStore.lineWidth,
-        isCircle: false,
-        userId: userId,
-      };
-
-      currentDrawing = new EllipseObject(ellipseProps);
+      currentDrawing = getNewEllipseObject(event);
       break;
     }
 
@@ -576,17 +568,14 @@ const onCanvasPointerUp = (event: PointerEvent) => {
 
   redrawWithClearing();
 
-  const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
-
-  socket.send(messageToServer);
+  socket.send(drawMessage(allObjectsStore.peek));
 };
 
 // задел ли ластик объект (x, y — координаты курсора на экране)
 const isHit = (drawObject: BaseObject, x: number, y: number): boolean => {
   const zoom = zoomStore.zoom;
   // координаты курсора на доске, без зума и сдвига
-  const boardX = (x - offsetXCustom.value) / zoom;
-  const boardY = (y - offsetYCustom.value) / zoom;
+  const { boardX, boardY } = offsetBoard({ x, y });
 
   switch (drawObject.drawType) {
     case "curve": {
@@ -598,7 +587,7 @@ const isHit = (drawObject: BaseObject, x: number, y: number): boolean => {
         offsetYCustom.value - y,
         1,
         1,
-        zoom,
+        zoomStore.zoom,
       );
     }
     case "line": {
@@ -631,7 +620,15 @@ const isHit = (drawObject: BaseObject, x: number, y: number): boolean => {
 };
 
 const sendTemp = useThrottleFn((obj) => {
-  socket.send(["temp", JSON.stringify(obj)]);
+  socket.send(tempMessage(obj));
+}, 50);
+
+// троттлим всю пачку: через sendTemp на каждый объект долетел бы только первый
+const sendDrafts = useThrottleFn((drafts: BaseObject[]) => {
+  drafts
+    // ponytail: картинку не шлём на лету, её src слишком тяжёлый; другие увидят её при отпускании
+    .filter((draft) => draft.drawType !== "image")
+    .forEach((draft) => socket.send(tempMessage(draft)));
 }, 50);
 
 const onCanvasPointerMove = (event: PointerEvent) => {
@@ -641,31 +638,47 @@ const onCanvasPointerMove = (event: PointerEvent) => {
   // const trailerY = event.clientY - trailer.offsetHeight / 2;
 
   if (element.id === "canvas") {
-    const messageToServer = [
-      "cur",
-      userId,
-      event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
-      event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
-      userName,
-    ].map(String);
-
-    socket.send(messageToServer);
+    socket.send(
+      cursorMessage(
+        userId,
+        event.clientX / zoomStore.zoom - offsetXCustom.value / zoomStore.zoom,
+        event.clientY / zoomStore.zoom - offsetYCustom.value / zoomStore.zoom,
+        userName,
+      ),
+    );
   }
 
   if (isMoving.value) {
-    offsetXCustom.value = event.clientX - cursorX.value;
-    offsetYCustom.value = event.clientY - cursorY.value;
+    movePan(event);
     redrawWithClearing();
 
     return;
   }
 
-  if (!isDrawing.value) return;
+  if (!isDrawing.value) {
+    if (cursorStore.cursor === "pointer") {
+      const { boardX, boardY } = offsetBoard({ x: event.clientX, y: event.clientY });
+
+      hoverCursor.value = selection.cursorAt(boardX, boardY, zoomStore.zoom);
+    }
+
+    return;
+  }
 
   const cursorXCurrent = event.clientX;
   const cursorYCurrent = event.clientY;
 
   switch (cursorStore.cursor) {
+    case "pointer": {
+      const { boardX, boardY } = offsetBoard({ x: cursorXCurrent, y: cursorYCurrent });
+
+      selection.drag(boardX, boardY);
+
+      sendDrafts(selection.drafts.value);
+
+      break;
+    }
+
     case "eraser": {
       const toErase = allObjectsStore.objects.filter((drawObject) =>
         isHit(drawObject, cursorXCurrent, cursorYCurrent),
@@ -689,10 +702,9 @@ const onCanvasPointerMove = (event: PointerEvent) => {
       const currentX = cursorXCurrent;
       const currentY = cursorYCurrent;
 
-      currentCoordinates.value.push([
-        (currentX - offsetXCustom.value) / zoomStore.zoom,
-        (currentY - offsetYCustom.value) / zoomStore.zoom,
-      ]);
+      const { boardX, boardY } = offsetBoard({ x: currentX, y: currentY });
+
+      currentCoordinates.value.push([boardX, boardY]);
 
       // без этого сначала рисуется не оч красиво, а когда отпускаешь становится норм, но думаю на производительность давит
       redrawWithClearing();
@@ -725,7 +737,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     }
 
     case "line": {
-      const line = getNewLineObject(cursorXCurrent, cursorYCurrent);
+      const line = getNewLineObject(event);
 
       redrawWithClearing();
 
@@ -739,7 +751,7 @@ const onCanvasPointerMove = (event: PointerEvent) => {
     }
 
     case "ellipse": {
-      const ellipse = getNewEllipseObject(event, cursorXCurrent, cursorYCurrent);
+      const ellipse = getNewEllipseObject(event);
 
       redrawWithClearing();
 
@@ -781,6 +793,21 @@ const onKeyDown = (event: KeyboardEvent) => {
 
       return;
     }
+    case "Delete":
+    case "Backspace": {
+      const targets = selection.selected.value;
+
+      allObjectsStore.remove(targets);
+      toServerMessages({ type: "remove", objects: targets }).forEach((msg) => socket.send(msg));
+      selection.deselect();
+
+      return;
+    }
+    case "Escape": {
+      selection.deselect();
+
+      return;
+    }
     case "Minus": {
       zoomStore.decreaseZoom();
 
@@ -816,8 +843,7 @@ const handleCommitText = (text: string) => {
 
   allObjectsStore.add(textObj);
   redrawWithClearing();
-  const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
-  socket.send(messageToServer);
+  socket.send(drawMessage(allObjectsStore.peek));
 
   textDraft.value = null;
 };
@@ -852,8 +878,7 @@ const handleImageCommit = async (props: {
 
   allObjectsStore.add(imageObject);
 
-  const messageToServer = ["drawObj", JSON.stringify(allObjectsStore.peek)].map(String);
-  socket.send(messageToServer);
+  socket.send(drawMessage(allObjectsStore.peek));
 
   imageDraft.value = null;
 };
@@ -881,6 +906,18 @@ watch(zoomStore, () => {
   redrawWithClearing();
 });
 
+watch([selection.selected, selection.drafts, selection.marquee], () => {
+  redrawWithClearing();
+});
+
+watch(
+  () => cursorStore.cursor,
+  () => {
+    selection.deselect();
+    hoverCursor.value = "default";
+  },
+);
+
 // стор всегда подменяет массив objects / previews, поэтому хватает слежки за ссылкой
 watch([() => allObjectsStore.objects, () => allObjectsStore.previews], () => {
   redrawWithClearing();
@@ -891,6 +928,7 @@ watch([() => allObjectsStore.objects, () => allObjectsStore.previews], () => {
   <canvas
     id="canvas"
     ref="canvasElement"
+    :style="{ cursor: canvasCursor }"
     @pointerdown="onCanvasPointerDown"
     @pointerup="onCanvasPointerUp"
     @pointermove="onCanvasPointerMove"

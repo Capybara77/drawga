@@ -81,30 +81,35 @@ export function getTypedDrawObject(
       const r = new RectangleObject({ ...parsedString, roughCanvas });
       r.objId = objId;
       r.zoom = zoom;
+      r.tempObj = tempObj;
       return r;
     }
     case "ellipse": {
       const e = new EllipseObject({ ...parsedString, roughCanvas });
       e.objId = objId;
       e.zoom = zoom;
+      e.tempObj = tempObj;
       return e;
     }
     case "line": {
       const l = new LineObject({ ...parsedString, roughCanvas });
       l.objId = objId;
       l.zoom = zoom;
+      l.tempObj = tempObj;
       return l;
     }
     case "curve": {
       const c = new CurveObject({ ...parsedString, ctx });
       c.objId = objId;
       c.zoom = zoom;
+      c.tempObj = tempObj;
       return c;
     }
     case "text": {
       const t = new TextObject({ ...parsedString, ctx });
       t.objId = objId;
       t.zoom = zoom;
+      t.tempObj = tempObj;
 
       return t;
     }
@@ -112,6 +117,7 @@ export function getTypedDrawObject(
       const im = new ImageObject({ ...parsedString, ctx });
       im.objId = objId;
       im.zoom = zoom;
+      im.tempObj = tempObj;
 
       return im;
     }

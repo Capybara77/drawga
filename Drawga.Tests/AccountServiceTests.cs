@@ -88,4 +88,23 @@ public class AccountServiceTests : IDisposable
 
         Assert.Null(_accounts.Authenticate("old@b.c", "123"));
     }
+
+    [Fact]
+    public void Register_TakenEmail_ReturnsNullAndAddsNothing()
+    {
+        Assert.NotNull(_accounts.Register("Ilya", "a@b.c", "secret123"));
+
+        Assert.Null(_accounts.Register("Other", "a@b.c", "secret456"));
+        Assert.Equal("Ilya", _context.Users.Single().Name);
+    }
+
+    [Fact]
+    public void Email_IgnoresCaseAndSpaces()
+    {
+        _accounts.Register("Ilya", " A@B.c ", "secret123");
+
+        Assert.Null(_accounts.Register("Other", "a@b.C", "secret456"));
+        Assert.NotNull(_accounts.Authenticate("a@b.c", "secret123"));
+        Assert.NotNull(_accounts.Authenticate(" A@B.C", "secret123"));
+    }
 }

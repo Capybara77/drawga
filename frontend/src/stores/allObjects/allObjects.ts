@@ -2,7 +2,9 @@ import { BaseObject } from "@/constructors";
 import { defineStore } from "pinia";
 
 // запись в журнале: что сделали и с какими объектами
-export type Action = { type: "add" | "remove"; objects: BaseObject[] };
+export type Action =
+  | { type: "add" | "remove"; objects: BaseObject[] }
+  | { type: "replace"; before: BaseObject[]; after: BaseObject[] };
 
 type State = {
   objects: BaseObject[]; // что сейчас на доске
@@ -33,7 +35,8 @@ export const useAllObjectsStore = defineStore("allObjects", {
     receiveTemp(obj: BaseObject) {
       const objInObjects = this.objects.find((curr) => curr.objId === obj.objId);
 
-      if (objInObjects) {
+      // tempObj — черновик перемещения существующего объекта, его показываем вместо оригинала
+      if (objInObjects && !obj.tempObj) {
         return;
       }
 
@@ -68,10 +71,24 @@ export const useAllObjectsStore = defineStore("allObjects", {
       }
       this.redoStack = [];
     },
+    // ponytail: заменённый объект всплывает наверх: сервер хранит доску как историю сообщений,
+    // и после перезагрузки порядок будет таким же
+    replace(before: BaseObject[], after: BaseObject[]) {
+      this.objects = [...without(this.objects, before), ...after];
+      this.undoStack.push({ type: "replace", before, after });
+      this.redoStack = [];
+    },
     undo(): Action | undefined {
       const action = this.undoStack.pop();
       if (!action) {
         return;
+      }
+
+      if (action.type === "replace") {
+        this.objects = [...without(this.objects, action.after), ...action.before];
+        this.redoStack.push(action);
+
+        return { type: "replace", before: action.after, after: action.before };
       }
 
       // делаем наоборот
@@ -88,6 +105,13 @@ export const useAllObjectsStore = defineStore("allObjects", {
       const action = this.redoStack.pop();
       if (!action) {
         return;
+      }
+
+      if (action.type === "replace") {
+        this.objects = [...without(this.objects, action.before), ...action.after];
+        this.undoStack.push(action);
+
+        return action;
       }
 
       // делаем то же самое ещё раз

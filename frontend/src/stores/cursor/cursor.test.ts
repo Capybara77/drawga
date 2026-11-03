@@ -29,4 +29,8 @@ describe("Cursor Store", () => {
       expect(store.cursor).toBe(cursor);
     }
   });
+
+  it("клавиша 9 выбирает руку", () => {
+    expect(constantsForKeyboard[9]).toBe("hand");
+  });
 });
