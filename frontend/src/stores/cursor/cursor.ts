@@ -14,6 +14,7 @@ export const constantsForKeyboard: Record<string, MyCursor> = {
   6: "ellipse",
   7: "text",
   8: "image",
+  9: "hand",
 };
 
 export const useCursorStore = defineStore("cursor", {

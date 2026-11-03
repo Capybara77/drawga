@@ -7,6 +7,7 @@ import UDropdownMenu from "@nuxt/ui/components/DropdownMenu.vue";
 import UButton from "@nuxt/ui/components/Button.vue";
 import UModal from "@nuxt/ui/components/Modal.vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
+import { clearMessage } from "@/utils/socketMessages/socketMessages";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -30,7 +31,7 @@ const themes: { mode: BasicColorSchema; label: string; icon: string }[] = [
 ];
 
 function clearBoard() {
-  socket.send(["clear"]);
+  socket.send(clearMessage());
   allObjectsStore.clear();
   isConfirmOpen.value = false;
 }

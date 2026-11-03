@@ -8,10 +8,27 @@ import type {
   ImageProps,
   LineProps,
   MyCursor,
+  Rect,
   RectangleProps,
   TextProps,
 } from "./types";
 import { generateId, commonIsOverlay, getSvgPathFromStroke } from "./utils";
+import { distanceToSegment, inRect, remap } from "./utils/selection/selection";
+
+// копия объекта без конструктора: те же ctx, roughCanvas и уже загруженная картинка
+const copyOf = <T extends object>(obj: T): T =>
+  Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+
+const rectOfPoints = (points: number[][]): Rect => {
+  if (points.length === 0) return { x: 0, y: 0, width: 0, height: 0 };
+
+  const xs = points.map((p) => p[0]);
+  const ys = points.map((p) => p[1]);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+
+  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
+};
 
 export abstract class BaseObject {
   color;
@@ -38,6 +55,16 @@ export abstract class BaseObject {
 
   isCloseToPoints(x: number, y: number, delta: number): boolean {
     return true;
+  }
+
+  // прямоугольник объекта в координатах доски
+  abstract bounds(): Rect;
+
+  // копия с тем же objId, вписанная в новый прямоугольник; исходный объект не меняется
+  abstract withBounds(next: Rect): BaseObject;
+
+  containsPoint(x: number, y: number, tolerance: number): boolean {
+    return inRect(this.bounds(), x, y, tolerance);
   }
 }
 
@@ -79,35 +106,37 @@ export class TextObject extends BaseObject {
   }
 
   isOverlay(x: number, y: number, offsetX: number, offsetY: number, zoom: number): boolean {
-    this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-
-    const lineHeight = this.fontSize * 1.25;
-    const lines = this.text.split("\n");
-
-    let width = 0;
-    const height = lines.length * lineHeight;
-
-    lines.forEach((line) => {
-      const lineWidth = this.ctx.measureText(line).width;
-      if (lineWidth > width) {
-        width = lineWidth;
-      }
-    });
+    const rect = this.bounds();
 
     x *= -1;
     y *= -1;
 
-    let Xmin = this.x;
-    let Xmax = this.x + width;
-    let Ymin = this.y;
-    let Ymax = this.y + height;
-
-    Xmin *= zoom;
-    Ymin *= zoom;
-    Xmax *= zoom;
-    Ymax *= zoom;
+    const Xmin = rect.x * zoom;
+    const Xmax = (rect.x + rect.width) * zoom;
+    const Ymin = rect.y * zoom;
+    const Ymax = (rect.y + rect.height) * zoom;
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
+  }
+
+  bounds(): Rect {
+    this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+
+    const lines = this.text.split("\n");
+    const width = Math.max(...lines.map((line) => this.ctx.measureText(line).width));
+
+    return { x: this.x, y: this.y, width, height: lines.length * this.fontSize * 1.25 };
+  }
+
+  // ponytail: у текста только шрифт, поэтому ширина рамки следует за высотой, а не за курсором
+  withBounds(next: Rect) {
+    const copy = copyOf(this);
+
+    copy.x = next.x;
+    copy.y = next.y;
+    copy.fontSize = (this.fontSize * next.height) / this.bounds().height;
+
+    return copy;
   }
 }
 
@@ -189,6 +218,25 @@ export class CurveObject extends BaseObject {
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
   }
+
+  bounds(): Rect {
+    return rectOfPoints(this.pointsList);
+  }
+
+  withBounds(next: Rect) {
+    const copy = copyOf(this);
+
+    copy.pointsList = this.pointsList.map(remap(this.bounds(), next));
+
+    return copy;
+  }
+
+  containsPoint(x: number, y: number, tolerance: number): boolean {
+    return this.pointsList.some(
+      (point, index) =>
+        distanceToSegment(x, y, point, this.pointsList[index + 1] ?? point) <= tolerance,
+    );
+  }
 }
 
 export class LineObject extends BaseObject {
@@ -248,6 +296,24 @@ export class LineObject extends BaseObject {
     }
 
     return false;
+  }
+
+  bounds(): Rect {
+    return rectOfPoints([this.startPoint, this.endPoint]);
+  }
+
+  withBounds(next: Rect) {
+    const copy = copyOf(this);
+    const map = remap(this.bounds(), next);
+
+    copy.startPoint = map(this.startPoint);
+    copy.endPoint = map(this.endPoint);
+
+    return copy;
+  }
+
+  containsPoint(x: number, y: number, tolerance: number): boolean {
+    return distanceToSegment(x, y, this.startPoint, this.endPoint) <= tolerance;
   }
 }
 
@@ -316,6 +382,20 @@ export class RectangleObject extends BaseObject {
     Ymax *= zoom;
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
+  }
+
+  bounds(): Rect {
+    return rectOfPoints([this.startPoint, this.endPoint]);
+  }
+
+  withBounds(next: Rect) {
+    const copy = copyOf(this);
+    const map = remap(this.bounds(), next);
+
+    copy.startPoint = map(this.startPoint);
+    copy.endPoint = map(this.endPoint);
+
+    return copy;
   }
 }
 
@@ -415,6 +495,37 @@ export class EllipseObject extends BaseObject {
     }
     return false;
   }
+
+  // startPoint — центр, endPoint — угол описанного прямоугольника
+  bounds(): Rect {
+    const radiusX = Math.abs(this.endPoint[0] - this.startPoint[0]);
+    const radiusY = Math.abs(this.endPoint[1] - this.startPoint[1]);
+
+    return {
+      x: this.startPoint[0] - radiusX,
+      y: this.startPoint[1] - radiusY,
+      width: radiusX * 2,
+      height: radiusY * 2,
+    };
+  }
+
+  withBounds(next: Rect) {
+    const copy = copyOf(this);
+    const map = remap(this.bounds(), next);
+
+    copy.startPoint = map(this.startPoint);
+    copy.endPoint = map(this.endPoint);
+
+    return copy;
+  }
+
+  containsPoint(x: number, y: number, tolerance: number): boolean {
+    const { width, height } = this.bounds();
+    const dx = (x - this.startPoint[0]) / (width / 2 + tolerance);
+    const dy = (y - this.startPoint[1]) / (height / 2 + tolerance);
+
+    return dx * dx + dy * dy <= 1;
+  }
 }
 
 export class ImageObject extends BaseObject {
@@ -469,5 +580,20 @@ export class ImageObject extends BaseObject {
     Ymax *= zoom;
 
     return commonIsOverlay(x, y, offsetX, offsetY, Xmin, Xmax, Ymin, Ymax);
+  }
+
+  bounds(): Rect {
+    return { x: this.x, y: this.y, width: this.width, height: this.height };
+  }
+
+  withBounds(next: Rect) {
+    const copy = copyOf(this);
+
+    copy.x = next.x;
+    copy.y = next.y;
+    copy.width = next.width;
+    copy.height = next.height;
+
+    return copy;
   }
 }

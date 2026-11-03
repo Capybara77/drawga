@@ -8,7 +8,7 @@ import ColorPicker from "./ColorPicker.vue";
 const cursorStore = useCursorStore();
 const optionsStore = useOptionsStore();
 
-const cursorsForHideAll: MyCursor[] = ["pointer", "eraser", "image"];
+const cursorsForHideAll: MyCursor[] = ["pointer", "eraser", "image", "hand"];
 const showFill: MyCursor[] = ["ellipse", "line", "curve", "rectangle"];
 const showStroke: MyCursor[] = ["ellipse", "rectangle"];
 const showText: MyCursor[] = ["text"];

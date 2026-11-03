@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import EllipseIcon from "@/icons/cursors/EllipseIcon/EllipseIcon.vue";
 import EraserIcon from "@/icons/cursors/EraserIcon/EraserIcon.vue";
+import HandIcon from "@/icons/cursors/HandIcon/HandIcon.vue";
 import ImageIcon from "@/icons/cursors/ImageIcon/ImageIcon.vue";
 import LineIcon from "@/icons/cursors/LineIcon/LineIcon.vue";
 import PenIcon from "@/icons/cursors/PenIcon/PenIcon.vue";
@@ -32,6 +33,7 @@ const items: CursorItem[] = [
   { name: "Окружность", key: "ellipse", title: "Окружность - 'c' или 6", icon: EllipseIcon },
   { name: "Текст", key: "text", title: "Текст - 't' или 7", icon: TextIcon },
   { name: "Изображение", key: "image", title: "Изображение - 'i' или 8", icon: ImageIcon },
+  { name: "Рука", key: "hand", title: "Рука - 9", icon: HandIcon },
 ];
 
 const cursorStore = useCursorStore();
@@ -64,7 +66,7 @@ const pickCursor = (newCursor: MyCursor) => {
   left: 50%;
   transform: translate(-50%, 0);
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(9, 1fr);
   gap: 1rem;
   border: 2px solid var(--clr-border);
   border-radius: 5px;
@@ -179,6 +181,16 @@ const pickCursor = (newCursor: MyCursor) => {
 
 #image-btn::after {
   content: "8";
+  position: absolute;
+  bottom: 1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  color: var(--clr-text);
+}
+
+#hand-btn::after {
+  content: "9";
   position: absolute;
   bottom: 1px;
   right: -1px;

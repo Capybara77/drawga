@@ -220,6 +220,34 @@ describe("allObjects store: черновики (temp)", () => {
     expect(store.previews).not.toBe(before);
   });
 
+  it("receiveTemp принимает черновик перемещения (tempObj) для объекта на доске", () => {
+    store.receive(obj("A"));
+
+    store.receiveTemp({ objId: "A", tempObj: true } as BaseObject);
+
+    expect(ids(store.previews)).toEqual(["A"]);
+    expect(ids(store.objects)).toEqual(["A"]);
+  });
+
+  it("replace заменяет объекты одной записью, undo и redo отдают обратную замену", () => {
+    const before = [{ objId: "A", color: "old" }, { objId: "B", color: "old" }] as BaseObject[];
+    const after = [{ objId: "A", color: "new" }, { objId: "B", color: "new" }] as BaseObject[];
+    store.add(before[0]);
+    store.add(before[1]);
+    store.add(obj("C"));
+
+    store.replace(before, after);
+    expect(ids(store.objects)).toEqual(["C", "A", "B"]);
+    expect(store.objects.at(-1)?.color).toBe("new");
+
+    expect(store.undo()).toEqual({ type: "replace", before: after, after: before });
+    expect(ids(store.objects)).toEqual(["C", "A", "B"]);
+    expect(store.objects.at(-1)?.color).toBe("old");
+
+    expect(store.redo()).toEqual({ type: "replace", before, after });
+    expect(store.objects.at(-1)?.color).toBe("new");
+  });
+
   it("receiveTemp должен игнорировать объект, если фигура с таким objId уже лежит в objects", () => {
     store.receive(obj("A"));
 
