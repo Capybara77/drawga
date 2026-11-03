@@ -1,23 +1,14 @@
 <script setup lang="ts">
-import CursorContainer from "./components/CursorContainer.vue";
-import OptionsContainer from "./components/OptionsContainer.vue";
-import SettingsContainer from "./components/SettingsContainer.vue";
-import ZoomContainer from "./components/ZoomContainer.vue";
-import CanvasContainer from "./components/CanvasContainer.vue";
-import { WebSocketService } from "./services/webSocketService";
-import UndoRedoContainer from "./components/UndoRedoContainer.vue";
 import UApp from "@nuxt/ui/components/App.vue";
+import { useColorMode } from "@vueuse/core";
+import { RouterView } from "vue-router";
 
-const socket = new WebSocketService();
+// тема применяется на всех страницах, а переключатель живёт в меню доски
+useColorMode({ attribute: "class", initialValue: "auto" });
 </script>
 
 <template>
   <UApp>
-    <CursorContainer />
-    <OptionsContainer />
-    <ZoomContainer />
-    <SettingsContainer :socket="socket" />
-    <CanvasContainer :socket="socket" />
-    <UndoRedoContainer />
+    <RouterView />
   </UApp>
 </template>

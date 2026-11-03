@@ -7,7 +7,7 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 builder.Services.AddSingleton<DataContext>();
 builder.Services.AddSingleton<AccountService>();
 
@@ -15,9 +15,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 {
     options.Cookie.MaxAge = new TimeSpan(365, 0, 0, 0);
     options.ExpireTimeSpan = new TimeSpan(365, 0, 0, 0);
-    options.AccessDeniedPath = "/login/noaccess";
     options.LoginPath = "/login";
-    options.LogoutPath = "/login/logout";
 });
 
 var app = builder.Build();
@@ -52,12 +50,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-    endpoints.MapDefaultControllerRoute());
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints => endpoints.MapControllers());
 
 if (app.Environment.IsDevelopment())
 {
@@ -74,7 +67,10 @@ app.Use(GetVueMain);
 
 async Task GetVueMain(HttpContext context, RequestDelegate arg2)
 {
-    if (context.Request.Path != "/draw")
+    // страницы, которыми заправляет vue-router
+    string[] vuePages = ["/", "/login", "/register", "/home", "/draw"];
+
+    if (!vuePages.Contains(context.Request.Path.Value))
     {
         context.Response.StatusCode = StatusCodes.Status404NotFound;
         return;

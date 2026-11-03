@@ -65,10 +65,10 @@ const items = computed<DropdownMenuItem[][]>(() => [
   ],
   [
     {
-      label: "Профиль",
-      icon: "i-heroicons-user",
-      kbds: ["ctrl", "U"],
-      onSelect: () => location.replace("/login"),
+      label: "На главную",
+      icon: "i-heroicons-home",
+      to: "/",
+      external: true,
     },
     {
       label: "Сохранить файл",
