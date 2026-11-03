@@ -6,9 +6,9 @@ namespace Drawga.Services
     public class BoardManager
     {
         private string PathToSaves { get; } = "saves";
-        private IDictionary<int, List<byte[]>> Boards { get; }
+        private IDictionary<string, List<byte[]>> Boards { get; }
 
-        public BoardManager(IDictionary<int, List<byte[]>> boards)
+        public BoardManager(IDictionary<string, List<byte[]>> boards)
         {
             Boards = boards;
 
@@ -19,7 +19,7 @@ namespace Drawga.Services
         }
 
 
-        public void SaveBoard(int id, string fileName)
+        public void SaveBoard(string id, string fileName)
         {
             if (!Boards.ContainsKey(id))
             {
@@ -34,7 +34,7 @@ namespace Drawga.Services
             File.WriteAllText(pathToFile, JsonConvert.SerializeObject(Boards[id]));
         }
 
-        public void LoadBoard(int id, string fileName)
+        public void LoadBoard(string id, string fileName)
         {
             var pathToFile = $"{PathToSaves}/{fileName}";
 

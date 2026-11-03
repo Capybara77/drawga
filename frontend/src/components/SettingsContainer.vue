@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WebSocketService } from "@/services/webSocketService";
-import { useColorMode, type BasicColorSchema } from "@vueuse/core";
+import { useClipboard, useColorMode, type BasicColorSchema } from "@vueuse/core";
 import { computed, ref } from "vue";
 import type { DropdownMenuItem } from "@nuxt/ui";
 import UDropdownMenu from "@nuxt/ui/components/DropdownMenu.vue";
@@ -8,6 +8,7 @@ import UButton from "@nuxt/ui/components/Button.vue";
 import UModal from "@nuxt/ui/components/Modal.vue";
 import { useAllObjectsStore } from "@/stores/allObjects";
 import { clearMessage } from "@/utils/socketMessages/socketMessages";
+import { useToast } from "@nuxt/ui/composables/useToast";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -19,6 +20,8 @@ const { store, system } = useColorMode({
 });
 
 const allObjectsStore = useAllObjectsStore();
+const toast = useToast();
+const { copy } = useClipboard({ legacy: true });
 
 const isConfirmOpen = ref(false);
 
@@ -36,12 +39,30 @@ function clearBoard() {
   isConfirmOpen.value = false;
 }
 
+async function copyBoardLink() {
+  await copy(location.href);
+  toast.add({ title: "Ссылка скопирована", description: "Отправь её тем, с кем рисуешь" });
+}
+
 function openConfirmModal() {
   isConfirmOpen.value = true;
 }
 
 // computed, а не ref: иконка темы и галочка в подменю меняются вместе с режимом
 const items = computed<DropdownMenuItem[][]>(() => [
+  [
+    {
+      label: "Новая доска",
+      icon: "i-heroicons-plus",
+      to: "/draw/new",
+      external: true,
+    },
+    {
+      label: "Скопировать ссылку",
+      icon: "i-heroicons-link",
+      onSelect: copyBoardLink,
+    },
+  ],
   [
     {
       label: "Профиль",

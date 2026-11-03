@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Drawga.Data;
+using Drawga.Draw;
 using Drawga.Services;
 using Microsoft.Extensions.FileProviders;
 
@@ -32,6 +33,18 @@ app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Environment.CurrentDirectory, "dist")),
+});
+
+// без id или с кривым id сразу заводим новую доску
+app.Use((context, next) =>
+{
+    if (context.Request.Path == "/draw" && !BoardIds.IsValid(context.Request.Query["id"]))
+    {
+        context.Response.Redirect("/draw/new");
+        return Task.CompletedTask;
+    }
+
+    return next();
 });
 
 app.UseRouting();

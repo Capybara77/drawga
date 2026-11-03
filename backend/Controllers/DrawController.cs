@@ -14,8 +14,8 @@ public class DrawController : Controller, IDisposable
 
     private readonly DrawState _state = DrawState.Instance;
 
-    public event Func<WebSocket, int, Task>? ClientDisconnectAsync;
-    public event Func<WebSocket, int, Task>? ClientConnectedAsync;
+    public event Func<WebSocket, string, Task>? ClientDisconnectAsync;
+    public event Func<WebSocket, string, Task>? ClientConnectedAsync;
 
     private bool _disposed;
 
@@ -26,11 +26,20 @@ public class DrawController : Controller, IDisposable
         ClientConnectedAsync += OnClientConnectedAsync;
     }
 
+    [Route("/draw/new")]
+    public IActionResult NewBoard() => Redirect($"/draw?id={BoardIds.New()}");
+
     [Route("/draw/ws")]
-    public async Task StartSocketDraw(int id)
+    public async Task StartSocketDraw(string? id)
     {
         if (!HttpContext.WebSockets.IsWebSocketRequest)
         {
+            return;
+        }
+
+        if (!BoardIds.IsValid(id))
+        {
+            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
 
@@ -132,21 +141,21 @@ public class DrawController : Controller, IDisposable
         return result;
     }
 
-    private async Task OnClientConnectedAsync(WebSocket socket, int id)
+    private async Task OnClientConnectedAsync(WebSocket socket, string id)
     {
         var msg = FormatMessage("message", "Пользователь подключился");
 
         await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
     }
 
-    private async Task EventForClientDisconnectAsync(WebSocket socket, int id)
+    private async Task EventForClientDisconnectAsync(WebSocket socket, string id)
     {
         var msg = FormatMessage("disconnect", "");
 
         await SendData(socket, Encoding.UTF8.GetBytes(msg), id);
     }
 
-    private Task SaveBoard(WebSocket client, int boardId)
+    private Task SaveBoard(WebSocket client, string boardId)
     {
         if (_state.Sockets.TryGetValue(boardId, out var sockets))
         {
@@ -162,7 +171,7 @@ public class DrawController : Controller, IDisposable
         return Task.CompletedTask;
     }
 
-    private void SaveHistory(int boardId)
+    private void SaveHistory(string boardId)
     {
         var history = _state.History[boardId];
 
@@ -172,7 +181,7 @@ public class DrawController : Controller, IDisposable
         }
     }
 
-    private Task DeleteHistory(byte[] buffer, int id, WebSocket socket)
+    private Task DeleteHistory(byte[] buffer, string id, WebSocket socket)
     {
         var message = Encoding.UTF8.GetString(buffer);
         var parts = message.Split(Separator);
@@ -194,7 +203,7 @@ public class DrawController : Controller, IDisposable
         return Task.CompletedTask;
     }
 
-    private void AddToHistory(byte[] buffer, int id)
+    private void AddToHistory(byte[] buffer, string id)
     {
         var message = Encoding.UTF8.GetString(buffer);
 
@@ -219,7 +228,7 @@ public class DrawController : Controller, IDisposable
         }
     }
 
-    private async Task SendData(WebSocket socketSender, byte[] buffer, int id)
+    private async Task SendData(WebSocket socketSender, byte[] buffer, string id)
     {
         var sockets = _state.Sockets[id];
         WebSocket[] clients;
