@@ -22,6 +22,7 @@ COPY --from=build /publish ./
 
 # база и сохранения досок живут в volume /app/data и /app/saves
 ENV ConnectionStrings__Default="Data Source=/app/data/data.db"
+ENV DataProtection__KeysPath="/app/data/keys"
 RUN mkdir -p /app/data /app/saves
 
 EXPOSE 8080

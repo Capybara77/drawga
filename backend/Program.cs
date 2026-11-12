@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Drawga.Data;
 using Drawga.Draw;
 using Drawga.Services;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +20,26 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.LoginPath = "/login";
 });
 
+// ключи шифруют куку входа; без папки они живут внутри контейнера и после деплоя всех разлогинивает
+var keysPath = builder.Configuration["DataProtection:KeysPath"];
+if (!string.IsNullOrEmpty(keysPath))
+{
+    builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+}
+
+// ponytail: доверяем X-Forwarded-For от любого адреса — наружу порт приложения не торчит, только Caddy
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+builder.Services.AddRateLimiter(AuthRateLimit.Configure);
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // ponytail: миграций в репо нет — на пустой базе (свежий volume на сервере) просто создаём схему
 app.Services.GetRequiredService<DataContext>().Database.EnsureCreated();
@@ -46,6 +67,8 @@ app.Use((context, next) =>
 });
 
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

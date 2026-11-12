@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CanvasContainer from "@/components/CanvasContainer.vue";
+import ConnectionStatus from "@/components/ConnectionStatus.vue";
 import CursorContainer from "@/components/CursorContainer.vue";
 import OptionsContainer from "@/components/OptionsContainer.vue";
 import SettingsContainer from "@/components/SettingsContainer.vue";
@@ -23,4 +24,5 @@ if (boardId) {
   <SettingsContainer :socket="socket" />
   <CanvasContainer :socket="socket" />
   <UndoRedoContainer />
+  <ConnectionStatus :socket="socket" />
 </template>

@@ -41,11 +41,7 @@ import { toBoard } from "@/utils/toBoard/toBoard";
 import { cursorMessage, drawMessage, tempMessage } from "@/utils/socketMessages/socketMessages";
 import { isPanStart, usePan } from "@/composables/usePan";
 import { useSelection } from "@/composables/useSelection";
-import {
-  drawMarquee,
-  drawObjectOutline,
-  drawSelectionBox,
-} from "@/utils/selection/selection";
+import { drawMarquee, drawObjectOutline, drawSelectionBox } from "@/utils/selection/selection";
 
 const { socket } = defineProps<{
   socket: WebSocketService;
@@ -148,8 +144,10 @@ allObjectsStore.$onAction(({ name, after }) => {
   }
 });
 
-const handleClose = (event: CustomEvent) => {
-  console.log("Соединение закрыто", event.detail);
+// сервер сейчас пришлёт доску заново целиком: без очистки всё задвоится
+const handleReconnect = () => {
+  selection.deselect();
+  allObjectsStore.resetFromServer();
 };
 
 const handleMessage = (event: CustomEvent) => {
@@ -221,7 +219,7 @@ const createWindowListeners = () => {
 const createSocketConnection = () => {
   useEventListener(socket, "move", handleMove);
   useEventListener(socket, "clear", handleClear);
-  useEventListener(socket, "close", handleClose);
+  useEventListener(socket, "reconnect", handleReconnect);
   useEventListener(socket, "message", handleMessage);
   useEventListener(socket, "drawObj", handleDraw);
   useEventListener(socket, "cur", handleCur);
@@ -772,7 +770,8 @@ const onCanvasPointerMove = (event: PointerEvent) => {
 const onKeyDown = (event: KeyboardEvent) => {
   // event.preventDefault();
 
-  if (isTyping(event)) {
+  // без связи доска закрыта плашкой, а клавиши до неё не доходят — отсекаем тут
+  if (isTyping(event) || !socket.online) {
     return;
   }
 
