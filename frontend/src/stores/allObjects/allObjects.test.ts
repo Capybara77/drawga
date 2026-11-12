@@ -230,8 +230,14 @@ describe("allObjects store: черновики (temp)", () => {
   });
 
   it("replace заменяет объекты одной записью, undo и redo отдают обратную замену", () => {
-    const before = [{ objId: "A", color: "old" }, { objId: "B", color: "old" }] as BaseObject[];
-    const after = [{ objId: "A", color: "new" }, { objId: "B", color: "new" }] as BaseObject[];
+    const before = [
+      { objId: "A", color: "old" },
+      { objId: "B", color: "old" },
+    ] as BaseObject[];
+    const after = [
+      { objId: "A", color: "new" },
+      { objId: "B", color: "new" },
+    ] as BaseObject[];
     store.add(before[0]);
     store.add(before[1]);
     store.add(obj("C"));
@@ -255,5 +261,16 @@ describe("allObjects store: черновики (temp)", () => {
 
     expect(ids(store.objects)).toEqual(["A"]);
     expect(ids(store.previews)).toEqual([]);
+  });
+
+  it("resetFromServer очищает доску и черновики, но оставляет историю undo", () => {
+    store.add(obj("A"));
+    store.receiveTemp(obj("B"));
+
+    store.resetFromServer();
+
+    expect(store.objects).toEqual([]);
+    expect(store.previews).toEqual([]);
+    expect(store.canUndo).toBe(true);
   });
 });

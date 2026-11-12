@@ -45,6 +45,12 @@ export const useAllObjectsStore = defineStore("allObjects", {
     receiveRemove(toRemove: string[]) {
       this.objects = this.objects.filter((o) => !toRemove.includes(o.objId));
     },
+    // после переподключения сервер присылает доску заново целиком.
+    // ponytail: undo/redo оставляем, они держатся за objId, а он у объектов тот же
+    resetFromServer() {
+      this.objects = [];
+      this.previews = [];
+    },
     clear() {
       this.undoStack.push({ type: "remove", objects: this.objects });
       this.objects = [];
