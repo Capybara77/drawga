@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { createPinia, setActivePinia } from "pinia";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { guard, routes } from "./index";
+import { guard, reloadOnStaleChunk, routes } from "./index";
 
 const stub = { template: "<div />" };
 
@@ -70,5 +70,55 @@ describe("router guard", () => {
 
   it("неизвестный адрес ведёт на лендос", async () => {
     expect(await visit("/nope")).toBe("/");
+  });
+});
+
+// после деплоя у вкладки со старой сборкой нет файлов страниц: переход падает молча
+describe("reloadOnStaleChunk", () => {
+  const goHome = async (error: Error) => {
+    const assign = vi.fn();
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: "/", component: stub },
+        { path: "/home", component: () => Promise.reject(error) },
+      ],
+    });
+
+    router.onError((err, to, from) => reloadOnStaleChunk(err, to, from, assign));
+    await router.push("/").catch(() => {});
+    await router.push("/home").catch(() => {});
+
+    return assign;
+  };
+
+  it.each([
+    "Failed to fetch dynamically imported module: https://x/assets/HomeView-old.js",
+    "Importing a module script failed.",
+    "error loading dynamically imported module",
+  ])("файл страницы не загрузился — открываем адрес заново: %s", async (message) => {
+    expect(await goHome(new TypeError(message))).toHaveBeenCalledWith("/home");
+  });
+
+  it("первый переход после загрузки не перезагружает — иначе страница перезагружалась бы по кругу", async () => {
+    const assign = vi.fn();
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: "/home",
+          component: () => Promise.reject(new TypeError("Importing a module script failed.")),
+        },
+      ],
+    });
+
+    router.onError((err, to, from) => reloadOnStaleChunk(err, to, from, assign));
+    await router.push("/home").catch(() => {});
+
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("обычную ошибку не трогает", async () => {
+    expect(await goHome(new Error("boom"))).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,5 @@
 import {
+  START_LOCATION,
   createRouter,
   createWebHistory,
   type RouteLocationNormalized,
@@ -46,6 +47,24 @@ export const guard = async (to: RouteLocationNormalized) => {
   return true;
 };
 
+// сообщения Chrome, Safari и Firefox, когда import() не нашёл файл
+const STALE_CHUNK = /dynamically imported module|Importing a module script failed/;
+
+// вкладка открыта со старой сборки, а после деплоя файлов страниц с такими именами уже нет:
+// грузим адрес целиком, сервер отдаст свежий index.html.
+// Первый переход после загрузки не трогаем: сборка и так свежая, а перезагрузка пошла бы по кругу
+export const reloadOnStaleChunk = (
+  error: Error,
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  assign: (url: string) => void = (url) => window.location.assign(url),
+) => {
+  if (from !== START_LOCATION && STALE_CHUNK.test(error.message)) {
+    assign(to.fullPath);
+  }
+};
+
 export const router = createRouter({ history: createWebHistory(), routes });
 
 router.beforeEach(guard);
+router.onError((error, to, from) => reloadOnStaleChunk(error, to, from));
